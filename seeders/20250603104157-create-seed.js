@@ -11,8 +11,18 @@ module.exports = {
       id: uuidv4(),
       name: 'Mario Rossi',
       email: 'mario@example.com',
-      password: 'hashedpassword', // NON plaintext, qui è solo demo
+      password: 'mario', // NON plaintext, qui è solo demo
       role: 'operatore',
+      tokens: 50,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    }, 
+    {
+      id: uuidv4(),
+      name: 'Luigi Bianchi',
+      email: 'luigi@example.com',
+      password: 'luigi', 
+      role: 'automobilista',
       tokens: 50,
       createdAt: new Date(),
       updatedAt: new Date()
