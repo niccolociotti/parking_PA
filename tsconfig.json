@@ -18,7 +18,7 @@
   },
   "include": [
     "src/**/*.ts"  // Includi tutti i file TypeScript nella cartella src/
-, "src/services/authService.ts", "src/database/config.js"  ],
+, "src/services/authService.ts", "src/config/config.js", "src/database/migration/create-migration.js"  ],
   "exclude": [
     "node_modules" ,"dist" // Escludi la cartella node_modules
   ]

@@ -1,9 +1,9 @@
 import { Router } from "express";
-import { UserController } from "../controllers/UserController";
-import { UserService } from "../services/UserService";
+//import { UserController } from "../controllers/UserController";
+//import { UserService } from "../services/UserService";
 //import { UserRepository } from "../repositories/UserRepository";
-import { UserDAO } from "../dao/UserDAO";
-
+//import { UserDAO } from "../dao/UserDAO";
+/*
 const router = Router();
 
 const userDAO = new UserDAO();
@@ -15,4 +15,4 @@ router.post("/users", userController.create);
 //router.get("/users/:id", userController.get);
 router.delete("/users/:id", userController.delete);
 
-export default router;
+export default router;*/

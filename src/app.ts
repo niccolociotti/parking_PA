@@ -1,6 +1,6 @@
 import express, { Request, Response } from 'express';
 import dotenv from 'dotenv';
-import UserRoutes from "./routes/UserRoutes";
+//import UserRoutes from "./routes/UserRoutes";
 import authRoutes from "./routes/authRoutes";
 import errorHandler from './helpers/errorHandler';
 import { syncModels } from './database/sync';
@@ -15,7 +15,7 @@ const app = express();
 // Middleware per il parsing dei body JSON
 app.use(express.json());
 
-app.use("/api", UserRoutes);
+//app.use("/api", UserRoutes);
 
 
 app.use('/auth', authRoutes);

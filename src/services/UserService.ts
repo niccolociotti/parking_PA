@@ -1,7 +1,7 @@
-import { UserDAO } from "../dao/UserDAO";
+
 import { User } from "../models/User";
 import { randomUUID } from "crypto";
-
+/*
 export class UserService {
   constructor(private userDAO: UserDAO) {}
 
@@ -24,3 +24,4 @@ export class UserService {
   }
   
 }
+*/
