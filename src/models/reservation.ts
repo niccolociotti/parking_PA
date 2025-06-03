@@ -7,7 +7,8 @@ export class Reservation extends Model<InferAttributes<Reservation>, InferCreati
   declare id: string;
   declare status: string;
   declare userId: string;      
-  declare parkingId: string;   
+  declare parkingId: string;
+  declare licenseplate: string   
 }
 
 Reservation.init(
@@ -18,6 +19,10 @@ Reservation.init(
       defaultValue: DataTypes.UUIDV4,
     },
     status: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    licenseplate: {
       type: DataTypes.STRING,
       allowNull: false,
     },

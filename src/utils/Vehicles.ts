@@ -1,6 +1,6 @@
     export enum Vehicles {
-    MOTO,
-    AUTO,
-    CARAVAN,
-    CAMION
+    MOTO ='moto',
+    AUTO = 'auto ',
+    CARAVAN = 'caravan',
+    CAMION = 'camion',
 }

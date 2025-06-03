@@ -1,4 +1,4 @@
 export enum Roles {
-  OPERATORE,
-  AUTOMOBILISTA
+  OPERATORE = 'operatore',
+  AUTOMOBILISTA = 'automobilista',
 }
