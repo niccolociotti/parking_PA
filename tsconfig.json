@@ -1,0 +1,25 @@
+{
+  "compilerOptions": {
+    "target": "ES6",                          // Compila per la versione ES6
+    "module": "commonjs",                     // Usa CommonJS per il modulo
+    "outDir": "./dist",                       // Cartella di output per i file compilati
+    "rootDir": "./src",                       // Cartella sorgente dei file TypeScript
+    "esModuleInterop": true,                  // Permette di importare moduli CommonJS come ES6
+    "strict": true,                           // Abilita tutte le opzioni di controllo rigoroso
+    "skipLibCheck": true,                     // Salta il controllo delle definizioni dei tipi
+    "forceConsistentCasingInFileNames": true, // Forza il casing consistente nei nomi dei file
+    "resolveJsonModule": true,                // Permette di importare file JSON come moduli
+    "moduleResolution": "node",               // Risoluzione dei moduli compatibile con Node.js
+    "noImplicitAny": true,                    // Evita l'uso di 'any' implicito
+    "noEmitOnError": true,                    // Non emette i file compilati se ci sono errori
+    "declaration": true,                      // Crea file di dichiarazione .d.ts (utile se vuoi usare il codice come libreria)
+    "skipDefaultLibCheck": true,               // Salta il controllo delle librerie di default
+    "typeRoots": ["./node_modules/@types", "./src/@types"]
+  },
+  "include": [
+    "src/**/*.ts"  // Includi tutti i file TypeScript nella cartella src/
+, "src/services/authService.ts", "src/database/config.js"  ],
+  "exclude": [
+    "node_modules" ,"dist" // Escludi la cartella node_modules
+  ]
+}
