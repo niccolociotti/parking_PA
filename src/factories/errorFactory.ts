@@ -28,9 +28,10 @@ class ErrorFactory {
     return this.createError(message, StatusCodes.FORBIDDEN);
   }
 
-  static notFound(message = "Not Found"): CustomError {
-    return this.createError(message, StatusCodes.NOT_FOUND);
-  }
+  static entityNotFound(entity: string): CustomError {
+  return this.createError(`${entity} not found`, StatusCodes.NOT_FOUND);
+}
+
 }
 
 export { CustomError, ErrorFactory };

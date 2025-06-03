@@ -6,7 +6,7 @@ module.exports = {
     await queryInterface.createTable('Users', {
       id: { type: Sequelize.UUID, primaryKey: true, defaultValue: Sequelize.UUIDV4 },
       name: { type: Sequelize.STRING, allowNull: false },
-      email: { type: Sequelize.STRING, allowNull: false, unique: true },
+      email: { type: Sequelize.STRING, allowNull: false},
       password: { type: Sequelize.STRING, allowNull: false },
       role: { type: Sequelize.STRING, allowNull: false },
       tokens: { type: Sequelize.INTEGER, allowNull: false, defaultValue: 0 },
@@ -52,7 +52,7 @@ module.exports = {
         onUpdate: 'CASCADE',
         onDelete: 'CASCADE',
       },
-      parkingCapacityId: {
+      parkingId: {
         type: Sequelize.UUID,
         allowNull: false,
         references: { model: 'ParkingCapacities', key: 'id' },
@@ -65,9 +65,58 @@ module.exports = {
       createdAt: { type: Sequelize.DATE, allowNull: false },
       updatedAt: { type: Sequelize.DATE, allowNull: false }
     });
+
+    // FINE
+
+    await queryInterface.createTable('Fines', {
+      id: {
+        type: Sequelize.UUID,
+        primaryKey: true,
+        defaultValue: Sequelize.lUUIDV4,
+        allowNull: false,
+      },
+      price: {
+        type: Sequelize.FLOAT,
+        allowNull: false,
+      },
+      licensePlate: {
+        type: Sequelize.STRING,
+        allowNull: false,
+      },
+      parkingId: {
+        type: Sequelize.UUID,
+        allowNull: false,
+        references: {
+          model: 'Parkings',
+          key: 'id'
+        },
+        onUpdate: 'CASCADE',
+        onDelete: 'CASCADE'
+      },
+      violationTime: {
+        type: Sequelize.DATE,
+        allowNull: false,
+      },
+      reason: {
+        type: Sequelize.STRING,
+        allowNull: false
+      },
+      createdAt: {
+        allowNull: false,
+        type: Sequelize.DATE,
+        defaultValue: Sequelize.literal('CURRENT_TIMESTAMP'),
+      },
+      updatedAt: {
+        allowNull: false,
+        type: Sequelize.DATE,
+        defaultValue: Sequelize.literal('CURRENT_TIMESTAMP'),
+      }
+    });
+
   },
 
   down: async (queryInterface, Sequelize) => {
+    await queryInterface.dropTable('Fines');
     await queryInterface.dropTable('Reservations');
     await queryInterface.dropTable('ParkingCapacities');
     await queryInterface.dropTable('Parkings');

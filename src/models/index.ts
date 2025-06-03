@@ -1,4 +1,4 @@
-import { User } from './User';
+import { User } from './user';
 import { Parking } from './parking';
 import { ParkingCapacity } from './parkingCapacity';
 import { Reservation } from './reservation';

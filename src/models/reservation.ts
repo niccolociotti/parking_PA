@@ -1,14 +1,18 @@
 import { DataTypes, Model, InferAttributes, InferCreationAttributes } from 'sequelize';
 import DatabaseConnection from '../database/databaseConnection';
+export type ReservationCreationAttributes = InferCreationAttributes<Reservation>;
+
 
 const sequelize = DatabaseConnection.getInstance();
 
 export class Reservation extends Model<InferAttributes<Reservation>, InferCreationAttributes<Reservation>> {
   declare id: string;
-  declare status: string;
+  declare status?: string;
   declare userId: string;      
   declare parkingId: string;
-  declare licenseplate: string   
+  declare licensePlate: string
+  declare startTime: Date;
+  declare endTime: Date;
 }
 
 Reservation.init(
@@ -22,7 +26,7 @@ Reservation.init(
       type: DataTypes.STRING,
       allowNull: false,
     },
-    licenseplate: {
+    licensePlate: {
       type: DataTypes.STRING,
       allowNull: false,
     },
@@ -42,8 +46,16 @@ Reservation.init(
         key: 'id',
       },
     },
+    startTime: {
+      type: DataTypes.DATE,
+      allowNull: false, 
   },
-  { sequelize, modelName: 'Reservation', timestamps: true }
+  endTime: {
+      type: DataTypes.DATE,
+      allowNull: false,
+  },  
+},
+  { sequelize, tableName: 'Reservations', timestamps: true }
 );
 
 export default Reservation;
