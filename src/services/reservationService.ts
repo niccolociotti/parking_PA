@@ -79,4 +79,12 @@ export class ReservationService {
     return reservations;
   }  
 
+  async getReservationsByPlatesPeriod(plates: string[], startTime: Date, endTime: Date): Promise<Reservation[]> {
+    const reservations = await this.reservationDAO.findByPlatesAndPeriod(plates, startTime, endTime);
+    if (!reservations) {
+      throw ErrorFactory.entityNotFound('Reservations');
+    } 
+    return reservations
+  }
+
 }

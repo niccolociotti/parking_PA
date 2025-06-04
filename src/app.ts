@@ -5,6 +5,7 @@ import authRoutes from "./routes/authRoutes";
 import fineRoutes from "./routes/fineRoutes";
 import parkingRoutes from "./routes/ParkingRoutes";
 import { errorMiddleware } from './middleware/errorMiddleware';
+import operatorRoutes from "./routes/operatorRoutes";
 
 dotenv.config();
 
@@ -15,6 +16,7 @@ const app = express();
 app.use(express.json());
 
 app.use('', authRoutes);
+app.use('/operator', operatorRoutes);
 app.use("/api", reservationRoutes);
 app.use("/check", fineRoutes);
 app.use('/park',parkingRoutes)

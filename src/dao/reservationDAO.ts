@@ -69,4 +69,27 @@ export class ReservationDAO implements ReservationDAOInterface {
     });
   }
 
+  async findByPlatesAndPeriod( plates: string[], startTime: Date, endTime: Date, parkingIds?: string[]): Promise<Reservation[]> {
+    const whereClause: any = {
+      licensePlate: { [Op.in]: plates },
+      // prendo solo prenotazioni PENDING o CONFIRMED (se vuoi includere anche altre, elimina questo filtro)
+      status: { [Op.in]: [Status.PENDING, Status.CONFIRMED] },
+      // condizione di overlap
+      [Op.not]: [
+        { endTime:   { [Op.lt]: startTime } },  // fine prenotazione precedente < mio inizio → non overlap
+        { startTime: { [Op.gt]: endTime   } },  // inizio prenotazione precedente > mio fine → non overlap
+      ],
+    };
+    
+    if (parkingIds && parkingIds.length > 0) {
+      whereClause.parkingId = { [Op.in]: parkingIds };
+    }
+
+    return Reservation.findAll({
+      where: whereClause,
+      order: [['startTime', 'ASC']],
+      // include: se vuoi caricare dati correlati (es. utente, parcheggio), aggiungi qui
+    });
+  }
+
 }
