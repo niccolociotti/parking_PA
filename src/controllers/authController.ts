@@ -8,10 +8,7 @@ export class AuthController {
   login = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const { email, password } = req.body;
-      const token = await this.authService.login(email,password); 
-      if (!token) {
-        res.status(StatusCodes.UNAUTHORIZED).json({ message: 'Invalid credentials' });
-      }    
+      const token = await this.authService.login(email,password);  
       res.status(StatusCodes.OK).json({ token, message: 'Login successful' });
     } catch (error) {
       next(error);

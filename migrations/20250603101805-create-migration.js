@@ -63,7 +63,12 @@ module.exports = {
       startTime: { type: Sequelize.DATE, allowNull: false },
       endTime: { type: Sequelize.DATE, allowNull: false },
       createdAt: { type: Sequelize.DATE, allowNull: false },
-      updatedAt: { type: Sequelize.DATE, allowNull: false }
+      updatedAt: { type: Sequelize.DATE, allowNull: false },
+      paymentAttemps : {
+        type: Sequelize.INTEGER, 
+        allowNull: false,
+        defaultValue: 0
+      }
     });
 
     // FINE

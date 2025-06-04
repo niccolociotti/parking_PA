@@ -13,7 +13,7 @@ module.exports = {
       id: userId,
       name: 'Mario Rossi',
       email: 'marioo@example.com',
-      password: 'mario', // NON plaintext, qui è solo demo
+      password: 'mario', 
       role: 'operatore',
       tokens: 50,
       createdAt: new Date(),

@@ -1,4 +1,3 @@
-import { IDAOBaseInterface } from "./BaseDAO";
 import { Parking } from "../models/parking";
 import { InferCreationAttributes } from "sequelize/types/model";
 

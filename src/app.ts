@@ -3,6 +3,7 @@ import dotenv from 'dotenv';
 import reservationRoutes from "./routes/reservationRoutes";
 import authRoutes from "./routes/authRoutes";
 import fineRoutes from "./routes/fineRoutes";
+import parkingRoutes from "./routes/ParkingRoutes";
 import { errorMiddleware } from './middleware/errorMiddleware';
 
 dotenv.config();
@@ -16,6 +17,7 @@ app.use(express.json());
 app.use('', authRoutes);
 app.use("/api", reservationRoutes);
 app.use("/check", fineRoutes);
+app.use('/park',parkingRoutes)
 
 app.use(errorMiddleware);
 

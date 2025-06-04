@@ -11,6 +11,7 @@ export class Reservation extends Model<InferAttributes<Reservation>, InferCreati
   declare userId: string;      
   declare parkingId: string;
   declare licensePlate: string
+  declare paymentAttemps: number
   declare startTime: Date;
   declare endTime: Date;
 }
@@ -29,6 +30,11 @@ Reservation.init(
     licensePlate: {
       type: DataTypes.STRING,
       allowNull: false,
+    },
+    paymentAttemps: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      defaultValue: 0,
     },
     userId: {
       type: DataTypes.UUID,

@@ -10,8 +10,8 @@ export class ParkingService {
     return this.parkingDao.findAll();
   } 
 
-  async create(name: string, address: string, closedDate: Date): Promise<Parking> {
-  if (!name || !address || !closedDate) {
+  async create(name: string, address: string, closedData: Date): Promise<Parking> {
+  if (!name || !address || !closedData) {
     throw new Error("Invalid parking data");
   }
 
@@ -19,7 +19,7 @@ export class ParkingService {
     id: randomUUID(),
     name,
     address,
-    closedDate,
+    closedData,
   } as InferCreationAttributes<Parking>);
 }
 
@@ -32,14 +32,14 @@ export class ParkingService {
     return this.parkingDao.findById(id);
   }
 
-  async update(id: string, name: string, address: string, closedDate: Date): Promise<Parking | null> {
+  async update(id: string, name: string, address: string, closedData: Date): Promise<Parking | null> {
     const parking = await this.parkingDao.findById(id);
     if (!parking) {
       return null; 
     }
     parking.name = name;
     parking.address = address;
-    parking.closedDate = closedDate;
+    parking.closedData = closedData;
     return this.parkingDao.update(id,parking);
 
 }

@@ -16,6 +16,7 @@ const authService = new AuthService(userDAO);
 const authMiddleware = new AuthMiddleware(authService);
 
 router.use(authMiddleware.authenticateToken);
+router.use(authMiddleware.isUser);
 
 router.post("/reservation", reservationController.create);
 router.get("/reservations", reservationController.list);
