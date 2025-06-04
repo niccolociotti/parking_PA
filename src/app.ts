@@ -13,11 +13,9 @@ const app = express();
 // Middleware per il parsing dei body JSON
 app.use(express.json());
 
+app.use('', authRoutes);
 app.use("/api", reservationRoutes);
 app.use("/check", fineRoutes);
-
-
-app.use('/auth', authRoutes);
 
 app.use(errorMiddleware);
 

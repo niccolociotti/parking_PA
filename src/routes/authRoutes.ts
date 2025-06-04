@@ -1,17 +1,15 @@
 import { Router, Request, Response} from 'express';
 import { AuthController } from '../controllers/authController';
 import { AuthMiddleware } from '../middleware/authMiddleware';
+import { User } from '../models/user';
+import { UserDAO } from '../dao/userDAO';
+import { AuthService } from '../services/authService';
 
 const router = Router();
-const authController = new AuthController();
-const authMiddleware = new AuthMiddleware();
+const userDAO = new UserDAO();
+const authService = new AuthService(userDAO);
+const authController = new AuthController(authService);
 
 router.post('/login', authController.login);
-router.get('/verify', authMiddleware.authenticateToken, (req: Request, res: Response) => {
-  // L'utente è stato salvato nel middleware
-  const user = (req as any).user;
-  res.json( user );
-});
-
 
 export default router;

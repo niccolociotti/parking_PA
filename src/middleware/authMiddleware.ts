@@ -2,10 +2,14 @@ import { Request, Response, NextFunction } from 'express';
 import { AuthService } from '../services/authService';
 import jwt from 'jsonwebtoken';
 import { CustomError, ErrorFactory } from '../factories/errorFactory';
+import { UserDAO } from '../dao/userDAO';
 
-const authService = new AuthService();
+const userDAO = new UserDAO(); 
+const authService = new AuthService(userDAO);
 
 export class AuthMiddleware {
+constructor(private authService: AuthService) {}
+
   authenticateToken = (req: Request, res: Response, next: NextFunction) => {
   try {
     const authHeader = req.headers.authorization;
@@ -15,7 +19,7 @@ export class AuthMiddleware {
     }
 
     const token = authHeader.split(' ')[1];
-    const user = authService.verifyToken(token);
+    const user = this.authService.verifyToken(token);
     req.user = user;
 
     next();

@@ -1,14 +1,20 @@
-import { Request, Response } from 'express';
+import { NextFunction, Request, Response } from 'express';
 import { AuthService } from '../services/authService';
-import { UserPayload } from '../@types/CustomUser';
-
-const authService = new AuthService();
+import { StatusCodes } from 'http-status-codes';
 
 export class AuthController {
-  login(req: Request, res: Response) {
-    // Normalmente controllerbbe anche username/password dal req.body
-    const payload : UserPayload = { id: '1' ,name: 'Luca', role : 'admin' };
-    const token = authService.generateToken(payload);     
-    res.json({ token, expiresIn: '1h' });
+  constructor(private authService: AuthService) {}
+
+  login = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { email, password } = req.body;
+      const token = await this.authService.login(email,password); 
+      if (!token) {
+        res.status(StatusCodes.UNAUTHORIZED).json({ message: 'Invalid credentials' });
+      }    
+      res.status(StatusCodes.OK).json({ token, message: 'Login successful' });
+    } catch (error) {
+      next(error);
+    }
   }
 }
