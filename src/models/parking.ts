@@ -9,7 +9,7 @@ export class Parking extends Model<InferAttributes<Parking>, InferCreationAttrib
   declare name: string;
   declare address: string;
   declare capacity: number;
-  declare closedData: Date;
+  declare closedData: Date[];
 }
 
 Parking.init(
@@ -32,8 +32,9 @@ Parking.init(
       allowNull: false,
     },
     closedData: {
-      type: DataTypes.DATE,
+      type: DataTypes.ARRAY(DataTypes.DATE),
       allowNull: false,
+      defaultValue: [],
     }
   },
   { sequelize, modelName: 'Parking', timestamps:true }

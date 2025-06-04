@@ -20,7 +20,7 @@ const parkingCapacityService = new ParkingCapacityService(parkingCapacityDao);
 const parkingCapacityController = new ParkingCapacityController(parkingCapacityService);
 
 const reservationDAO = new ReservationDAO();
-const reservationService = new ReservationService(reservationDAO);
+const reservationService = new ReservationService(reservationDAO,parkingDao);
 const reservationController = new ReservationController(reservationService);
 
 router.get('/parcheggi', parkingController.listParking);

@@ -6,14 +6,14 @@ import { AuthMiddleware } from "../middleware/authMiddleware";
 import { AuthService } from "../services/authService";
 import { UserDAO } from "../dao/userDAO";
 import { PaymentService } from "../services/paymentService";
-import { ParkingCapacityDAO } from "../dao/parkingCapacityDAO";
+import { ParkingCapacityDao } from "../dao/parkingCapacityDAO";
 import { PaymentController } from "../controllers/paymentController";
 import { ParkingDao} from "../dao/ParkingDao";
 
 
 const router = Router();
 
-const parkingCapacityDAO = new ParkingCapacityDAO();
+const parkingCapacityDAO = new ParkingCapacityDao();
 const parkingDAO = new ParkingDao(); 
 const reservationDAO = new ReservationDAO();
 const reservationService = new ReservationService(reservationDAO,parkingDAO);

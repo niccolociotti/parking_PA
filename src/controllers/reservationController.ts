@@ -75,7 +75,7 @@ export class ReservationController {
       const updatedReservation = await this.reservationService.updateReservation(reservationId, status);
       
       if (updatedReservation) {
-        res.status(StatusCodes.OK).json(updatedReservation);
+        res.status(StatusCodes.OK).json({status: Status.CANCELED,reservation:updatedReservation});
       } else {
         throw ErrorFactory.entityNotFound("Reservation");
       }

@@ -1,6 +1,6 @@
 import { ReservationDAO } from "../dao/reservationDAO";
 import { UserDAO } from "../dao/userDAO";
-import { ParkingCapacityDAO } from "../dao/parkingCapacityDAO";
+import { ParkingCapacityDao } from "../dao/parkingCapacityDAO";
 import { ErrorFactory } from "../factories/errorFactory";
 import { Status } from "../utils/Status";
 import { StatusCodes } from "http-status-codes";
@@ -10,7 +10,7 @@ export class PaymentService {
   constructor(
     private reservationDAO: ReservationDAO,
     private userDAO: UserDAO,
-    private parkingCapacityDAO: ParkingCapacityDAO,
+    private parkingCapacityDAO: ParkingCapacityDao,
   ) {}
 
   async payReservation(reservationId: string, userId: string): Promise<Reservation> {
@@ -27,11 +27,10 @@ export class PaymentService {
     if (!user) throw ErrorFactory.entityNotFound('User');
 
    
-    const parkingCapacity = await this.parkingCapacityDAO.findByParkingAndType(reservation.parkingId, reservation.vehicle);
-    if (!parkingCapacity) throw ErrorFactory.entityNotFound('Parking');
-
+    const parking = await this.parkingCapacityDAO.findByParkingAndType(reservation.parkingId, reservation.vehicle);
+    if (!parking) throw ErrorFactory.entityNotFound('Parking');
     
-    const price = this.calculatePrice(parkingCapacity.price, reservation.startTime, reservation.endTime);
+    const price = this.calculatePrice(parking.price, reservation.startTime, reservation.endTime);
 
     if (user.tokens >= price) {
       user.tokens -= price;

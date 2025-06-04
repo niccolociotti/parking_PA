@@ -20,7 +20,7 @@ module.exports = {
       name: { type: Sequelize.STRING, allowNull: false },
       address: { type: Sequelize.STRING, allowNull: false },
       capacity: { type: Sequelize.INTEGER, allowNull: false },
-      closedData: { type: Sequelize.DATE, allowNull: false },
+      closedData: { type: Sequelize.ARRAY(Sequelize.DATE), allowNull: false },
       createdAt: { type: Sequelize.DATE, allowNull: false },
       updatedAt: { type: Sequelize.DATE, allowNull: false }
     });

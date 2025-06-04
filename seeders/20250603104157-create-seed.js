@@ -36,7 +36,10 @@ module.exports = {
       name: 'Parcheggio Centrale',
       address: 'Via Roma 1',
       capacity: 45,
-      closedData: new Date('2025-12-31'), 
+      closedData: [
+          new Date('2025-12-31'),
+          new Date('2026-01-01'), 
+      ],
       createdAt: new Date(),
       updatedAt: new Date()
     }], {});
