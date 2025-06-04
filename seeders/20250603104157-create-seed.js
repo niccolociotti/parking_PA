@@ -36,10 +36,10 @@ module.exports = {
       name: 'Parcheggio Centrale',
       address: 'Via Roma 1',
       capacity: 45,
-      closedData: [
-          new Date('2025-12-31'),
-          new Date('2026-01-01'), 
-      ],
+      closedData: Sequelize.literal(`ARRAY[
+            '2025-12-31T00:00:00.000Z'::timestamptz,
+            '2026-01-01T00:00:00.000Z'::timestamptz
+          ]`),
       createdAt: new Date(),
       updatedAt: new Date()
     }], {});

@@ -8,9 +8,9 @@ import { Op } from "sequelize";
  interface IDaoParkingCapacityInterface{
   findAll(): Promise<Parking[]>; 
   findById(id: string): Promise<ParkingCapacity | null>; 
-  findByVeicleType(id: string,vehicleType: string, startTime:Date, period: number): Promise<ParkingCapacity | null>;
-
-  findByVeicleTypeAndDayAndPeriod(id: string, vehicleType: string): Promise<ParkingCapacity | null>;  
+  //findByVeicleType(id: string,vehicleType: string, startTime:Date, period: number): Promise<ParkingCapacity | null>;
+  findByParkingAndType(id:string,vehicle: string): Promise<ParkingCapacity | null>;
+  //findByVeicleTypeAndDayAndPeriod(id: string, vehicleType: string): Promise<ParkingCapacity | null>;  
 }
 
 export class ParkingCapacityDao implements IDaoParkingCapacityInterface {
@@ -22,11 +22,11 @@ export class ParkingCapacityDao implements IDaoParkingCapacityInterface {
     return await ParkingCapacity.findByPk(id);
   }
 
-  async findByVeicleType(id: string,vehicleType: string): Promise<ParkingCapacity | null> {
-    return await ParkingCapacity.findOne({ where: { parkingId: id, vehicle } });
-  }
+  /*async findByVeicleType(id: string,vehicle: string): Promise<ParkingCapacity | null> {
+    return await ParkingCapacity.findOne({ where: { parkingId: id, vehicle: vehicle } });
+  }*/
 
-  async findByVeicleTypeAndDayAndPeriod(id: string, vehicleType: string, startTime: Date, durationHours: number): Promise<ParkingCapacity | null> {
+  /*async findByVeicleTypeAndDayAndPeriod(id: string, vehicleType: string, startTime: Date, durationHours: number): Promise<ParkingCapacity | null> {
     const capacity = await ParkingCapacity.findOne({ where: { parkingId: id, vehicle }});
     if (!capacity) {
       throw ErrorFactory.entityNotFound("Parking Capacity");
@@ -49,7 +49,7 @@ export class ParkingCapacityDao implements IDaoParkingCapacityInterface {
       price: capacity.price
     };
    
-  }
+  }*/
 
   findByParkingAndType(id:string,vehicle: string): Promise<ParkingCapacity | null>;
   async findByParkingAndType(id:string,vehicle: string): Promise<ParkingCapacity | null> {

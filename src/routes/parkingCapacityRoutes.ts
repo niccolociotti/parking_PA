@@ -23,12 +23,12 @@ const reservationDAO = new ReservationDAO();
 const reservationService = new ReservationService(reservationDAO,parkingDao);
 const reservationController = new ReservationController(reservationService);
 
-router.get('/parcheggi', parkingController.listParking);
+/*router.get('/parcheggi', parkingController.listParking);
 router.get('/parcheggio/:id', parkingController.getParking);
 router.get('/posti/:id/:vehicleType' , parkingCapacityController.getParkingCapacityByIdAndVehicle);
 
 router.get("/prenotazioni", reservationController.list);
 
 router.get('/parcheggi/:id/:vehicleType/:data/:period', parkingCapacityController.getParkingCapacityByIdAndVehicleAndDayAndPeriod);           
-
+*/
 export default router;

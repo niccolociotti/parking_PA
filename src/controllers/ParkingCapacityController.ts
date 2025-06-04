@@ -6,7 +6,7 @@ import { ParkingCapacityService } from "../services/parkingCapacityService";
 export class ParkingCapacityController {
 constructor(private parkingCapacityService: ParkingCapacityService) {}
 
-   getParkingCapacityByIdAndVehicle = async (req: Request, res: Response, next: NextFunction) => {
+   /*getParkingCapacityByIdAndVehicle = async (req: Request, res: Response, next: NextFunction) => {
      try {
        const parkingId = req.params.id;
        const vehicleType = req.params.vehicleType;
@@ -41,6 +41,7 @@ constructor(private parkingCapacityService: ParkingCapacityService) {}
        next(error);
      }
    }
+   */
 
 
 }

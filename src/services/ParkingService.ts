@@ -11,7 +11,7 @@ export class ParkingService {
     return this.parkingDao.findAll();
   } 
 
-  async create(name: string, address: string, capacity:number, closedData: Date): Promise<Parking> {
+  async create(name: string, address: string, capacity:number, closedData: Date[]): Promise<Parking> {
   if (!name || !address || !closedData) {
     throw ErrorFactory.entityNotFound("Parking");
   }
