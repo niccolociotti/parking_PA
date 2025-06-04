@@ -5,14 +5,23 @@ import { ReservationDAO } from "../dao/reservationDAO";
 import { AuthMiddleware } from "../middleware/authMiddleware";
 import { AuthService } from "../services/authService";
 import { UserDAO } from "../dao/userDAO";
+import { PaymentService } from "../services/paymentService";
+import { ParkingCapacityDAO } from "../dao/parkingCapacityDAO";
+import { PaymentController } from "../controllers/paymentController";
+import { ParkingDao} from "../dao/ParkingDao";
+
 
 const router = Router();
 
+const parkingCapacityDAO = new ParkingCapacityDAO();
+const parkingDAO = new ParkingDao(); 
 const reservationDAO = new ReservationDAO();
-const reservationService = new ReservationService(reservationDAO);
+const reservationService = new ReservationService(reservationDAO,parkingDAO);
 const reservationController = new ReservationController(reservationService);
 const userDAO = new UserDAO();
 const authService = new AuthService(userDAO);
+const paymentService = new PaymentService(reservationDAO,userDAO,parkingCapacityDAO);
+const paymentController = new PaymentController(paymentService);
 const authMiddleware = new AuthMiddleware(authService);
 
 router.use(authMiddleware.authenticateToken);
@@ -24,5 +33,7 @@ router.get("/reservation/:id", reservationController.listById);
 router.get("/reservations/user/:userId", reservationController.listByUser);
 router.delete("/reservation/:id", reservationController.delete);
 router.post("/reservation/update/:id", reservationController.updateStatus);
+
+router.post('/pay',paymentController.pay);
 
 export default router;

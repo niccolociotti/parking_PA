@@ -9,12 +9,12 @@ constructor(private parkingService: ParkingService) {}
  createParking = async (req: Request, res: Response, next: NextFunction) => {
   try {
 
-    const { name, address, closedData } = req.body;
+    const { name, address,capacity, closedData } = req.body;
      if (!name || !address || !closedData) {
      throw ErrorFactory.entityNotFound("Parking");;
     }
 
-    const parking = await this.parkingService.create(name, address, closedData );
+    const parking = await this.parkingService.create(name, address,capacity,closedData );
     res.status(StatusCodes.CREATED).json(parking);
   } catch (error) {
     next(error);

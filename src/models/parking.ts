@@ -8,6 +8,7 @@ export class Parking extends Model<InferAttributes<Parking>, InferCreationAttrib
   declare id: string;
   declare name: string;
   declare address: string;
+  declare capacity: number;
   declare closedData: Date;
 }
 
@@ -24,6 +25,10 @@ Parking.init(
     },
     address: {
       type: DataTypes.STRING,
+      allowNull: false,
+    },
+    capacity: {
+      type: DataTypes.INTEGER,
       allowNull: false,
     },
     closedData: {

@@ -1,5 +1,6 @@
 import { DataTypes, Model, InferAttributes, InferCreationAttributes } from 'sequelize';
 import DatabaseConnection from '../database/databaseConnection';
+import { Vehicles } from '../utils/Vehicles';
 export type ReservationCreationAttributes = InferCreationAttributes<Reservation>;
 
 
@@ -10,7 +11,8 @@ export class Reservation extends Model<InferAttributes<Reservation>, InferCreati
   declare status?: string;
   declare userId: string;      
   declare parkingId: string;
-  declare licensePlate: string
+  declare licensePlate: string;
+  declare vehicle: Vehicles;
   declare paymentAttemps: number
   declare startTime: Date;
   declare endTime: Date;
@@ -29,6 +31,11 @@ Reservation.init(
     },
     licensePlate: {
       type: DataTypes.STRING,
+      allowNull: false,
+    },
+    vehicle: {
+      type: DataTypes.ENUM,
+      values: Object.values(Vehicles),
       allowNull: false,
     },
     paymentAttemps: {

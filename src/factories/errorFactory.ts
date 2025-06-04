@@ -30,6 +30,10 @@ class ErrorFactory {
 
   static entityNotFound(entity: string): CustomError {
   return this.createError(`${entity} not found`, StatusCodes.NOT_FOUND);
+  }
+
+  static customMessage(message: string, statusCode: number): CustomError {
+    return this.createError(message, statusCode);
 }
 
 }

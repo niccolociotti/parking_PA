@@ -11,7 +11,7 @@ export class ParkingService {
     return this.parkingDao.findAll();
   } 
 
-  async create(name: string, address: string, closedData: Date): Promise<Parking> {
+  async create(name: string, address: string, capacity:number, closedData: Date): Promise<Parking> {
   if (!name || !address || !closedData) {
     throw ErrorFactory.entityNotFound("Parking");
   }
@@ -20,6 +20,7 @@ export class ParkingService {
     id: randomUUID(),
     name,
     address,
+    capacity,
     closedData,
   } 
   return this.parkingDao.create(parkingData);

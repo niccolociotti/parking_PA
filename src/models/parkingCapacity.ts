@@ -7,7 +7,7 @@ const sequelize = DatabaseConnection.getInstance();
 export class ParkingCapacity extends Model<InferAttributes<ParkingCapacity>, InferCreationAttributes<ParkingCapacity>> {
   declare id: string;
   declare parkingId: string;
-  declare vehicleType: Vehicles;    
+  declare vehicle: Vehicles;    
   declare capacity: number;
   declare price: number;
 }
@@ -23,7 +23,7 @@ ParkingCapacity.init(
       type: DataTypes.UUID,
       allowNull: false,
     },
-    vehicleType: {
+    vehicle: {
       type: DataTypes.STRING,
       allowNull: false,
     },

@@ -4,20 +4,21 @@ import { ReservationDAO } from "../dao/reservationDAO";
 import { Status } from "../utils/Status";
 import { Reservation } from "../models/reservation";
 import { User } from "../models/user";
-import { ParkingCapacity } from "../models/parkingCapacity";
+import { ParkingDao } from "../dao/ParkingDao";
+import { Vehicles } from "../utils/Vehicles";
 
 
 export class ReservationService {
 
-  constructor(private reservationDAO: ReservationDAO) {}
+  constructor(private reservationDAO: ReservationDAO, private parkingDAO: ParkingDao) {}
 
-  async createReservation( userId: string, parkingId: string, licensePlate: string, paymentAttemps : number , status?: Status): Promise<Reservation> {
+  async createReservation( userId: string, parkingId: string, licensePlate: string, vehicle: Vehicles ,paymentAttemps : number , status?: Status): Promise<Reservation> {
   
     const user = await User.findByPk(userId);
     if (!user) throw ErrorFactory.entityNotFound("User");
 
-    const parkingCapacity = await ParkingCapacity.findByPk(parkingId);
-    if (!parkingCapacity) throw ErrorFactory.entityNotFound("Parking");
+    const parking = await this.parkingDAO.findById(parkingId);
+    if (!parking) throw ErrorFactory.entityNotFound("Parking");
 
     const startTime = new Date();
     const endTime = new Date(startTime);
@@ -29,7 +30,8 @@ export class ReservationService {
       userId,
       parkingId,
       licensePlate,
-      status,
+      vehicle,
+      status: status || Status.PENDING,
       startTime,
       endTime,
       paymentAttemps : 0
