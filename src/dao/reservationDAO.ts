@@ -1,5 +1,8 @@
 import { Reservation } from '../models/reservation';
 import { ReservationCreationAttributes } from '../models/reservation'; 
+import { Op } from 'sequelize';
+import { Vehicles } from '../utils/Vehicles';
+import { Status } from '../utils/Status';
 
 
 interface ReservationDAOInterface {
@@ -43,4 +46,27 @@ export class ReservationDAO implements ReservationDAOInterface {
     async findByPlate(licensePlate: string): Promise<Reservation | null> {
         return await Reservation.findOne({ where: { licensePlate } });
     }
+
+    async countOverlapping(
+    parkingId: string,
+    vehicle: Vehicles,
+    startTime: Date,
+    endTime: Date
+  ): Promise<number> {
+    return Reservation.count({
+      where: {
+        parkingId,
+        vehicle,
+        status: { [Op.in]: [Status.PENDING, Status.CONFIRMED] },
+        // condizione di “overlap”:
+        // NON (prenotazione endTime < nostro startTime
+        //    OR prenotazione startTime > nostro endTime)
+        [Op.not]: [
+          { endTime: { [Op.lt]: startTime } },
+          { startTime: { [Op.gt]: endTime } },
+        ],
+      },
+    });
+  }
+
 }

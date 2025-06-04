@@ -9,6 +9,7 @@ import { PaymentService } from "../services/paymentService";
 import { ParkingCapacityDao } from "../dao/parkingCapacityDAO";
 import { PaymentController } from "../controllers/paymentController";
 import { ParkingDao} from "../dao/ParkingDao";
+import { ParkingMiddleware } from "../middleware/parkingMiddleware";
 
 
 const router = Router();
@@ -23,11 +24,12 @@ const authService = new AuthService(userDAO);
 const paymentService = new PaymentService(reservationDAO,userDAO,parkingCapacityDAO);
 const paymentController = new PaymentController(paymentService);
 const authMiddleware = new AuthMiddleware(authService);
+const parkingMiddleware = new ParkingMiddleware(parkingCapacityDAO,reservationDAO,parkingDAO);
 
 router.use(authMiddleware.authenticateToken);
 router.use(authMiddleware.isUser);
 
-router.post("/reservation", reservationController.create);
+router.post("/reservation", parkingMiddleware.checkCapacity, parkingMiddleware.checkParkingClosed, reservationController.create);
 router.get("/reservations", reservationController.list);
 router.get("/reservation/:id", reservationController.listById);
 router.get("/reservations/user/:userId", reservationController.listByUser);
