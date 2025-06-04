@@ -44,7 +44,11 @@ isUser = (req: Request, res: Response, next: NextFunction) => {
     next();
   }
 
+  isOperator = (req: Request, res: Response, next: NextFunction) => {
+  if (!req.user || req.user.role !== Roles.OPERATORE) {
+    return next(ErrorFactory.forbidden('Accesso negato: utente non autorizzato'));
+  }
+  next();
 }
 
-
-
+}

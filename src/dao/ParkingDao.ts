@@ -1,51 +1,39 @@
-import { Parking } from "../models/parking";
-import { InferCreationAttributes } from "sequelize/types/model";
+import { Parking, ParkingCreationAttributes } from "../models/parking";
 
-export interface IDaoParkingInterface<T = Parking, CreateData = Partial<Parking>>{
-  findAll(): Promise<T[]>; 
-  delete(id: string): Promise<void>; 
-  findById(id: string): Promise<T | null>; 
-  update(id: string, data: Partial<T>): Promise<T>; 
-  create(data: CreateData): Promise<T>; 
+
+ interface IDaoParkingInterface{
+  create(data: Parking): Promise<Parking>; 
+  findAll(): Promise<Parking[]>; 
+  delete(id: string): Promise<number>; 
+  findById(id: string): Promise<Parking | null>; 
+  update(id: string, updates:Partial<Parking>): Promise<Parking | null>;
+  
 }
 
 
-export class ParkingDao implements IDaoParkingInterface<Parking, Partial<Parking>> {
+export class ParkingDao implements IDaoParkingInterface {
   async findAll(): Promise<Parking[]> {
-    console.log("DAO: Cerco tutti i parcheggi...");
-    const result = await Parking.findAll();
-    console.log("DAO: Trovati", result.length, "parcheggi");
     return await Parking.findAll();
   }
 
-
-  async create(data: Omit<InferCreationAttributes<Parking>, never>): Promise<Parking> {
-    return await Parking.create(data);
+  async create(parking: ParkingCreationAttributes): Promise<Parking> {
+    return await Parking.create(parking);
   }
-  /*async create(data: Partial<Parking>): Promise<Parking> {
-    return await Parking.create(data);
-  }*/
 
-async delete(id: string): Promise<void> {
- await Parking.destroy({ where: { id } });
-}                                                                                                   
+  async delete(id: string): Promise<number> {
+    return await Parking.destroy({ where: { id } });
+  }                                                                                                   
 
 async findById(id: string): Promise<Parking | null> {
   return await Parking.findByPk(id);
                                                                                                     
 }
-async update(id: string, data: Partial<Parking>): Promise<Parking> {
-  const [_, [updatedParking]] = await Parking.update(data, {
-    where: { id },
-    returning: true,
-  });
-
-  if (!updatedParking) {
-    throw new Error(`Parking with id ${id} not found or not updated`);
+async update(id: string, updates: Partial<Parking>): Promise<Parking | null> {
+  const parking = await Parking.findByPk(id);
+  if (parking === null) {    
+    throw new Error(`Parking with id ${id} not found`);
   }
 
-  return updatedParking;
+  return await parking.update(updates);
 }
-
-
 }

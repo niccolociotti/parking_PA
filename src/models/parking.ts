@@ -1,5 +1,6 @@
 import { DataTypes, Model, InferAttributes, InferCreationAttributes } from 'sequelize';
 import DatabaseConnection from '../database/databaseConnection';
+export type ParkingCreationAttributes = InferCreationAttributes<Parking>;
 
 const sequelize = DatabaseConnection.getInstance();
 
@@ -32,3 +33,5 @@ Parking.init(
   },
   { sequelize, modelName: 'Parking', timestamps:true }
 );
+
+export default Parking;

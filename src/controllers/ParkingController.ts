@@ -1,5 +1,7 @@
 import e, { NextFunction, Request, Response } from "express";
 import { ParkingService } from "../services/ParkingService";
+import { StatusCodes } from "http-status-codes";
+import { ErrorFactory } from "../factories/errorFactory";
 
 export class ParkingController {
 constructor(private parkingService: ParkingService) {}
@@ -7,85 +9,69 @@ constructor(private parkingService: ParkingService) {}
  createParking = async (req: Request, res: Response, next: NextFunction) => {
   try {
 
-    /*const { name, address, closedDate } = req.body;
-     if (!name || !address || !closedDate) {
-      return res.status(400).json({ error: "Name, address, and closedDate are required." });
-    }*/
+    const { name, address, closedData } = req.body;
+     if (!name || !address || !closedData) {
+     throw ErrorFactory.entityNotFound("Parking");;
+    }
 
-    const Parking = await this.parkingService.create(req.body.name, req.body.address, req.body.closedDate);
-    console.log(req.body.name, req.body.address, req.body.closedDate);
-    
-
-    res.status(201).json(Parking);
+    const parking = await this.parkingService.create(name, address, closedData );
+    res.status(StatusCodes.CREATED).json(parking);
   } catch (error) {
-    console.error("Error creating parking:");
-  }
-next(); 
+    next(error);
+  } 
 };
-/*
+
   listParking = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const parkings = await this.parkingService.findAll();
-      res.json(parkings);
+      res.status(StatusCodes.OK).json(parkings);
     } catch (error) {
-      next(error); // passa l'errore al middleware di errore
+      next(error); 
     }
-  }*/
-
-  listParking = async (req: Request, res: Response, next: NextFunction) => {
-  try {
-    console.log("Controller: listParking chiamato");
-    const parkings = await this.parkingService.findAll();
-    console.log("Controller: Risposta", parkings);
-    res.json(parkings);
-  } catch (error) {
-    console.error("Errore nel listParking:", error);
-    next(error);
   }
-};
 
 
   DeleteParking = async (req: Request, res: Response, next: NextFunction) => {                      
-    try {
-      //const deleted = await this.parkingService.deleteParking(req.params.id);
-      const id = req.body;
-        const deleted = await this.parkingService.delete(id);
-        res.status(200).json({ message: `Parking with ID ${id} deleted.`});
-    } catch (error) {
-      next(error); // passa l'errore al middleware di errore
+      const deleted = await this.parkingService.delete(req.params.id);
+      
+      if (deleted > 0) {
+          res.status(StatusCodes.OK).json({ message: `Parking with ID ${req.params.id} deleted.` });
+    } else {
+      throw ErrorFactory.entityNotFound("Parking");
     }
-    next();
+
   }
+
 
      getParking = async (req: Request, res: Response, next: NextFunction) => {
        try {
-            const id = req.params.id; // Assicurati che l'ID venga passato come parametro nella richiesta
-            const parking = await this.parkingService.findById(id);
+            const parkingid = req.params.id;
+            const parking = await this.parkingService.findById(parkingid);
             if (parking) { 
-              res.json(parking);
+              res.status(StatusCodes.OK).json(parking);
          } else {
-              res.status(404).json({ message: "Parking not found" });
+              throw ErrorFactory.entityNotFound("Parking");
    }
         } catch (error) {
-          next(error); // passa l'errore al middleware di errore
+          next(error);
           }
-     next();
-   };
+   }
 
    UpdateParking = async (req: Request, res: Response, next: NextFunction) => {
-try {
-const { id, name, address, closedDate } = req.body; // Assicurati che questi campi siano presenti nel corpo della richiesta
 
-const updatedParking = await this.parkingService.update(id, name, address, closedDate);
-if (updatedParking) {
-res.json(updatedParking);
-} else {
-res.status(404).json({ message: "Parking not found" });
-}
-} catch (error) {
-next(error); // passa l'errore al middleware di errore
-}
-next();
-}
+const status = req.body; 
+const parkingid = req.params.id;
+try {
+  const updatedParking = await this.parkingService.update(parkingid, status);
+  if (updatedParking) {
+    res.status(StatusCodes.OK).json(updatedParking);
+    }  else {
+  throw ErrorFactory.entityNotFound("Parking");
+      }
+  }catch (error) {
+    next(error); 
+    }
+
+  }
 
 }
