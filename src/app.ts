@@ -4,6 +4,7 @@ import reservationRoutes from "./routes/reservationRoutes";
 import authRoutes from "./routes/authRoutes";
 import fineRoutes from "./routes/fineRoutes";
 import parkingRoutes from "./routes/ParkingRoutes";
+import parkingCapacityRoutes from "./routes/parkingCapacityRoutes";
 import { errorMiddleware } from './middleware/errorMiddleware';
 import operatorRoutes from "./routes/operatorRoutes";
 
@@ -19,7 +20,8 @@ app.use('', authRoutes);
 app.use('/operator', operatorRoutes);
 app.use("/api", reservationRoutes);
 app.use("/check", fineRoutes);
-app.use('/park',parkingRoutes)
+app.use('/park',parkingRoutes);
+app.use('/info', parkingCapacityRoutes);
 
 app.use(errorMiddleware);
 

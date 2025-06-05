@@ -15,22 +15,22 @@ export class ParkingCapacityService {
       throw new Error(`Parking capacity with id ${id} not found`);
     }
     return parkingCapacity;
-  }/*
+  }
 
   async findByVehicleType(id: string, vehicleType: string): Promise<ParkingCapacity | null> {
-    const parkingCapacity= this.parkingCapacityDao.findByVeicleType(id, vehicleType);
+    const parkingCapacity= this.parkingCapacityDao.findByParkingAndType(id, vehicleType);
     if (!parkingCapacity) {
       throw new Error(`Parking capacity for vehicle type ${vehicleType} in parking ${id} not found`);
     }
     return parkingCapacity;
   }
 
-async findByVehicleTypeAndDayAndPeriod(id: string, vehicleType: string, startTime:Date, period: number): Promise<ParkingCapacity | null> {
-const parkingCapacity = this.parkingCapacityDao.findByVeicleTypeAndDayAndPeriod(id, vehicleType,startTime, period);
+async findByVehicleTypeAndDayAndPeriod(id: string, vehicleType: string, startTime:Date, endTime:Date): Promise<ParkingCapacity | null> {
+const parkingCapacity = this.parkingCapacityDao.findByVeicleTypeAndDayAndPeriod(id, vehicleType,startTime, endTime);
 if (!parkingCapacity) {
-throw new Error(`Parking capacity for vehicle type ${vehicleType} in parking ${id} not found in this ${startTime} with period ${period}`);
+throw new Error(`Parking capacity for vehicle type ${vehicleType} in parking ${id} not found in this ${startTime} with period ${endTime}`);
 }
 return parkingCapacity;
-}*/
+}
 
 }
