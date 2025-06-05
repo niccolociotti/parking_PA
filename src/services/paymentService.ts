@@ -85,17 +85,11 @@ export class PaymentService {
     const reservation = await this.reservationDAO.findById(reservationId);
     if (!reservation) throw ErrorFactory.entityNotFound('Reservation');
 
-    console.log('Reservation found:',  reservation.id, reservation.parkingId, reservation.vehicle, reservation.startTime, reservation.endTime);
- 
     const parking = await this.parkingCapacityDAO.findByParkingAndType(reservation.parkingId, reservation.vehicle.trim().toLowerCase() as Vehicles);
     if (!parking) throw ErrorFactory.entityNotFound('Parking');
 
-    console.log('Parking found:', parking.id, parking.vehicle, parking.price);
-
     const amount = PaymentService.calculatePrice(parking.price, reservation.startTime, reservation.endTime);
     const licensePlate = reservation.licensePlate;
-
-    console.log('Parking found:', parking.price, licensePlate, amount);
 
     //Genera UUID pagamento
     const paymentId = uuidv4();
@@ -123,7 +117,7 @@ export class PaymentService {
   }
 
   generateQrBuffer(paymentId: string, licensePlate: string, amount: number): Promise<Buffer> {
-    const qrString = `${paymentId}| |${licensePlate}|${amount}`;
+    const qrString = `${paymentId}| |${licensePlate}|${amount.toFixed(2)}`;
     return QRCode.toBuffer(qrString);
   }
 
