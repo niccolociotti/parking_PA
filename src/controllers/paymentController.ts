@@ -25,4 +25,22 @@ export class PaymentController {
         next(err);
     }
     }
+
+    downloadPaymentSlip = async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            const reservationId = req.params.id;
+            if (!reservationId) {
+                throw ErrorFactory.badRequest('ReservationId not valid. Please provide a valid ReservationId.');
+            }
+
+            const pdfBuffer  = await this.paymentService.downloadPaymentSlip(reservationId);
+            res.setHeader('Content-Type', 'application/pdf');
+            res.setHeader('Content-Disposition', `attachment; filename=payment-slip-${reservationId}.pdf`);
+            res.send(pdfBuffer);
+        } catch (err) {
+            console.error('Error downloading payment slip:', err);
+            next(err);
+        }
+    }
+
 }

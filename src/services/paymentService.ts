@@ -6,6 +6,11 @@ import { Status } from "../utils/Status";
 import { StatusCodes } from "http-status-codes";
 import Reservation from "../models/reservation";
 import { Vehicles } from "../utils/Vehicles";
+import { v4 as uuidv4 } from 'uuid';
+import PDFDocument from 'pdfkit';
+import { PassThrough } from "stream";
+import { buffer } from "stream/consumers";
+import QRCode from 'qrcode';
 
 export class PaymentService {
   constructor(
@@ -74,5 +79,52 @@ export class PaymentService {
 
   return Math.round(totalPrice * 100) / 100;
 }
+
+  async downloadPaymentSlip(reservationId: string): Promise<Buffer> {
+
+    const reservation = await this.reservationDAO.findById(reservationId);
+    if (!reservation) throw ErrorFactory.entityNotFound('Reservation');
+
+    console.log('Reservation found:',  reservation.id, reservation.parkingId, reservation.vehicle, reservation.startTime, reservation.endTime);
+ 
+    const parking = await this.parkingCapacityDAO.findByParkingAndType(reservation.parkingId, reservation.vehicle.trim().toLowerCase() as Vehicles);
+    if (!parking) throw ErrorFactory.entityNotFound('Parking');
+
+    console.log('Parking found:', parking.id, parking.vehicle, parking.price);
+
+    const amount = PaymentService.calculatePrice(parking.price, reservation.startTime, reservation.endTime);
+    const licensePlate = reservation.licensePlate;
+
+    console.log('Parking found:', parking.price, licensePlate, amount);
+
+    //Genera UUID pagamento
+    const paymentId = uuidv4();
+    
+    // Genera QR code
+    const qrBuffer = await this.generateQrBuffer(paymentId, licensePlate, amount);
+
+    // Crea il PDF
+    const doc = new PDFDocument();
+    const stream = doc.pipe(new PassThrough());
+
+    doc.fontSize(18).text('Bollettino di Pagamento', { align: 'center' });
+    doc.moveDown();
+
+    doc.fontSize(14).text(`Targa: ${licensePlate}`);
+    doc.text(`Importo: € ${amount.toFixed(2)}`);
+    doc.text(`ID Pagamento: ${paymentId}`);
+    doc.moveDown();
+    doc.image(qrBuffer, { fit: [150, 150], align: 'center' });
+
+    doc.end();
+    const pdfBuffer = await buffer(stream);
+
+    return pdfBuffer;
+  }
+
+  generateQrBuffer(paymentId: string, licensePlate: string, amount: number): Promise<Buffer> {
+    const qrString = `${paymentId}| |${licensePlate}|${amount}`;
+    return QRCode.toBuffer(qrString);
+  }
 
 }
