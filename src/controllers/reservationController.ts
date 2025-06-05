@@ -22,7 +22,12 @@ export class ReservationController {
       const finalStatus = capacityRejected ? Status.REJECTED : Status.PENDING;
 
       const reservation = await this.reservationService.createReservation( userId, parkingId, licensePlate, vehicle,finalStatus);
-      res.status(StatusCodes.CREATED).json(reservation);
+      if(!res.locals.capacityRejected){
+        res.status(StatusCodes.CREATED).json(reservation);
+      }else{
+        throw ErrorFactory.customMessage("Prenotazione rifiutata per mancanza di posti disponibili.", StatusCodes.BAD_REQUEST);
+          
+      }
     } catch (error) {
       next(error)
     }

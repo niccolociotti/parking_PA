@@ -8,7 +8,6 @@ import { ParkingCapacityDao } from "../dao/parkingCapacityDAO";
 import { PaymentService } from "./paymentService";
 import { Status } from "../utils/Status";
 import { DayOfWeek } from "../models/statsResults";
-import { start } from "repl";
 
 export class ParkingService {  
   constructor(private parkingDao: ParkingDao, private reservationDAO: ReservationDAO, private parkingCapacityDAO?: ParkingCapacityDao) {}
@@ -129,7 +128,7 @@ export class ParkingService {
     const groupByDayHour: Record<DayOfWeek, Record<string, number[]>> = {
       'Lun': {}, 'Mar': {}, 'Mer': {}, 'Gio': {}, 'Ven': {}, 'Sab': {}, 'Dom': {}
     };
-console.log('Occupation Points:', occupationPoints);
+
     occupationPoints.forEach(({ timestamp, occupied }) => {
   // 1) Ottengo l’indice numerico del giorno (0 = Dom, 1 = Lun, …, 6 = Sab)
   const dowIndex = timestamp.getDay(); 
@@ -149,9 +148,6 @@ console.log('Occupation Points:', occupationPoints);
   // 5) Aggiungo il valore di occupazione
   groupByDayHour[dow][slot].push(occupied);
 });
-
-    console.log('Group by Day and Hour:', groupByDayHour);
-
     const averageOccupancy: Record<DayOfWeek, Record<string, number>> = {
       'Lun': {}, 'Mar': {}, 'Mer': {}, 'Gio': {}, 'Ven': {}, 'Sab': {}, 'Dom': {}
     };
@@ -161,38 +157,45 @@ console.log('Occupation Points:', occupationPoints);
         averageOccupancy[dow as DayOfWeek][slot] = parseFloat((sum / arr.length).toFixed(2));
       });
     });
-/*
+
     // 6) Occupazione max e min
     const allOccValues = occupationPoints.map(p => p.occupied);
-    console.log('All Occupancy Values:', allOccValues);
-    const maxOccupancy = Math.max(...allOccValues);
-    const minOccupancy = Math.min(...allOccValues);
+    const contemporaryMaxOccupancy = Math.max(...allOccValues);
+    const contemporaryMinOccupancy = Math.min(...allOccValues);
 
+    
     // 7) Fatturato totale (solo status CONFIRMED o COMPLETED)
+
+    const price: Record<string, number> = {};
+    parkingCapacity.forEach(cap => {
+      // cap.vehicle es. "auto", cap.price es. 2.5
+      price[cap.vehicle] = cap.price;
+  });
+
     let revenue = 0;
-    allReservations
-      .filter(r => r.status && ['CONFIRMED', 'COMPLETED'].includes(r.status))
+
+    console.log(price);
+
+    allReservations.filter(r => r.status && [Status.CONFIRMED].includes(r.status as Status))
       .forEach(r => {
+        // 4.a) Estrai il tipo di veicolo dalla prenotazione
         const veh = r.vehicle;
-        const pricePerMin = priceByVehicle[veh]; 
-        if (pricePerMin === undefined) {
-          // se non ho il prezzo di quel veicolo, salta o fai un throw
-          console.warn(`Nessun prezzo per veicolo ${veh}, salto prenotazione ${r.id}`);
-          return;
-        }
-     
-      revenue += PaymentService.calculatePrice(pricePerMin, r.startTime, r.endTime);
- });
+        // 4.b) Prendi la tariffa al minuto corrispondente
+        const pricePerMin = price[veh];      
+        // 4.d) Calcola il prezzo totale della singola prenotazione passando prezzo al minuto, startTime e endTime
+        revenue += PaymentService.calculatePrice(pricePerMin, r.startTime, r.endTime);
+      });    
+ 
     // 8) Conteggio richieste rifiutate (status = REJECTED)
-    const rejectedCount = allReservations.filter(r => r.status === 'REJECTED').length;
+    const rejectedCount = allReservations.filter(r => r.status === Status.REJECTED).length;
 
     // 9) Fascia oraria più richiesta (conteggio sull’inizio prenotazione)
     const startSlotCount: Record<string, number> = {};
     allReservations.forEach(r => {
-      if (!r.status || ![Status.PENDING, Status.CONFIRMED].includes(r.status as Status)) {
-        const hh = r.startTime.getHours();
-        const slot = `${hh.toString().padStart(2, '0')}:00-${(hh + 1).toString().padStart(2, '0')}:00`;
-        startSlotCount[slot] = (startSlotCount[slot] || 0) + 1;
+      if (r.status || [Status.PENDING, Status.CONFIRMED].includes(r.status as Status)) {
+        const hh = r.startTime.getHours(); //(es 16)
+        const slot = `${hh.toString().padStart(2, '0')}:00-${(hh + 1).toString().padStart(2, '0')}:00`; //slot= "16:00-17:00"
+        startSlotCount[slot] = (startSlotCount[slot] || 0) + 1; //startSlotCount["16:00-17:00"]=1 -> startSlotCount = {"16:00-17:00": 1};
       }
     });
     let mostRequestedSlot = '';
@@ -202,15 +205,16 @@ console.log('Occupation Points:', occupationPoints);
         bestCount = cnt;
         mostRequestedSlot = slot;
       }
-    });*/
+    })
 
     return {
-      averageOccupancy
-   
+      averageOccupancy,
+      contemporaryMaxOccupancy,
+      contemporaryMinOccupancy,
+      revenue,
+      rejectedCount,
+      mostRequestedSlot
     };
-
-
-
   }
 
 }

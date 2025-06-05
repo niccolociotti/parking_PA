@@ -99,7 +99,7 @@ export class ReservationDAO implements ReservationDAOInterface {
 
     const whereClause: any = {
     parkingId,
-    status: { [Op.in]: [Status.PENDING, Status.CONFIRMED] }
+    status: { [Op.in]: [Status.PENDING, Status.CONFIRMED, Status.REJECTED] }
   };
 
   if (startTimeMin) {
@@ -114,20 +114,4 @@ export class ReservationDAO implements ReservationDAOInterface {
     order: [['startTime', 'ASC']],
   });
   }
-  /*const whereClause: any = {
-      parkingId,
-      status: { [Op.in]: [Status.PENDING, Status.CONFIRMED, Status.REJECTED] },
-    };
-    if (startTimeMin) {
-      whereClause.startTime = { [Op.gte]: startTimeMin };
-    }
-    if (endTimeMax) {
-      whereClause.endTime = Object.assign(whereClause.endTime || {}, {
-        [Op.lte]: endTimeMax,
-      });
-    }
-    return Reservation.findAll({ where: whereClause });
-  }*/
-
-
 }
