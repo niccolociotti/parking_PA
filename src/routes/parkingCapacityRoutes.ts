@@ -12,23 +12,24 @@ import { ReservationDAO } from "../dao/reservationDAO";
 const router = Router();
 
 const parkingDao = new ParkingDao();
-const parkingService = new ParkingService(parkingDao);
+const reservationDAO = new ReservationDAO();
+const parkingCapacityDao = new ParkingCapacityDao();
+const parkingService = new ParkingService(parkingDao,reservationDAO,parkingCapacityDao);
 const parkingController = new ParkingController(parkingService)
 
-const parkingCapacityDao = new ParkingCapacityDao();
+
 const parkingCapacityService = new ParkingCapacityService(parkingCapacityDao);
 const parkingCapacityController = new ParkingCapacityController(parkingCapacityService);
 
-const reservationDAO = new ReservationDAO();
 const reservationService = new ReservationService(reservationDAO,parkingDao);
 const reservationController = new ReservationController(reservationService);
 
 router.get('/parcheggi', parkingController.listParking);
 router.get('/parcheggio/:id', parkingController.getParking);
-router.get('/posti/:id/:vehicleType' , parkingCapacityController.getParkingCapacityByIdAndVehicle);
+router.get('/posti/:id/:vehicle' , parkingCapacityController.getParkingCapacityByIdAndVehicle);
 
 router.get("/prenotazioni", reservationController.list);
 
-router.get('/parcheggi/:id/:vehicleType/:data/:period', parkingCapacityController.getParkingCapacityByIdAndVehicleAndDayAndPeriod);           
+router.get('/parcheggi/:id/:vehicle/:data/:period', parkingCapacityController.getParkingCapacityByIdAndVehicleAndDayAndPeriod);           
 
 export default router;

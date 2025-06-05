@@ -26,7 +26,7 @@ checkCapacity = async (req: Request, res: Response, next: NextFunction ) => {
     // 1) Recupero il record di capacità per quel parcheggio e quel tipo di veicolo
     const capacityRecord = await this.parkingCapacityDao.findByParkingAndType(parkingId, vehicle as Vehicles);
     if (!capacityRecord) {
-      throw ErrorFactory.entityNotFound('ParkingCapacity');
+      throw ErrorFactory.entityNotFound('Parking');
     }
     const totalePosti = capacityRecord.capacity;
 
@@ -40,9 +40,7 @@ checkCapacity = async (req: Request, res: Response, next: NextFunction ) => {
     );
     
     if (occupiedSpots >= totalePosti) {
-      throw ErrorFactory.badRequest(
-        'Non ci sono posti disponibili per il tipo di veicolo selezionato in questo periodo.'
-      );
+        res.locals.capacityRejected = true;
     }
 
     // Se arrivo qui, ci sono posti → next()
@@ -87,20 +85,20 @@ checkParkingClosed = async ( req: Request, res: Response, next: NextFunction) =>
 
         // 3) Verifica se c’è almeno una closedDate compresa fra startNorm e endNorm
         for (const closed of closedDates) {
-        const closedNorm = normalizeDate(closed);
-        if (
-            closedNorm.getTime() >= startNorm.getTime() &&
-            closedNorm.getTime() <= endNorm.getTime()
-        ) {
-            // Il parcheggio è chiuso in quella data
-            const dayStr = closedNorm.toLocaleDateString('it-IT', {
-            year: 'numeric',
-            month: '2-digit',
-            day: '2-digit',
-            }); 
-            // Genero un errore con status 400
-            throw ErrorFactory.badRequest(`Il parcheggio è chiuso il giorno ${dayStr}`);
-        }
+          const closedNorm = normalizeDate(closed);
+          if (
+              closedNorm.getTime() >= startNorm.getTime() &&
+              closedNorm.getTime() <= endNorm.getTime()
+          ) {
+              // Il parcheggio è chiuso in quella data
+              const dayStr = closedNorm.toLocaleDateString('it-IT', {
+              year: 'numeric',
+              month: '2-digit',
+              day: '2-digit',
+              }); 
+              // Genero un errore con status 400
+              throw ErrorFactory.badRequest(`Il parcheggio è chiuso il giorno ${dayStr}`);
+          }
         }
 
         // Se arrivo qui, non ho trovato giorni di chiusura: ok → next()

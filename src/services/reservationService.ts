@@ -12,7 +12,7 @@ export class ReservationService {
 
   constructor(private reservationDAO: ReservationDAO, private parkingDAO: ParkingDao) {}
 
-  async createReservation( userId: string, parkingId: string, licensePlate: string, vehicle: Vehicles ,paymentAttemps : number , status?: Status): Promise<Reservation> {
+  async createReservation( userId: string, parkingId: string, licensePlate: string, vehicle: Vehicles,status: Status): Promise<Reservation> {
   
     const user = await User.findByPk(userId);
     if (!user) throw ErrorFactory.entityNotFound("User");
@@ -31,7 +31,7 @@ export class ReservationService {
       parkingId,
       licensePlate,
       vehicle,
-      status: status || Status.PENDING,
+      status,
       startTime,
       endTime,
       paymentAttemps : 0

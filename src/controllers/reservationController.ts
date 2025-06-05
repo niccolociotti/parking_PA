@@ -15,8 +15,13 @@ export class ReservationController {
 
   create = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const { userId, parkingId, licensePlate, vehicle, status = Status.PENDING } = req.body;
-      const reservation = await this.reservationService.createReservation( userId, parkingId, licensePlate, vehicle, status);
+      const { userId, parkingId, licensePlate, vehicle} = req.body;
+
+      const capacityRejected = res.locals.capacityRejected === true;
+
+      const finalStatus = capacityRejected ? Status.REJECTED : Status.PENDING;
+
+      const reservation = await this.reservationService.createReservation( userId, parkingId, licensePlate, vehicle,finalStatus);
       res.status(StatusCodes.CREATED).json(reservation);
     } catch (error) {
       next(error)

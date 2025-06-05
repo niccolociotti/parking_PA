@@ -2,6 +2,7 @@ import e, { NextFunction, Request, Response } from "express";
 import { ParkingService } from "../services/ParkingService";
 import { StatusCodes } from "http-status-codes";
 import { ErrorFactory } from "../factories/errorFactory";
+import { parseDateString } from "../helpers/dateParser";
 
 export class ParkingController {
 constructor(private parkingService: ParkingService) {}
@@ -73,5 +74,47 @@ try {
     }
 
   }
+
+  getStats = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { parkingId } = req.params;
+      let { start: startRaw, end: endRaw } = req.query as { start?: string; end?: string };
+
+      let startTime: Date | undefined = undefined;
+      let endTime: Date | undefined = undefined;
+
+      if (startRaw) {
+        const parsedStart = parseDateString(startRaw);
+        if (!parsedStart) {
+          throw ErrorFactory.badRequest("Formato data non valido");
+        }
+        startTime = parsedStart;
+      }
+
+      if (endRaw) {
+        const parsedEnd = parseDateString(endRaw);
+        if (!parsedEnd) {
+          throw ErrorFactory.badRequest("Formato data non valido");
+        }
+        endTime = parsedEnd;
+      }
+
+      if (startTime && endTime && startTime.getTime() > endTime.getTime()) {
+        throw ErrorFactory.badRequest('“start” non può essere successivo a “end”.');
+      }
+
+      const stats = await this.parkingService.getParkingStatistics(
+        parkingId,
+        startTime,
+        endTime
+      );
+
+    res.json({ parkingId, stats });
+
+    }catch (error) {
+      console.error("Error in getStats:", error);
+      next(error);
+    }
+  } 
 
 }

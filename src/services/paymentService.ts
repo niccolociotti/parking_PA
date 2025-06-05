@@ -5,6 +5,7 @@ import { ErrorFactory } from "../factories/errorFactory";
 import { Status } from "../utils/Status";
 import { StatusCodes } from "http-status-codes";
 import Reservation from "../models/reservation";
+import { Vehicles } from "../utils/Vehicles";
 
 export class PaymentService {
   constructor(
@@ -15,22 +16,20 @@ export class PaymentService {
 
   async payReservation(reservationId: string, userId: string): Promise<Reservation> {
     const reservation = await this.reservationDAO.findById(reservationId);
- 
+
     if (!reservation || reservation.userId !== userId)
       throw ErrorFactory.entityNotFound('Reservation');
 
     if (reservation.status !== Status.PENDING)
       throw ErrorFactory.badRequest('Reservation is not in pending state');
-
     
     const user = await this.userDAO.findById(userId);
     if (!user) throw ErrorFactory.entityNotFound('User');
-
    
-    const parking = await this.parkingCapacityDAO.findByParkingAndType(reservation.parkingId, reservation.vehicle);
-    if (!parking) throw ErrorFactory.entityNotFound('Parking');
+    const parkingCapacity = await this.parkingCapacityDAO.findByParkingAndType(reservation.parkingId, reservation.vehicle.trim().toLowerCase() as Vehicles);
+    if (!parkingCapacity) throw ErrorFactory.entityNotFound('Parking');
     
-    const price = this.calculatePrice(parking.price, reservation.startTime, reservation.endTime);
+    const price = PaymentService.calculatePrice(parkingCapacity.price, reservation.startTime, reservation.endTime);
 
     if (user.tokens >= price) {
       user.tokens -= price;
@@ -51,7 +50,7 @@ export class PaymentService {
   }
 
   // Funzione di calcolo prezzo secondo le regole della specifica
-  calculatePrice(pricePerMinute: number, startTime: Date, endTime: Date): number {
+  static calculatePrice(pricePerMinute: number, startTime: Date, endTime: Date): number {
   const msPerMinute = 1000 * 60;
   let totalPrice = 0;
   let cursor = new Date(startTime.getTime()); // data “corrente” che avanzeremo minuto per minuto

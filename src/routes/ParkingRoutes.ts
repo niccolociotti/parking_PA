@@ -5,11 +5,15 @@ import { ParkingService } from "../services/ParkingService";
 import { ParkingDao } from '../dao/ParkingDao';
 import { UserDAO } from "../dao/userDAO";
 import { AuthService } from "../services/authService";
+import { ReservationDAO } from '../dao/reservationDAO';
+import { ParkingCapacityDao } from '../dao/parkingCapacityDAO';
 
 const router = Router();
 
 const parkingDao = new ParkingDao();
-const parkingService = new ParkingService(parkingDao);
+const reservationDAO = new ReservationDAO();
+const parkingCapacityDao = new ParkingCapacityDao();
+const parkingService = new ParkingService(parkingDao,reservationDAO, parkingCapacityDao);
 const parkingController = new ParkingController(parkingService)
 const userDAO = new UserDAO();
 const authService = new AuthService(userDAO);

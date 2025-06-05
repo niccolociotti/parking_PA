@@ -3,12 +3,14 @@ import { Reservation } from '../models/reservation';
 import { ParkingCapacity } from "../models/parkingCapacity";
 import { ErrorFactory } from "../factories/errorFactory";
 import { Op } from "sequelize";
+import { Vehicles } from "../utils/Vehicles";
 
 
  interface IDaoParkingCapacityInterface{
   findAll(): Promise<Parking[]>; 
   findById(id: string): Promise<ParkingCapacity | null>; 
   findByParkingAndType(id:string,vehicle: string): Promise<ParkingCapacity | null>;
+  findByParkingsById(parkingId: string): Promise<ParkingCapacity[] | null>;
   //findByVeicleTypeAndDayAndPeriod(id: string, vehicleType: string): Promise<ParkingCapacity | null>;  
 }
 
@@ -21,9 +23,9 @@ export class ParkingCapacityDao implements IDaoParkingCapacityInterface {
     return await ParkingCapacity.findByPk(id);
   }
 
-  async findByVeicleTypeAndDayAndPeriod(id: string, vehicleType: string, startTime: Date, endTime: Date): Promise<ParkingCapacity | null> {
+  async findByVeicleTypeAndDayAndPeriod(id: string, vehicle: string, startTime: Date, endTime: Date): Promise<ParkingCapacity | null> {
     
-    const capacity = await ParkingCapacity.findOne({ where: { parkingId: id, vehicle: vehicleType } });
+    const capacity = await ParkingCapacity.findOne({ where: { parkingId: id, vehicle: vehicle } });
     if (!capacity) {
       throw ErrorFactory.entityNotFound("Parking Capacity");
     } 
@@ -47,12 +49,20 @@ export class ParkingCapacityDao implements IDaoParkingCapacityInterface {
    
   }
 
-  findByParkingAndType(id:string,vehicle: string): Promise<ParkingCapacity | null>;
-  async findByParkingAndType(id:string,vehicle: string): Promise<ParkingCapacity | null> {
-      return await ParkingCapacity.findOne({
+  async findByParkingAndType(parkingId:string,vehicle: Vehicles): Promise<ParkingCapacity | null> {
+      const  parking = await  ParkingCapacity.findOne({
         where: {
-          parkingId: id,
-          vehicle: vehicle}})
+          parkingId: parkingId,
+          vehicle: vehicle as Vehicles}})
+      return parking;
       }
+
+  async findByParkingsById(parkingId: string): Promise<ParkingCapacity[] | null> {
+    return await ParkingCapacity.findAll({
+      where: {
+        parkingId: parkingId
+      }
+    });
+  }
 }
 

@@ -1,8 +1,9 @@
 import { Reservation } from '../models/reservation';
 import { ReservationCreationAttributes } from '../models/reservation'; 
-import { Op } from 'sequelize';
+import { Op,fn,col,where as seqWhere } from 'sequelize';
 import { Vehicles } from '../utils/Vehicles';
 import { Status } from '../utils/Status';
+import { start } from 'repl';
 
 
 interface ReservationDAOInterface {
@@ -70,26 +71,63 @@ export class ReservationDAO implements ReservationDAOInterface {
   }
 
   async findByPlatesAndPeriod( plates: string[], startTime: Date, endTime: Date, parkingIds?: string[]): Promise<Reservation[]> {
-    const whereClause: any = {
-      licensePlate: { [Op.in]: plates },
-      // prendo solo prenotazioni PENDING o CONFIRMED (se vuoi includere anche altre, elimina questo filtro)
-      status: { [Op.in]: [Status.PENDING, Status.CONFIRMED] },
-      // condizione di overlap
-      [Op.not]: [
-        { endTime:   { [Op.lt]: startTime } },  // fine prenotazione precedente < mio inizio → non overlap
-        { startTime: { [Op.gt]: endTime   } },  // inizio prenotazione precedente > mio fine → non overlap
-      ],
-    };
-    
-    if (parkingIds && parkingIds.length > 0) {
-      whereClause.parkingId = { [Op.in]: parkingIds };
-    }
 
-    return Reservation.findAll({
-      where: whereClause,
-      order: [['startTime', 'ASC']],
-      // include: se vuoi caricare dati correlati (es. utente, parcheggio), aggiungi qui
-    });
+    const whereClause: any = {
+    licensePlate: { [Op.in]: plates },
+    status:       { [Op.in]: [Status.PENDING, Status.CONFIRMED] },
+    // Confrontiamo solo la parte “data” di startTime e endTime, 
+    // escludendo l’orario:
+    [Op.and]: [
+      // DATE("startTime") >= 'YYYY-MM-DD'
+      seqWhere(fn("DATE", col("startTime")), { [Op.gte]: startTime }),
+      // DATE("endTime")   <= 'YYYY-MM-DD'
+      seqWhere(fn("DATE", col("endTime")),   { [Op.lte]: endTime   }),
+    ],
+  };
+
+  if (parkingIds && parkingIds.length > 0) {
+    whereClause.parkingId = { [Op.in]: parkingIds };
   }
+
+  return Reservation.findAll({
+    where: whereClause,
+    order: [["startTime", "ASC"]],
+  });
+  }
+
+  async findAllByParkingAndPeriod(parkingId: string, startTimeMin?: Date, endTimeMax?: Date): Promise<Reservation[]> {
+
+    const whereClause: any = {
+    parkingId,
+    status: { [Op.in]: [Status.PENDING, Status.CONFIRMED] }
+  };
+
+  if (startTimeMin) {
+    whereClause.startTime = { [Op.gte]: startTimeMin };
+  }
+  if (endTimeMax) {
+    whereClause.endTime = { [Op.lte]: endTimeMax };
+  }
+
+  return Reservation.findAll({
+    where: whereClause,
+    order: [['startTime', 'ASC']],
+  });
+  }
+  /*const whereClause: any = {
+      parkingId,
+      status: { [Op.in]: [Status.PENDING, Status.CONFIRMED, Status.REJECTED] },
+    };
+    if (startTimeMin) {
+      whereClause.startTime = { [Op.gte]: startTimeMin };
+    }
+    if (endTimeMax) {
+      whereClause.endTime = Object.assign(whereClause.endTime || {}, {
+        [Op.lte]: endTimeMax,
+      });
+    }
+    return Reservation.findAll({ where: whereClause });
+  }*/
+
 
 }
