@@ -88,6 +88,10 @@ export class PaymentService {
     const reservation = await this.reservationDAO.findById(reservationId);
     if (!reservation) throw ErrorFactory.entityNotFound('Reservation');
 
+    if (reservation.status !== Status.CONFIRMED) {
+      throw ErrorFactory.customMessage('Reservation is not confirmed', StatusCodes.BAD_REQUEST);
+    }
+
     const parking = await this.parkingCapacityDAO.findByParkingAndType(reservation.parkingId, reservation.vehicle.trim().toLowerCase() as Vehicles);
     if (!parking) throw ErrorFactory.entityNotFound('Parking');
 

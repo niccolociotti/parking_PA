@@ -41,6 +41,16 @@ export class ReservationDAO implements ReservationDAOInterface {
        return await Reservation.destroy({ where: { id } });
     }
 
+    async deleteByIdStatus(id: string): Promise<number> {
+        const deletedCount = await Reservation.destroy({
+            where: {
+                id,
+                status: Status.CONFIRMED
+            }
+        });
+        return deletedCount;
+    }
+
     async findAll(): Promise<Reservation[]> {
         return await Reservation.findAll();
     }

@@ -3,6 +3,29 @@ import DatabaseConnection from '../database/databaseConnection';
 import { Vehicles } from '../utils/Vehicles';
 export type ReservationCreationAttributes = InferCreationAttributes<Reservation>;
 
+/**
+ *
+ * Questo modello definisce lo schema per la tabella 'Reservations' nel database.
+ * Ogni prenotazione contiene informazioni sull'utente, il parcheggio, il veicolo,
+ * lo stato della prenotazione, i tentativi di pagamento e il periodo di validità.
+ *
+ * Attributi:
+ *  - id: Identificativo univoco della prenotazione (UUID, chiave primaria).
+ *  - status: Stato della prenotazione (es. PENDING, CONFIRMED, REJECTED).
+ *  - userId: ID dell'utente che ha effettuato la prenotazione (chiave esterna).
+ *  - parkingId: ID del parcheggio prenotato (chiave esterna).
+ *  - licensePlate: Targa del veicolo associato alla prenotazione.
+ *  - vehicle: Tipo di veicolo (auto, moto, ecc.).
+ *  - paymentAttemps: Numero di tentativi di pagamento effettuati.
+ *  - startTime: Data e ora di inizio della prenotazione.
+ *  - endTime: Data e ora di fine della prenotazione.
+ *
+ * Il modello utilizza una connessione singleton al database per garantire un'unica istanza.
+ *
+ * @param {Model} - Estende Sequelize Model per tipizzazione e metodi di istanza.
+ *
+ * @exports Reservation - Modello Sequelize per le prenotazioni.
+ */
 
 const sequelize = DatabaseConnection.getInstance();
 
@@ -62,12 +85,12 @@ Reservation.init(
     startTime: {
       type: DataTypes.DATE,
       allowNull: false, 
-  },
-  endTime: {
+    },
+    endTime: {
       type: DataTypes.DATE,
       allowNull: false,
-  },  
-},
+    },  
+  },
   { sequelize, tableName: 'Reservations', timestamps: true }
 );
 

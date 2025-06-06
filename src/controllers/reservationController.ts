@@ -16,11 +16,20 @@ import { mkdir, writeFile } from 'fs/promises';
 export class ReservationController {
   constructor(private reservationService: ReservationService) {}
 
+  /**
+   * Crea una nuova prenotazione per un utente.
+   * Questa funzione riceve i dati della prenotazione dal body della richiesta, imposta lo stato in base alla disponibilità
+   * (pending o rejected), e chiama il ReservationService per creare la prenotazione. Se la capacità è esaurita, restituisce errore.
+   * Viene utilizzata nella rotta POST /reservation.
+   * @param req - Richiesta HTTP contenente userId, parkingId, licensePlate, vehicle
+   * @param res - Risposta HTTP con la prenotazione creata o errore
+   * @param next - Funzione per la gestione degli errori
+   */
   create = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const { userId, parkingId, licensePlate, vehicle} = req.body;
 
-      const capacityRejected = res.locals.capacityRejected === true;
+      const capacityRejected = res.locals.capacityRejected;
 
       const finalStatus = capacityRejected ? Status.REJECTED : Status.PENDING;
 
@@ -36,6 +45,15 @@ export class ReservationController {
     }
   }
 
+  /**
+   * Restituisce tutte le prenotazioni di un utente specifico.
+   * Recupera l'userId dai parametri della richiesta e usa il ReservationService per ottenere tutte le prenotazioni associate.
+   * Se non ci sono prenotazioni, restituisce errore. Usata nella rotta GET /reservations/user/:userId.
+   * @param req - Richiesta HTTP con userId nei parametri
+   * @param res - Risposta HTTP con l'elenco delle prenotazioni
+   * @param next - Funzione per la gestione degli errori
+   * @returns Restituisce una risposta HTTP con l'elenco delle prenotazioni dell'utente o un errore se non trovate
+   */
   listByUser = async (req: Request, res: Response, next: NextFunction) => {
     const userId = req.params.userId;
     try {
@@ -51,6 +69,15 @@ export class ReservationController {
   }
 
 
+  /**
+   * Restituisce i dettagli di una prenotazione tramite il suo ID.
+   * Prende l'id della prenotazione dai parametri della richiesta e usa il ReservationService per recuperare i dettagli.
+   * Se la prenotazione non esiste, restituisce errore. Usata nella rotta GET /reservation/:id.
+   * @param req - Richiesta HTTP con id nei parametri
+   * @param res - Risposta HTTP con i dettagli della prenotazione
+   * @param next - Funzione per la gestione degli errori
+   * @returns Restituisce una risposta HTTP con i dettagli della prenotazione o un errore se non trovata
+   */
   listById = async (req: Request, res: Response, next: NextFunction) => {
     const reservationId = req.params.id;
     try {
@@ -65,6 +92,15 @@ export class ReservationController {
     }
   }
 
+  /**
+   * Restituisce tutte le prenotazioni presenti nel sistema.
+   * Chiama il ReservationService per ottenere tutte le prenotazioni senza filtri.
+   * Usata nella rotta GET /reservations.
+   * @param req - Richiesta HTTP
+   * @param res - Risposta HTTP con tutte le prenotazioni
+   * @param next - Funzione per la gestione degli errori
+   * @returns Restituisce una risposta HTTP con tutte le prenotazioni o un errore se non trovate
+   */
   list = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const reservations = await this.reservationService.findAllReservations();
@@ -74,6 +110,14 @@ export class ReservationController {
     }
   }
 
+  /**
+   * Elimina una prenotazione tramite il suo ID.
+   * Prende l'id della prenotazione dai parametri della richiesta e chiama il ReservationService per eliminarla.
+   * Se la prenotazione viene eliminata restituisce conferma, altrimenti errore. Usata nella rotta DELETE /reservation/:id.
+   * @param req - Richiesta HTTP con id nei parametri
+   * @param res - Risposta HTTP di conferma eliminazione
+   * @returns Restituisce una risposta HTTP di conferma eliminazione o un errore se la prenotazione non esiste
+   */
   delete = async (req: Request, res: Response) => {   
     const deleted = await this.reservationService.deleteReservation(req.params.id);
 
@@ -85,15 +129,40 @@ export class ReservationController {
 
   }
 
-  updateStatus = async (req: Request, res: Response, next: NextFunction) => {
+  /**
+   * Aggiorna una prenotazione esistente.
+   * Riceve l'id della prenotazione dai parametri e i nuovi dati dal body, poi chiama il ReservationService per aggiornare.
+   * Se nessun campo è fornito, restituisce errore. Usata nella rotta POST /reservation/update/:id.
+   * @param req - Richiesta HTTP con id nei parametri e dati aggiornati nel body
+   * @param res - Risposta HTTP con la prenotazione aggiornata
+   * @param next - Funzione per la gestione degli errori
+   * @returns Restituisce una risposta HTTP con la prenotazione aggiornata o un errore se non trovata
+   */
+  update = async (req: Request, res: Response, next: NextFunction) => {
     const reservationId = req.params.id;
-    const status  = req.body;
+    const { userId, parkingId, licensePlate, vehicle, startTime, endTime} = req.body;
+
+    const updates = {
+      userId,
+      parkingId,
+      licensePlate,
+      vehicle,
+      startTime,
+      endTime
+    };
+
+    console.log("Updates:", updates);
+
+    const allUndefined = Object.values(updates).every(val => val === undefined);
+    if (allUndefined) {
+      throw ErrorFactory.badRequest("Nessun campo da aggiornare.");
+}
 
     try {
-      const updatedReservation = await this.reservationService.updateReservation(reservationId, status);
-      
+      const updatedReservation = await this.reservationService.updateReservation(reservationId, updates);
+
       if (updatedReservation) {
-        res.status(StatusCodes.OK).json({status: Status.CANCELED,reservation:updatedReservation});
+        res.status(StatusCodes.OK).json(updatedReservation);
       } else {
         throw ErrorFactory.entityNotFound("Reservation");
       }
@@ -102,14 +171,23 @@ export class ReservationController {
     }
   }
 
-    postReservationsReport = async (req: Request, res: Response, next: NextFunction) => {
+  /**
+   * Genera un report delle prenotazioni filtrate per targhe e periodo, in formato JSON o PDF.
+   * Riceve dal body le targhe, le date e il formato desiderato. Chiama il ReservationService per ottenere i dati,
+   * poi restituisce il report nel formato richiesto. Usata nella rotta POST /reservationsReport.
+   * @param req - Richiesta HTTP con plates, start, end, format nel body
+   * @param res - Risposta HTTP con il report in formato richiesto
+   * @param next - Funzione per la gestione degli errori
+   * @returns Restituisce una risposta HTTP con il report delle prenotazioni in formato JSON o PDF
+   */
+  postReservationsReport = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const { plates: platesRaw, start: startRaw, end: endRaw, format: fmtRaw } = req.body;
 
       if (!Array.isArray(platesRaw) || platesRaw.length === 0) {
         throw ErrorFactory.badRequest('Il campo “plates” è obbligatorio e deve essere un array di stringhe.');
       }
-      // controlliamo che ogni elemento di platesRaw sia stringa non vuota
+      // controllo che ogni elemento di platesRaw sia stringa non vuota
       const plates = platesRaw
         .map((p: any) => (typeof p === 'string' ? p.trim().toUpperCase() : ''))
         .filter((p: string) => p.length > 0);
@@ -117,7 +195,7 @@ export class ReservationController {
         throw ErrorFactory.badRequest('Almeno una targa valida nel campo “plates”.');
       }
 
-      // 2) Parsare date
+      // Parsare date
       const startTime = parseDateString(startRaw);
       const endTime   = parseDateString(endRaw);
       if (!startTime || !endTime) {
@@ -135,7 +213,7 @@ export class ReservationController {
         endTime,
       );
 
-      // 6) Restituisco JSON oppure genero PDF
+      // Restituisco JSON oppure genero PDF
       if (format === 'json') {
         res.json({ reservations });
       } 
@@ -147,11 +225,11 @@ export class ReservationController {
       const filename = `report_${Date.now()}.pdf`;
       const filePath = path.join(pdfDir, filename);
 
-      // c) Imposto header per il download del PDF al client
+      // Imposto header per il download del PDF al client
       res.setHeader('Content-Type', 'application/pdf');
       res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
 
-      // d) Creo il documento PDF
+      // Creo il documento PDF
       const doc = new PDFDocument({
         margin: 40,
         size: 'A4',
@@ -169,7 +247,6 @@ export class ReservationController {
       const pageWidth = doc.page.width;
       const leftMargin = doc.page.margins.left;
       const rightMargin = doc.page.margins.right;
-      const usableWidth = pageWidth - leftMargin - rightMargin;
 
       // Definisco posizioni X fisse per le colonne
       const colX = {
@@ -247,11 +324,8 @@ export class ReservationController {
         doc.text(endStr,         colX.end,     currentY, { width: 80,  height: rowHeight });
         doc.text(r.status ?? '', colX.status,  currentY, { width: 100, height: rowHeight });
 
-        // Salto di riga fisso
         currentY += rowHeight;
       });
-
-      // j) Chiudo il documento
       doc.end();
 
       }catch (error) {
@@ -259,7 +333,16 @@ export class ReservationController {
     }
   }
 
-   reportReservations = async (req: Request, res: Response, next: NextFunction) => {
+  /**
+   * Genera un report delle prenotazioni di un utente, opzionalmente filtrato per parcheggio e periodo, in formato JSON, CSV o PDF.
+   * Riceve l'userId e il formato dai parametri, e le date/parkingId dalla query. Chiama il ReservationService per ottenere i dati,
+   * poi restituisce il report nel formato richiesto. Usata nella rotta GET /reservationsReport/:id/:format.
+   * @param req - Richiesta HTTP con id e format nei parametri, start/end/parkingId nella query
+   * @param res - Risposta HTTP con il report in formato richiesto
+   * @param next - Funzione per la gestione degli errori
+   * @returns Restituisce una risposta HTTP con il report delle prenotazioni in formato JSON, CSV o PDF
+   */
+  reportReservations = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const userId = req.params.id;
       if (!userId) {
