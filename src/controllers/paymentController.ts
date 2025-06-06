@@ -9,8 +9,8 @@ import * as fs from 'fs/promises';
 export class PaymentController {
   constructor(private paymentService: PaymentService) {}
     pay = async (req: Request, res: Response, next: NextFunction) => {
+         const reservationId  = req.params.reservationId;
         try {
-        const reservationId  = req.body.reservationId;
         const user = (req as any).user; 
         if (!user || !user.id) {
         throw ErrorFactory.unauthorized();

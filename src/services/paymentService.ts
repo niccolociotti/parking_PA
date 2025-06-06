@@ -22,8 +22,11 @@ export class PaymentService {
   async payReservation(reservationId: string, userId: string): Promise<Reservation> {
     const reservation = await this.reservationDAO.findById(reservationId);
 
-    if (!reservation || reservation.userId !== userId)
+    if (!reservation) 
       throw ErrorFactory.entityNotFound('Reservation');
+
+    if(reservation.userId !== userId)
+      throw ErrorFactory.customMessage('Nessuna prenotazione trovata per questo utente', StatusCodes.FORBIDDEN);
 
     if (reservation.status !== Status.PENDING)
       throw ErrorFactory.badRequest('Reservation is not in pending state');
@@ -117,7 +120,7 @@ export class PaymentService {
   }
 
   generateQrBuffer(paymentId: string, licensePlate: string, amount: number): Promise<Buffer> {
-    const qrString = `${paymentId}| |${licensePlate}|${amount.toFixed(2)}`;
+    const qrString = `${paymentId}|${licensePlate}|${amount.toFixed(2)}`;
     return QRCode.toBuffer(qrString);
   }
 

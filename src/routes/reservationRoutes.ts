@@ -36,7 +36,7 @@ router.get("/reservations/user/:userId", reservationController.listByUser);
 router.delete("/reservation/:id", reservationController.delete);
 router.post("/reservation/update/:id", reservationController.updateStatus);
 
-router.post('/pay',paymentController.pay);
+router.get('/pay/:reservationId',paymentController.pay);
 router.get('/paymentslip/:id', paymentController.downloadPaymentSlip);
 
 

@@ -7,8 +7,6 @@ export class FineController {
     createFine = async (req: Request, res: Response, next: NextFunction) => {
     
     const { licensePlate, parkingId } = req.body;
-    console.log("Richiesta di creazione multa:", parkingId);
-
     try {
       
       const fine = await this.fineService.checkAndCreateFine(licensePlate, parkingId);
