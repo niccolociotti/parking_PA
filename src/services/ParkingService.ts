@@ -6,7 +6,8 @@ import { ReservationDAO } from "../dao/reservationDAO";
 import { ParkingCapacityDao } from "../dao/parkingCapacityDAO";
 import { PaymentService } from "./paymentService";
 import { Status } from "../utils/Status";
-import { DayOfWeek } from "../models/statsResults";
+
+type DayOfWeek = 'Lun' | 'Mar' | 'Mer' | 'Gio' | 'Ven' | 'Sab' | 'Dom';
 
 /** ParkingService gestisce le operazioni sui parcheggi.
  * @class ParkingService

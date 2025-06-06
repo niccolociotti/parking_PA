@@ -1,3 +1,21 @@
+/**
+ * Questo modello definisce lo schema per la tabella 'User' nel database.
+ * Ogni utente contiene informazioni identificative, credenziali, ruolo e saldo token.
+ *
+ * Attributi:
+ *  - id: Identificativo univoco dell'utente (UUID, chiave primaria).
+ *  - name: Nome dell'utente.
+ *  - email: Email dell'utente.
+ *  - password: Password cifrata dell'utente.
+ *  - role: Ruolo dell'utente (es. Operatore, Automobilista).
+ *  - tokens: Numero di token disponibili per l'utente.
+ *
+ * Il modello utilizza una connessione singleton al database per garantire un'unica istanza.
+ *
+ * @param {Model} - Estende Sequelize Model per tipizzazione e metodi di istanza.
+ *
+ * @exports User - Modello Sequelize per gli utenti.
+ */
 import { DataTypes, Model, InferAttributes, InferCreationAttributes } from 'sequelize';
 import { Roles } from '../utils/Roles';
 import DatabaseConnection from '../database/databaseConnection';
@@ -45,4 +63,6 @@ User.init(
   },
   { sequelize, modelName: 'User',timestamps: true,}
 );
+
+export default User;
 
