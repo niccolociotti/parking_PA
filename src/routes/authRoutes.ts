@@ -3,7 +3,7 @@ import { AuthController } from '../controllers/authController';
 import { UserDAO } from '../dao/userDAO';
 import { AuthService } from '../services/authService';
 
-const router = Router(); // nouva instanza di di Express Router
+const router = Router(); // nouva instanza di Express Router
 
 /**
  * Inizializzazione delle dipendenze per il modulo di autenticazione.
