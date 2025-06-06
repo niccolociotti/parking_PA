@@ -1,0 +1,672 @@
+{
+	"info": {
+		"_postman_id": "dc8d8522-4dfc-48d9-9c63-6edd57db8f91",
+		"name": "ProgettoPA_parking",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "45019058",
+		"_collection_link": "https://interstellar-trinity-3589516.postman.co/workspace/Niccol%C3%B2-Ciotti's-Workspace~1a007433-d0ae-4bb0-8932-bc15b04a074d/collection/45019058-dc8d8522-4dfc-48d9-9c63-6edd57db8f91?action=share&source=collection_link&creator=45019058"
+	},
+	"item": [
+		{
+			"name": "CRUD reservation",
+			"item": [
+				{
+					"name": "createReservation",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{JWT_TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"userId\": \"ab7c99b2-1469-4f70-bba2-b60d6114ab6f\",\n    \"parkingId\": \"f42245be-29d9-4e9d-a84c-5a8082937d5f\",\n    \"licensePlate\": \"ATRYSA\",\n    \"vehicle\": \"auto\",\n    \"startTime\": \"23-06-2025\",\n    \"endTime\": \"25-06-2025\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/reservation",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"reservation"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getReservations",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{JWT_TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/api/reservations",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"reservations"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getReservationById",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{JWT_TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/api/reservation/9a14ba00-f7b7-49db-a089-3cfb6e08a5de",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"reservation",
+								"9a14ba00-f7b7-49db-a089-3cfb6e08a5de"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getReservationsByUser",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{JWT_TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/api/reservations/user/5fd090e1-2ba5-4afb-8218-708a4569a13b",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"reservations",
+								"user",
+								"5fd090e1-2ba5-4afb-8218-708a4569a13b"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "updateReservation",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{JWT_TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"status\":\"confdasskmklfmnkewnfgklaqwernermato\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/reservation/update/99cff92d-c1ba-4726-a21a-10f4b12ad87b",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"reservation",
+								"update",
+								"99cff92d-c1ba-4726-a21a-10f4b12ad87b"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "deleteReservation",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{JWT_TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/api/reservation/99cff92d-c1ba-4726-a21a-10f4b12ad87b",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"reservation",
+								"99cff92d-c1ba-4726-a21a-10f4b12ad87b"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "check-access",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{JWT_TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"licensePlate\":\"AB124CD\",\n    \"parkingId\":\"c957e6f9-0f32-4aa2-b9ca-6275dc8ccb4a\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3000/check/fine",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"check",
+								"fine"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "CRUD parking",
+			"item": [
+				{
+					"name": "createParking",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{JWT_TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/park/parking",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"park",
+								"parking"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getParkings",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{JWT_TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/park/parkings",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"park",
+								"parkings"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getParkingById",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{JWT_TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/park/parking/",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"park",
+								"parking",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "updateParking",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{JWT_TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/park/parking/update/",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"park",
+								"parking",
+								"update",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "deleteParking",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{JWT_TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/park/parking/",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"park",
+								"parking",
+								""
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "login",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const jsonResponse = pm.response.json();",
+							"pm.environment.set(\"JWT_TOKEN\", jsonResponse.token);"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"email\": \"luigi@example.com\",\n    \"password\": \"luigi\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3000/login",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "pay",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{JWT_TOKEN}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3000/api/pay/b0dc1c76-c603-4aa2-b714-cd611dfe206b",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"pay",
+						"b0dc1c76-c603-4aa2-b714-cd611dfe206b"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "createReports",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{JWT_TOKEN}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"plates\": [\n        \"AB124CD\",\n        \"AB123CD\"\n    ],\n    \"start\": \"01-06-2025\",\n    \"end\": \"02-07-2025\",\n    \"format\": \"pdf\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3000/operator/reports/reservations",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"operator",
+						"reports",
+						"reservations"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "getStats",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{JWT_TOKEN}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3000/operator/stats/c53c6174-2dc6-4b9c-96d1-64d124ac24cd?start=31-05-2025 08:00&end=02-08-2025 20:00",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"operator",
+						"stats",
+						"c53c6174-2dc6-4b9c-96d1-64d124ac24cd"
+					],
+					"query": [
+						{
+							"key": "start",
+							"value": "31-05-2025 08:00"
+						},
+						{
+							"key": "end",
+							"value": "02-08-2025 20:00"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "getQR",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{JWT_TOKEN}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3000/api/paymentslip/b0dc1c76-c603-4aa2-b714-cd611dfe206b",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"paymentslip",
+						"b0dc1c76-c603-4aa2-b714-cd611dfe206b"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "getParkingByVeicDataPeriod",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3000/info/parcheggi/e241bccc-96b5-40ad-be7c-b7e79be91a65/auto/2025-07-01/10",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"info",
+						"parcheggi",
+						"e241bccc-96b5-40ad-be7c-b7e79be91a65",
+						"auto",
+						"2025-07-01",
+						"10"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "getReserv",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{JWT_TOKEN}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3000/api/reservationsReport/044e84b7-8db5-4f1b-a7b0-f4131e1a4122/json?start=01-03-2025&end=04-06-2025&parkingId=e241bccc-96b5-40ad-be7c-b7e79be91a65",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"reservationsReport",
+						"044e84b7-8db5-4f1b-a7b0-f4131e1a4122",
+						"json"
+					],
+					"query": [
+						{
+							"key": "start",
+							"value": "01-03-2025"
+						},
+						{
+							"key": "end",
+							"value": "04-06-2025"
+						},
+						{
+							"key": "parkingId",
+							"value": "e241bccc-96b5-40ad-be7c-b7e79be91a65"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

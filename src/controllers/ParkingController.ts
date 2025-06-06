@@ -58,20 +58,20 @@ constructor(private parkingService: ParkingService) {}
           }
    }
 
-   UpdateParking = async (req: Request, res: Response, next: NextFunction) => {
+  UpdateParking = async (req: Request, res: Response, next: NextFunction) => {
 
-const status = req.body; 
-const parkingid = req.params.id;
-try {
-  const updatedParking = await this.parkingService.update(parkingid, status);
-  if (updatedParking) {
-    res.status(StatusCodes.OK).json(updatedParking);
-    }  else {
-  throw ErrorFactory.entityNotFound("Parking");
+  const status = req.body; 
+  const parkingid = req.params.id;
+  try {
+    const updatedParking = await this.parkingService.update(parkingid, status);
+    if (updatedParking) {
+      res.status(StatusCodes.OK).json(updatedParking);
+      }  else {
+    throw ErrorFactory.entityNotFound("Parking");
+        }
+    }catch (error) {
+      next(error); 
       }
-  }catch (error) {
-    next(error); 
-    }
 
   }
 
