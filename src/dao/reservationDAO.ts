@@ -13,6 +13,7 @@ interface ReservationDAOInterface {
     findById(id: string): Promise<Reservation | null>;
     delete(id: string): Promise<number>;
     findAll(): Promise<Reservation[]>;
+    report(userId: string,parkingId?: string, startTime?: Date, endTime?: Date): Promise<Reservation[]>;
 }
 
 export class ReservationDAO implements ReservationDAOInterface {
@@ -113,5 +114,22 @@ export class ReservationDAO implements ReservationDAOInterface {
     where: whereClause,
     order: [['startTime', 'ASC']],
   });
+  }
+
+  async report( userId: string,parkingId?: string, startTime?: Date, endTime?: Date): Promise<Reservation[]> {
+    const whereClause: any = {};
+
+    whereClause.userId = userId;
+
+    if (parkingId) {
+      whereClause.parkingId = parkingId;
+    }
+    if (startTime) {
+      whereClause.startTime = { [Op.gte]: startTime };
+    }
+    if (endTime) {
+      whereClause.endTime = { [Op.lte]: endTime };
+    }
+    return await Reservation.findAll({ where: whereClause });
   }
 }

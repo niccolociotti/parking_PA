@@ -87,4 +87,14 @@ export class ReservationService {
     return reservations
   }
 
+  async getReservationsReport(userId: string, parkingId?: string, startTime?: Date, endTime?: Date): Promise<Reservation[]> {
+
+    const reservations = await this.reservationDAO.report(userId,parkingId, startTime, endTime);
+    if (!reservations) {
+      throw ErrorFactory.entityNotFound('Reservations');
+    }
+    return reservations;
+  }
+
+
 }

@@ -39,5 +39,6 @@ router.post("/reservation/update/:id", reservationController.updateStatus);
 router.get('/pay/:reservationId',paymentController.pay);
 router.get('/paymentslip/:id', paymentController.downloadPaymentSlip);
 
+router.get('/reservationsReport/:id/:format', reservationController.reportReservations);
 
 export default router;

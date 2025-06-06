@@ -7,6 +7,9 @@ import { parseDateString } from "../helpers/dateParser";
 import PDFDocument from 'pdfkit';
 import path from 'path';
 import fs from 'fs';
+import { Parser as CsvParser } from 'json2csv';
+import { mkdir, writeFile } from 'fs/promises'; 
+
 
 
 
@@ -253,6 +256,96 @@ export class ReservationController {
 
       }catch (error) {
         next(error);  
+    }
+  }
+
+   reportReservations = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const userId = req.params.id;
+      if (!userId) {
+        throw ErrorFactory.badRequest('ID utente mancante.');
+      }
+
+      const format = req.params.format;
+      if (!['json', 'csv', 'pdf'].includes(format)) {
+        throw ErrorFactory.badRequest('Formato non valido. Usa “json”, “csv” o “pdf”.');
+      }
+      let { start: startRaw, end: endRaw, parkingId: parkingIdRaw } = req.query as { start?: string; end?: string; parkingId?: string};
+
+      let startTime: Date | undefined = undefined;
+      let endTime: Date | undefined = undefined;
+      let parkingId: string | undefined = undefined;
+
+      if (startRaw) {
+        const startTimeParsed = parseDateString(startRaw);
+        if (!startTimeParsed) {
+          throw ErrorFactory.badRequest('Formato di data non valido');
+        }
+        startTime = startTimeParsed;
+      }
+
+      if (endRaw) {
+        const endTimeParsed = parseDateString(endRaw);
+        if (!endTimeParsed) {
+          throw ErrorFactory.badRequest('Formato di data non valido');
+        }
+        endTime = endTimeParsed;
+      }
+
+      if (parkingIdRaw) {
+        parkingId = parkingIdRaw.toString().trim();
+      }
+
+      if (startTime && endTime && startTime.getTime() > endTime.getTime()) {
+        throw ErrorFactory.badRequest('La data “start” deve essere precedente o uguale a “end”.');
+      }
+      const reservations = await this.reservationService.getReservationsReport(userId,parkingId, startTime, endTime);  
+      if (format === 'json'){
+        if(reservations.length > 0) {
+        res.status(StatusCodes.OK).json(reservations);
+      } else {
+        throw ErrorFactory.entityNotFound("Reservations");
+      }
+    }
+
+    if (format === 'csv') {
+      const csv = new CsvParser().parse(reservations);
+      const filename = `reservations-${userId}.csv`;
+      const filePath = path.join(__dirname, '../../csv', filename);
+      await mkdir(path.dirname(filePath), { recursive: true });
+      await writeFile(filePath, csv);
+      return res.download(filePath);
+    }
+
+    if (format === 'pdf') {
+      const pdfDoc = new PDFDocument();
+      const filename = `reservations-${userId}.pdf`;
+      const filePath = path.join(__dirname, '../../pdf', filename);
+      await mkdir(path.dirname(filePath), { recursive: true });
+      const writeStream = fs.createWriteStream(filePath);
+      pdfDoc.pipe(writeStream);
+
+      pdfDoc.fontSize(20).text('Report Prenotazioni', { align: 'center' });
+      pdfDoc.moveDown();
+
+      // Aggiungo le intestazioni
+      pdfDoc.fontSize(12).text('ID Prenotazione | Parking ID | Targa | Veicolo | Inizio | Fine | Stato');
+      pdfDoc.moveDown();
+
+      // Aggiungo i dati delle prenotazioni
+      reservations.forEach(reservation => {
+        const startStr = new Date(reservation.startTime).toLocaleString('it-IT', { hour12: false });
+        const endStr = new Date(reservation.endTime).toLocaleString('it-IT', { hour12: false });
+        pdfDoc.text(`${reservation.id} | ${reservation.parkingId} | ${reservation.licensePlate} | ${reservation.vehicle} | ${startStr} | ${endStr} | ${reservation.status}`);
+      });
+
+      pdfDoc.end();
+      writeStream.on('finish', () => {
+        res.download(filePath, filename);
+      });
+    }
+    } catch (error) {
+      next(error);
     }
   }
     
