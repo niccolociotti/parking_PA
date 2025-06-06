@@ -235,7 +235,7 @@ module.exports = {
           parkingId: parking3Id,
           licensePlate: 'ZZ123YY',
           vehicle: 'camion',
-          startTime: new Date('2025-08-15T06:00:00Z'),
+          startTime: new Date('2025-05-15T06:00:00Z'),
           endTime: new Date('2025-08-15T14:00:00Z'),
           createdAt: new Date(),
           updatedAt: new Date(),

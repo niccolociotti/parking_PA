@@ -1,65 +1,44 @@
 import { Fine } from "../models/fine";
 import { randomUUID } from "crypto";
 import { FineDAO } from "../dao/fineDAO";
-import { ReservationDAO } from "../dao/reservationDAO";
 
+/**
+ * Classe che fornisce metodi per creare una multa in base alla targa, parcheggio.
+ * Il prezzo viene determinato automaticamente in base al motivo della multa.
+ * Utilizzato dal TransitService per generare multe automatiche in caso di transito non valido.
+ *
+ * @class FineService
+ */
 export class FineService {
 
-  constructor(private fineDAO: FineDAO, private reservationDAO: ReservationDAO) {}
+  constructor(private fineDAO: FineDAO) {}
 
-  async checkAndCreateFine(licensePlate: string, parkingId: string, now: Date = new Date()): Promise<Fine | null> {
-    // 1. Trova la reservation più recente per quella targa/parcheggio
-    const reservation = await this.reservationDAO.findByPlate(licensePlate);
+  /**
+   * Crea una nuova multa.
+   * Il prezzo viene impostato in base al motivo.
+   * @param licensePlate - Targa del veicolo
+   * @param parkingId - ID del parcheggio
+   * @param reason - Motivo della multa
+   * @returns La multa creata o null
+   */
+  async createFine(licensePlate: string, parkingId: string ,reason: string): Promise<Fine | null> {
 
-    const violatedTime = new Date('2025-06-04')
-
+    let price = 0;
     const fineId = randomUUID();
 
-    // 2. Se NON esiste reservation: crea multa!
-    if (!reservation) {
-      return await this.fineDAO.create({
-        id: fineId,
-        licensePlate,
-        parkingId,
-        violationTime: violatedTime,
-        price: 100, 
-        reason: "Transito senza prenotazione valida"
-      });
+    if(reason === "Transito senza prenotazione valida"){
+      price = 50;
+    } else if(reason === "Transito fuori orario prenotazione") {
+      price = 30;
     }
-    // 3. Se esiste reservation:
-    // - Se la reservation è valida ORA (ora è tra start e end), nessuna multa
-    if ( 
-      reservation.startTime <= violatedTime && 
-      reservation.endTime >= violatedTime
-    ) 
-      return null;
     
-
-    // - Se la reservation è scaduta (endTime < now), crea multa con motivo diverso
-    if (reservation.endTime < violatedTime) {
-      return await this.fineDAO.create({
+    return await this.fineDAO.create({
         id: fineId,
         licensePlate,
         parkingId,
-        violationTime: violatedTime,
-        price: 150,
-        reason: "Transito con prenotazione scaduta"
+        price, 
+        reason
       });
-    }
-
-    // - Se la reservation non è ancora iniziata
-    if (reservation.startTime > violatedTime) {
-      return await this.fineDAO.create({
-        id: fineId,
-        licensePlate,
-        parkingId,
-        violationTime: violatedTime,
-        price: 50,
-        reason: "Transito prima dell'inizio della prenotazione"
-      });
-    }
-    return null
-
   }
 }
 

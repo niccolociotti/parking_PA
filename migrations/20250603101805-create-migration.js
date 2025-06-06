@@ -73,6 +73,58 @@ module.exports = {
       }
     });
 
+    //TRANSIT
+    await queryInterface.createTable('Transits', {
+      id: {
+        type: Sequelize.UUID,
+        primaryKey: true,
+        defaultValue: Sequelize.UUIDV4,
+        allowNull: false,
+      },
+      licensePlate: {
+        type: Sequelize.STRING,
+        allowNull: false,
+      },
+      time: {
+        type: Sequelize.STRING,
+        allowNull: false,
+      },
+      parkingId: {
+        type: Sequelize.UUID,
+        allowNull: false,
+        references: {
+          model: 'Parkings',
+          key: 'id'
+        },
+        onUpdate: 'CASCADE',
+        onDelete: 'CASCADE'
+      },
+      type: {
+        type: Sequelize.STRING,
+        allowNull: false,
+      },
+      reservationId: {
+        type: Sequelize.UUID,
+        allowNull: true,
+        references: {
+          model: 'Reservations',
+          key: 'id'
+        },
+        onUpdate: 'CASCADE',
+        onDelete: 'SET NULL'
+      },
+      createdAt: {
+        allowNull: false,
+        type: Sequelize.DATE,
+        defaultValue: Sequelize.literal('CURRENT_TIMESTAMP'),
+      },
+      updatedAt: {
+        allowNull: false,
+        type: Sequelize.DATE,
+        defaultValue: Sequelize.literal('CURRENT_TIMESTAMP'),
+      }
+    });
+
     // FINE
 
     await queryInterface.createTable('Fines', {
@@ -100,10 +152,6 @@ module.exports = {
         onUpdate: 'CASCADE',
         onDelete: 'CASCADE'
       },
-      violationTime: {
-        type: Sequelize.DATE,
-        allowNull: false,
-      },
       reason: {
         type: Sequelize.STRING,
         allowNull: false
@@ -123,6 +171,7 @@ module.exports = {
   },
 
   down: async (queryInterface, Sequelize) => {
+    await queryInterface.dropTable('Transits');
     await queryInterface.dropTable('Fines');
     await queryInterface.dropTable('Reservations');
     await queryInterface.dropTable('ParkingCapacities');

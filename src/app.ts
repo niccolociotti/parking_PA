@@ -2,7 +2,7 @@ import express from 'express';
 import dotenv from 'dotenv';
 import reservationRoutes from "./routes/reservationRoutes";
 import authRoutes from "./routes/authRoutes";
-import fineRoutes from "./routes/fineRoutes";
+import fineRoutes from "./routes/fineTransitRoutes";
 import parkingRoutes from "./routes/ParkingRoutes";
 import parkingCapacityRoutes from "./routes/parkingCapacityRoutes";
 import { errorMiddleware } from './middleware/errorMiddleware';
