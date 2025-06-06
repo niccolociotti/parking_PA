@@ -3,19 +3,40 @@ import { Parking } from "../models/parking";
 import { ParkingDao } from "../dao/ParkingDao";
 import { ErrorFactory } from "../factories/errorFactory";
 import { ReservationDAO } from "../dao/reservationDAO";
-import { StatsResult } from "../models/statsResults";
 import { ParkingCapacityDao } from "../dao/parkingCapacityDAO";
 import { PaymentService } from "./paymentService";
 import { Status } from "../utils/Status";
 import { DayOfWeek } from "../models/statsResults";
 
+/** ParkingService gestisce le operazioni sui parcheggi.
+ * @class ParkingService
+ * @description Fornisce metodi per creare, eliminare, aggiornare e recuperare parcheggi,
+ * calcolare statistiche sui parcheggi e gestire le prenotazioni.
+ * @param parkingDao - Istanza di ParkingDao per interagire con il database dei parcheggi 
+ * @param reservationDAO - Istanza di ReservationDAO per interagire con il database delle prenotazioni
+ * @param parkingCapacityDAO - (opzionale) Istanza di ParkingCapacityDao per interagire con il database delle capacità dei parcheggi
+ * */
+
 export class ParkingService {  
   constructor(private parkingDao: ParkingDao, private reservationDAO: ReservationDAO, private parkingCapacityDAO?: ParkingCapacityDao) {}
+  /**
+   * Trova tutti i parcheggi
+   * @returns Lista di parcheggi
+   */
 
   async findAll(): Promise<Parking[]> {
     return this.parkingDao.findAll();
   } 
 
+  /**
+   * Crea un nuovo parcheggio
+   * @param name - Nome del parcheggio
+   * @param address - Indirizzo del parcheggio
+   * @param capacity - Capacità del parcheggio
+   * @param closedData - Date in cui il parcheggio è chiuso
+   * @returns Il parcheggio creato
+   */
+  
   async create(name: string, address: string, capacity:number, closedData: Date[]): Promise<Parking> {
   if (!name || !address || !closedData) {
     throw ErrorFactory.entityNotFound("Parking");
@@ -31,6 +52,12 @@ export class ParkingService {
   return this.parkingDao.create(parkingData);
   }
 
+  /**
+   * Elimina un parcheggio per ID
+   * @param id - ID del parcheggio da eliminare
+   * @returns Numero di parcheggi eliminati (0 o 1)
+   */
+
   async delete(id: string): Promise<number> {
     const deleted= await this.parkingDao.delete(id);
     if (deleted === 0) {
@@ -39,9 +66,22 @@ export class ParkingService {
     return deleted;
   }
 
+  /**
+   * Trova un parcheggio per ID
+   * @param id - ID del parcheggio da trovare
+   * @returns Il parcheggio trovato o null se non esiste
+   */
+
   async findById(id: string): Promise<Parking | null> {
     return this.parkingDao.findById(id);
   }
+
+  /**
+   * Aggiorna un parcheggio per ID
+   * @param id - ID del parcheggio da aggiornare
+   * @param updates - Oggetto con i campi da aggiornare
+   * @returns Il parcheggio aggiornato o null se non esiste
+   */
 
   async update(id: string, updates: Partial<Parking>): Promise<Parking | null> {
     const parkings = await this.parkingDao.update(id, updates);
@@ -50,6 +90,14 @@ export class ParkingService {
     }
     return parkings
   }
+
+  /**
+   * Calcola le statistiche di un parcheggio
+   * @param parkingId - ID del parcheggio
+   * @param startTime - Data di inizio per il calcolo delle statistiche (opzionale)
+   * @param endTime - Data di fine per il calcolo delle statistiche (opzionale)
+   * @returns Oggetto con le statistiche del parcheggio
+   */
 
   async getParkingStatistics(parkingId: string, startTime?: Date, endTime?: Date): Promise<any> {
     const parking = await this.parkingDao.findById(parkingId);
