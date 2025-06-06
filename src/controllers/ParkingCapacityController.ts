@@ -2,7 +2,6 @@ import { NextFunction, Request, Response } from "express";
 import { StatusCodes } from "http-status-codes";
 import { ErrorFactory } from "../factories/errorFactory";
 import { ParkingCapacityService } from "../services/parkingCapacityService";
-import { Vehicles } from "../utils/Vehicles";
 
 /**
  * Controller per gestire le operazioni sulle capacità dei parcheggi.

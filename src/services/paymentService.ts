@@ -12,6 +12,13 @@ import { PassThrough } from "stream";
 import { buffer } from "stream/consumers";
 import QRCode from 'qrcode';
 
+/**
+ * Questa classe fornisce metodi per effettuare il pagamento di una prenotazione,
+ * calcolare il prezzo in base a regole tariffarie, generare e scaricare la ricevuta PDF
+ * e produrre QR code per i pagamenti. Gestisce anche i tentativi di pagamento e la cancellazione
+ * automatica della prenotazione dopo 3 tentativi falliti.
+ * @class PaymentService
+ */
 export class PaymentService {
   constructor(
     private reservationDAO: ReservationDAO,
@@ -19,6 +26,17 @@ export class PaymentService {
     private parkingCapacityDAO: ParkingCapacityDao,
   ) {}
 
+  /**
+   * Esegue il pagamento di una prenotazione.
+   * Verifica che la prenotazione esista, appartenga all'utente e sia in stato PENDING.
+   * Scala i token all'utente se sufficienti, aggiorna lo stato della prenotazione e azzera i tentativi.
+   * Dopo 3 tentativi falliti per credito insufficiente, elimina la prenotazione.
+   * Usata dal PaymentController nella rotta GET /pay/:reservationId.
+   * @param reservationId - ID della prenotazione da pagare
+   * @param userId - ID dell'utente che effettua il pagamento
+   * @returns La prenotazione aggiornata e confermata
+   * @throws Errore se la prenotazione non esiste, non appartiene all'utente, non è pagabile o per credito insufficiente
+   */
   async payReservation(reservationId: string, userId: string): Promise<Reservation> {
     const reservation = await this.reservationDAO.findById(reservationId);
 
@@ -57,7 +75,14 @@ export class PaymentService {
     }
   }
 
-  // Funzione di calcolo prezzo secondo le regole della specifica
+  /**
+   * Calcola il prezzo totale della prenotazione in base alla durata, weekend e sconti.
+   * +50% nel weekend, sconto 5% se durata > 12h.
+   * @param pricePerMinute - Prezzo base al minuto
+   * @param startTime - Data/ora di inizio
+   * @param endTime - Data/ora di fine
+   * @returns Prezzo totale arrotondato a due decimali
+   */
   static calculatePrice(pricePerMinute: number, startTime: Date, endTime: Date): number {
   const msPerMinute = 1000 * 60;
   let totalPrice = 0;
@@ -83,6 +108,14 @@ export class PaymentService {
   return Math.round(totalPrice * 100) / 100;
 }
 
+  /**
+   * Genera e restituisce la ricevuta di pagamento in PDF per una prenotazione confermata.
+   * Inserisce nel PDF i dati della prenotazione, l'importo e un QR code.
+   * Usata dal PaymentController nella rotta GET /paymentslip/:id.
+   * @param reservationId - ID della prenotazione
+   * @returns Buffer del file PDF generato
+   * @throws Errore se la prenotazione non esiste o non è confermata
+   */
   async downloadPaymentSlip(reservationId: string): Promise<Buffer> {
 
     const reservation = await this.reservationDAO.findById(reservationId);
@@ -123,6 +156,13 @@ export class PaymentService {
     return pdfBuffer;
   }
 
+  /**
+   * Genera un QR code in formato Buffer con i dati del pagamento.
+   * @param paymentId - ID univoco del pagamento
+   * @param licensePlate - Targa del veicolo
+   * @param amount - Importo pagato
+   * @returns Buffer contenente il QR code
+   */
   generateQrBuffer(paymentId: string, licensePlate: string, amount: number): Promise<Buffer> {
     const qrString = `${paymentId}|${licensePlate}|${amount.toFixed(2)}`;
     return QRCode.toBuffer(qrString);
