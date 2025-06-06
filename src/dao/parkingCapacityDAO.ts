@@ -4,6 +4,7 @@ import { ParkingCapacity } from "../models/parkingCapacity";
 import { ErrorFactory } from "../factories/errorFactory";
 import { Op } from "sequelize";
 import { Vehicles } from "../utils/Vehicles";
+import { Status } from "../utils/Status";
 
 
  interface IDaoParkingCapacityInterface{
@@ -30,7 +31,7 @@ export class ParkingCapacityDao implements IDaoParkingCapacityInterface {
       throw ErrorFactory.entityNotFound("Parking Capacity");
     } 
     // Trova le prenotazioni attive per il parcheggio e il tipo di veicolo specificato   
-    const prenotazioniAttive = await Reservation.count({ where: {parkingId: id , status: 'In attesa di pagamento' ,
+    const prenotazioniAttive = await Reservation.count({ where: {parkingId: id , status: [Status.CONFIRMED, Status.PENDING],
         [Op.or]: [
           {
             startTime: { [Op.lt]: endTime },

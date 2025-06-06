@@ -39,7 +39,7 @@ constructor(private parkingCapacityService: ParkingCapacityService) {}
 
        const parkingCapacity = await this.parkingCapacityService.findByVehicleTypeAndDayAndPeriod(parkingId, vehicle, startTime, endTime);
        if (parkingCapacity) {
-         res.status(StatusCodes.OK).json(parkingCapacity);
+         res.status(StatusCodes.OK).json({Disponibilità : parkingCapacity.capacity});
        } else {
          throw ErrorFactory.entityNotFound("Parking Capacity");
        }
