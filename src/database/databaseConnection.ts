@@ -2,11 +2,20 @@ import { Sequelize, Dialect} from 'sequelize';
 import dotenv from 'dotenv';
 dotenv.config();
 
+/**
+ * @module DatabaseConnection
+ * @description Configura e stabilisce la connessione a un database Postgres utilizzando Sequelize
+ * e le variabili d'ambiente definite nel file `.env`.
+ */
 class DatabaseConnection {
     private static instance: Sequelize;
 
     private constructor() {}
 
+    /**
+     * Restituisce l'istanza di Sequelize, creando una nuova connessione se non esiste già.
+     * @returns L'istanza di Sequelize.
+     */
     public static getInstance(): Sequelize {
         if (!DatabaseConnection.instance) {
 
