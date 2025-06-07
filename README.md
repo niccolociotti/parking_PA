@@ -143,6 +143,37 @@ Il pattern Chain of Responsibility è stato adottato per gestire il flusso delle
 # Diagramma E-R
 # Diagrammi delle sequenze
 # API Routes
+| Verbo HTTP | Endpoint | Descrzione  | Autenticazione JWT|
+|:----------:|:--------:|:-----------:|:------------------:|
+| POST| /login| | ❌ |
+| POST| /park/parking| | ✅ |
+| GET| /park/parkings| | ✅|
+| DELETE| /park/parking:id| | ✅|
+| GET| /park/parking/:id| | ✅ |
+| POST| /park/parking/update/:id| | ✅ |
+| GET| /info/parcheggi/:id/:vehicle/:data/:period| | ❌ |
+| POST| /api/reservation| | ✅ |
+| GET| /api/reservations| | ✅ |
+| GET| /api/reservation/:id| | ✅ |
+| GET| /api/reservations/user/:userId| | ✅ |
+| DELETE| /api/reservation/:id| | ✅ |
+| POST| /api/reservation/update/:id| | ✅ |
+| GET| /api/pay/:reservationId| | ✅ |
+| GET| /api/paymentslip/:id| | ✅ |
+| DELETE| /api/pay/:reservationId| | ✅ |
+| GET| /api/reservationsReport/:id/:format| | ✅ |
+| POST| /operator/reservations| | ✅ |
+| GET| /operator/stats/:parkingId| | ✅ |
+| POST| /check/transit/:type| | ✅ |
+
+
+
+
+
+
+
+
+
 # Configurazione e uso
 # Strumenti utilizzati
 - **Node.js**: Runtime utilizzato per eseguire il codice JavaScript sul lato server.
