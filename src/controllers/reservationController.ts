@@ -346,7 +346,7 @@ export class ReservationController {
    */
   reportReservations = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const userId = req.params.id;
+      const userId = (req as any).user.id as string;
       if (!userId) {
         throw ErrorFactory.badRequest('ID utente mancante.');
       }

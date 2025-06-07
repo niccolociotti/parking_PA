@@ -148,7 +148,6 @@ export class ReservationDAO implements ReservationDAOInterface {
    */
   async findByPlatesAndPeriod( licensePlates: string[], startTime: Date, endTime: Date): Promise<Reservation[]> {
 
-    console.log("findByPlatesAndPeriod called with plates:", licensePlates, "startTime:", startTime, "endTime:", endTime);
     const whereClause: any = {
     licensePlate: { [Op.in]: licensePlates },
     // Confrontiamo solo la parte “data” di startTime e endTime, 

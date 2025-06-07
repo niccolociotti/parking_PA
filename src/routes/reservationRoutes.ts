@@ -108,6 +108,6 @@ router.delete('/pay/:reservationId', paymentController.deletePayment);
  * @param res - Risposta da inviare al client
  * @param next - Funzione per passare al middleware successivo
  */
-router.get('/reservationsReport/:id/:format', reservationController.reportReservations);
+router.get('/reservationsReport/:format', reservationController.reportReservations);
 
 export default router;
