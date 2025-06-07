@@ -632,16 +632,15 @@ Esempio di risposta
 | **Posizione**      | **Nome**   | **Tipo**  | **Descrizione**                                                                                    | **Obbligatorio** |
 |--------------------|------------|-----------|----------------------------------------------------------------------------------------------------|------------------|
 | Richiesta nel path | `format` | `string`  | 	formato in cui si vuole ottenere il report(json,csv,pdf)                                                                    | ✅               |
-| Richiesta nel body | `start` | `string`  | 	data di inizio del periodo temporale                                                                  | ✅               |
-| Richiesta nel body | `end` | `string`  | 	data di fine del periodo temporale                                                                        | ✅               |
-| Richiesta nel body | `parkingId` | `string`  | 	ID del parcheggio con cui si vuole filtrare                                                                    | ✅               |
+| Richiesta nel body | `start` | `string`  | 	data di inizio del periodo temporale                                                                  | ❌               |
+| Richiesta nel body | `end` | `string`  | 	data di fine del periodo temporale                                                                        | ❌               |
+| Richiesta nel body | `parkingId` | `string`  | 	ID del parcheggio con cui si vuole filtrare                                                                    | ❌               |
 | Richiesta nel header | `Authorization` | `string`  | 	JWT di autenticazione: Bearer <token>                                                                              | ✅               |
 
 
 
 ```http
-GET /api/reservationsReport/json?start=01-03-2025&end=12-07-2025&parkingId=a4b69567-1fa7-43ef-b222-90db6a17ab76
-HTTP/1.1
+GET /api/reservationsReport/json?start=01-03-2025&end=12-07-2025&parkingId=a4b69567-1fa7-43ef-b222-90db6a17ab76 HTTP/1.1
 Authorization: Bearer {{JWT_TOKEN}}
 ```
 
@@ -662,7 +661,7 @@ Esempio di risposta
         "updatedAt": "2025-06-07T15:46:34.889Z"
     }
 ```
-oppure in un file [csv](csv/reservations-e603cb6d-97e3-435f-bdc3-38f28823e7cc.csv)( o [pdf](pdf/reservations-e603cb6d-97e3-435f-bdc3-38f28823e7cc.pdf)
+oppure in un file [csv](csv/reservations-e603cb6d-97e3-435f-bdc3-38f28823e7cc.csv) o [pdf](pdf/reservations-e603cb6d-97e3-435f-bdc3-38f28823e7cc.pdf)
 
 
 
