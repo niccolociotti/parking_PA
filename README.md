@@ -331,8 +331,8 @@ Il pattern Chain of Responsibility è stato adottato per gestire il flusso delle
 |:---------:|:-------:|:--------:|:------------:|:------------:|
 |Path Param| id| string|Id del parcheggio| ✅ |
 |Path Param| vehicle| string|Tipologia di veicolo| ✅ |
-||Path Param| data| string|Data di arrivo. Formato YYYY-MM-DD| ✅ |
-||Path Param| period| integer |Durata della prenotazione| ✅ |
+|Path Param| data| string|Data di arrivo. Formato YYYY-MM-DD| ✅ |
+|Path Param| period| integer |Durata della prenotazione| ✅ |
 
 ** Esempio di risposta**
 ```json
@@ -349,6 +349,7 @@ Il pattern Chain of Responsibility è stato adottato per gestire il flusso delle
 
 ** Esempio di risposta (Formato PDF) **
 
+[Scarica il PDF](./pdf/payment-slip-938c89e4-7bbb-4143-b873-d5a56ff1a4fb.pdf)
 
 # Configurazione e uso
 # Strumenti utilizzati
