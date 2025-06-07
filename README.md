@@ -157,15 +157,14 @@ Il pattern Chain of Responsibility è stato adottato per gestire il flusso delle
 | POST| /park/parking/update/:id| Aggiornamento parametri percheggio | ✅ |
 | GET| /info/parcheggi/:id/:vehicle/:data/:period| Verifica della disponibilità di un parcheggio | ❌ |
 | POST| /api/reservation| Creazione di una prenotazione | ✅ |
-| GET| /api/reservations| Recupero della lista delle prenotazioni | ✅ |
 | GET| /api/reservation/:id| Recupero informazioni di una prenotazione | ✅ |
-| GET| /api/reservations/user/:userId| Recupero prenotazioni di un utente| ✅ |
+| GET| /api/reservations| Recupero prenotazioni di un utente| ✅ |
 | DELETE| /api/reservation/:id| Cancellazione di una prenotazione| ✅ |
 | POST| /api/reservation/update/:id| Aggiornamenot della prenotazione | ✅ |
 | GET| /api/pay/:reservationId| Esecuzione del pagamento della prenotazione | ✅ |
 | GET| /api/paymentslip/:id| Generazione del bollettino di una prenotazione | ✅ |
 | DELETE| /api/pay/:reservationId| Annullamento del pagamento di una prenotazione esclusivamente se il suo stato è in attesa.| ✅ |
-| GET| /api/reservationsReport/:id/:format| Generazione di una report sulle prenotazioni | ✅ |
+| GET| /api/reservationsReport/:format| Generazione di una report sulle prenotazioni | ✅ |
 | POST| /operator/reports/reservations| Generazione di una report sulle prenotazioni degli utenti| ✅ |
 | GET| /operator/stats/:parkingId|Generazione di una report sulle prenotazioni di un parcheggio | ✅ |
 | POST| /check/transit/:type|Acquisizione del trasito di un vericolo per la generazione di una multa | ✅ |
@@ -329,7 +328,7 @@ Il pattern Chain of Responsibility è stato adottato per gestire il flusso delle
     "updatedAt": "2025-06-07T15:54:50.932Z"
 }
 ```
-# GET /parcheggi/:id/:vehicle/:data/:period
+# GET info/parcheggi/:id/:vehicle/:data/:period
 **Parametri**
 | Posizione | Nome    | Tipo     | Descrizione  |Obbligatorio  |
 |:---------:|:-------:|:--------:|:------------:|:------------:|
@@ -344,16 +343,7 @@ Il pattern Chain of Responsibility è stato adottato per gestire il flusso delle
   "Disponibilità":"14"
 }
 ```
-# GET	/api/paymentslip/:id
-**Parametri**
-| Posizione | Nome    | Tipo     | Descrizione  |Obbligatorio  |
-|:---------:|:-------:|:--------:|:------------:|:------------:|
-|Path Param| id| string|Id della prenotazione| ✅ |
-|Header|	Authorization|	string|	Token JWT per autenticazione	| ✅|
 
-** Esempio di risposta (Formato PDF) **
-
-[Scarica il PDF](./pdf/payment-slip-938c89e4-7bbb-4143-b873-d5a56ff1a4fb.pdf)
 
 # POST /api/reservation
 ### Parametri
@@ -605,6 +595,17 @@ Esempio di risposta
 }
 ```
 
+# GET	/api/paymentslip/:id
+**Parametri**
+| Posizione | Nome    | Tipo     | Descrizione  |Obbligatorio  |
+|:---------:|:-------:|:--------:|:------------:|:------------:|
+|Path Param| id| string|Id della prenotazione| ✅ |
+|Header|	Authorization|	string|	Token JWT per autenticazione	| ✅|
+
+** Esempio di risposta (Formato PDF) **
+
+[Scarica il PDF](./pdf/payment-slip-938c89e4-7bbb-4143-b873-d5a56ff1a4fb.pdf)
+
 # DELETE /api/pay/:reservationId
 ### Parametri
 
@@ -626,6 +627,44 @@ Esempio di risposta
    "message": "Reservation with ID e40fa6c9-8e16-4305-86a6-14f10bdbb4e1 deleted."
 }
 ```
+# GET /api/reservationsReport/:format
+### Parametri
+| **Posizione**      | **Nome**   | **Tipo**  | **Descrizione**                                                                                    | **Obbligatorio** |
+|--------------------|------------|-----------|----------------------------------------------------------------------------------------------------|------------------|
+| Richiesta nel path | `format` | `string`  | 	formato in cui si vuole ottenere il report(json,csv,pdf)                                                                    | ✅               |
+| Richiesta nel body | `start` | `string`  | 	data di inizio del periodo temporale                                                                  | ✅               |
+| Richiesta nel body | `end` | `string`  | 	data di fine del periodo temporale                                                                        | ✅               |
+| Richiesta nel body | `parkingId` | `string`  | 	ID del parcheggio con cui si vuole filtrare                                                                    | ✅               |
+| Richiesta nel header | `Authorization` | `string`  | 	JWT di autenticazione: Bearer <token>                                                                              | ✅               |
+
+
+
+```http
+GET /api/reservationsReport/json?start=01-03-2025&end=12-07-2025&parkingId=a4b69567-1fa7-43ef-b222-90db6a17ab76
+HTTP/1.1
+Authorization: Bearer {{JWT_TOKEN}}
+```
+
+Esempio di risposta
+
+```json
+{
+        "id": "1f9f3edc-e2b1-4b54-b9ce-285ef53117e0",
+        "status": "In attesa di pagamento",
+        "licensePlate": "ATRYSA",
+        "vehicle": "auto",
+        "paymentAttemps": 0,
+        "userId": "e603cb6d-97e3-435f-bdc3-38f28823e7cc",
+        "parkingId": "a4b69567-1fa7-43ef-b222-90db6a17ab76",
+        "startTime": "2025-06-07T15:46:34.885Z",
+        "endTime": "2025-06-12T15:46:34.885Z",
+        "createdAt": "2025-06-07T15:46:34.889Z",
+        "updatedAt": "2025-06-07T15:46:34.889Z"
+    }
+```
+oppure in un file [csv](csv/reservations-e603cb6d-97e3-435f-bdc3-38f28823e7cc.csv)( o [pdf](pdf/reservations-e603cb6d-97e3-435f-bdc3-38f28823e7cc.pdf)
+
+
 
 # POST /operator/reports/reservations
 ### Parametri
