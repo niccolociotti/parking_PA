@@ -167,10 +167,164 @@ Il pattern Chain of Responsibility è stato adottato per gestire il flusso delle
 | POST| /check/transit/:type|Acquisizione del trasito di un vericolo per la generazione di una multa | ✅ |
 
 # POST /login
+**Parametri**
+| Posizione | Nome    | Tipo     | Descrizione  |Obbligatorio  |
+|:---------:|:-------:|:--------:|:------------:|:------------:|
+|Richiesta nel body| email| string|Indirizzo email dell'utente| ✅ |
+|Richiesta nel body| password| string|Password dell'utente| ✅ |
 
+**Esempio di richiesta**
+```json
+{
+  "email": "luigi@example.com",
+  "password": "luigi"
+}
+```
+**Esempio di risposta**
+```json
+{
+  "token":  "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImMwMzlhMGI3LTk2ZTktNGYyNC04YmQwLWU3ZmVlOWZlNmYyNSIsInJvbGUiOiJvcGVyYXRvcmUiLCJpYXQiOjE3NDkzMTAwOTUsImV4cCI6MTc0OTMxMzY5NX0.lU2POutp8peqHHCHTQEO90Fcu3bmurHJmki_fbjhiyb4c3vpycbnQmmKtTrSPQAwco4z0xyf5G8sOzwLWgspx81NCLCgxkuTpvQyhE76TcRrSHIH5BhDFv2pDvUKkWy1Q7oZ4o_0bKc0r0gRyTbOhDYw_wVkdrXZJkUpu0hGgUnlaNubrdHi7qoCOVPkaEfgOr5EvHdxCFGseZa-RMva17YhR0o85W54aJSvuBgyye-Fd7-MP8shXOzqBgrBoMSLRHSSAtk-m00b_dLNQYu_1Lbk2LJTbbHZo1LBsIF7lldMKtPPLqkaVZKpPOCwCrIKFyOvv5K0uCHeRmvQ15VqqiyQKyH7pYwaYPfiuyKvqzOAkOW3Kwf2LqOepWlk5iyk3ZlF6ZGKb6HVrR6dw2mxYB39YSDIXITBe1YVMQmq2bPJS7-kcRfY2m3Cm6mdtgC4SQjcSezqC27EsbyqgCQckrm7wr2ENbFZNCtVzsKVsTDTdTiHdK8oKDrcWjGZX6Oyv_j4zJZgZNrTe2L1l4p2Yt0d1Z6ZI3gLzhfJja3un8feERHwcgozrTGsKSrMLemN17U6oGhj2k-pK4PUJsC_GAaX_98hAjkxSsLSpQZ4_6-907bU1jwn0B-SOnkqA2kyRRCxlXMdtBfa5vcIRJP9R5zRR14RSBCHPBdeSt_-GSk",
+  "message": "Login successful"
+}
+```
+# POST /park/parking
+**Parametri**
+| Posizione | Nome    | Tipo     | Descrizione  |Obbligatorio  |
+|:---------:|:-------:|:--------:|:------------:|:------------:|
+|Richiesta nel body| name| string|Nome del parcheggio| ✅ |
+|Richiesta nel body| address| string|Indirizzo del parcheggio| ✅ |
+|Richiesta nel body| capacity| string|Capacità del parcheggio| ✅ |
+|Richiesta nel body| closedData| string|Date di chiusura del parcheggio| ✅ |
+|Header|	Authorization|	string|	Token JWT per autenticazione	| ✅|
 
+** Esempio di richiesta**
+```json
+{
+  "name": "Parcheggio Stamira",
+  "address": "Via Stamira 11",
+  "capacity": "60",
+  "closedData": ["2025-04-01"]
+}
+```
 
+** Esempio di risposta**
+```json
+{
+    "id": "d6a7239f-78c5-413e-b479-f7b6eb3988fd",
+    "name": "Parcheggio Stamira",
+    "address": "Via Stamira 11",
+    "capacity": 60,
+    "closedData": [
+        "2025-04-01T00:00:00.000Z"
+    ],
+    "updatedAt": "2025-06-07T15:38:21.190Z",
+    "createdAt": "2025-06-07T15:38:21.190Z"
+}
+```
+# GET /park/parkings
+**Parametri**
+| Posizione | Nome    | Tipo     | Descrizione  |Obbligatorio  |
+|:---------:|:-------:|:--------:|:------------:|:------------:|
+|Header|	Authorization|	string|	Token JWT per autenticazione	| ✅|
 
+** Esempio di risposta**
+```json
+[
+    {
+        "id": "d5ff1727-d01b-4b59-baa3-a800e244cd4f",
+        "name": "Parcheggio Centrale",
+        "address": "Via Roma 1, Milano",
+        "capacity": 45,
+        "closedData": [
+            "2025-12-31T00:00:00.000Z",
+            "2026-01-01T00:00:00.000Z"
+        ],
+        "createdAt": "2025-06-06T10:06:21.095Z",
+        "updatedAt": "2025-06-06T10:06:21.095Z"
+    },
+    {
+        "id": "66fe25c9-a390-4326-8193-99b0513ad973",
+        "name": "Parcheggio Stamira",
+        "address": "Via Stamira 9",
+        "capacity": 60,
+        "closedData": [
+            "2025-04-01T00:00:00.000Z"
+        ],
+        "createdAt": "2025-06-06T10:18:40.312Z",
+        "updatedAt": "2025-06-06T10:18:40.312Z"
+    }
+]
+```
+
+# DELETE /park/parking:id
+**Parametri**
+| Posizione | Nome    | Tipo     | Descrizione  |Obbligatorio  |
+|:---------:|:-------:|:--------:|:------------:|:------------:|
+|Path Param| id| string|Id del parcheggio| ✅ |
+|Header|	Authorization|	string|	Token JWT per autenticazione	| ✅|
+
+** Esempio di risposta**
+```json
+{
+    "message": "Parking with ID aaf28cf9-eeb9-4d4f-8d96-3a5345551e9b deleted."
+}
+```
+# GET /park/parking/:id
+**Parametri**
+| Posizione | Nome    | Tipo     | Descrizione  |Obbligatorio  |
+|:---------:|:-------:|:--------:|:------------:|:------------:|
+|Path Param| id| string|Id del parcheggio| ✅ |
+|Header|	Authorization|	string|	Token JWT per autenticazione	| ✅|
+
+** Esempio di risposta**
+```json
+{
+    "id": "d5ff1727-d01b-4b59-baa3-a800e244cd4f",
+    "name": "Parcheggio Centrale",
+    "address": "Via Roma 1, Milano",
+    "capacity": 45,
+    "closedData": [
+        "2025-12-31T00:00:00.000Z",
+        "2026-01-01T00:00:00.000Z"
+    ],
+    "createdAt": "2025-06-06T10:06:21.095Z",
+    "updatedAt": "2025-06-06T10:06:21.095Z"
+}
+```
+# POST /parking/update/:id
+**Parametri**
+| Posizione | Nome    | Tipo     | Descrizione  |Obbligatorio  |
+|:---------:|:-------:|:--------:|:------------:|:------------:|
+|Richiesta nel body| name| string|Nome del parcheggio| ✅ |
+|Richiesta nel body| address| string|Indirizzo del parcheggio| ✅ |
+|Richiesta nel body| capacity| string|Capacità del parcheggio| ✅ |
+|Richiesta nel body| closedData| string|Date di chiusura del parcheggio| ✅ |
+|Header|	Authorization|	string|	Token JWT per autenticazione	| ✅|
+
+** Esempio di richiesta**
+```json
+{
+  "name": "Parcheggio Arco",
+  "address": "Via Stamira 11",
+  "capacity": "40",
+  "closedData": ["2025-04-01"]
+}
+```
+
+** Esempio di risposta**
+```json
+{
+    "id": "d6a7239f-78c5-413e-b479-f7b6eb3988fd",
+    "name": "Parcheggio Arco",
+    "address": "Via Stamira 11",
+    "capacity": "40",
+    "closedData": [
+        "2025-04-01"
+    ],
+    "createdAt": "2025-06-07T15:38:21.190Z",
+    "updatedAt": "2025-06-07T15:54:50.932Z"
+}
+```
 
 # Configurazione e uso
 # Strumenti utilizzati
