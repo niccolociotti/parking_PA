@@ -222,9 +222,6 @@ export class ParkingService {
   });
 
     let revenue = 0;
-
-    console.log(price);
-
     allReservations.filter(r => r.status && [Status.CONFIRMED].includes(r.status as Status))
       .forEach(r => {
         // 4.a) Estrai il tipo di veicolo dalla prenotazione

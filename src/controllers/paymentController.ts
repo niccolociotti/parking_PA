@@ -57,7 +57,6 @@ export class PaymentController {
     const deleted = await this.reservationService.deletePayment(req.params.reservationId);
 
     try{
-    console.log("deleted", deleted);
     if (deleted > 0) {
     res.status(StatusCodes.OK).json({ message: `Reservation with ID ${req.params.reservationId} deleted.` });
   } else {

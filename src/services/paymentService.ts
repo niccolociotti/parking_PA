@@ -53,9 +53,10 @@ export class PaymentService {
     if (!user) throw ErrorFactory.entityNotFound('User');
    
     const parkingCapacity = await this.parkingCapacityDAO.findByParkingAndType(reservation.parkingId, reservation.vehicle.trim().toLowerCase() as Vehicles);
-    if (!parkingCapacity) throw ErrorFactory.entityNotFound('Parking');
+    if (!parkingCapacity) throw ErrorFactory.entityNotFound('Parking for the vehicle '+ reservation.vehicle+' ');
     
-    const price = PaymentService.calculatePrice(parkingCapacity.price, reservation.startTime, reservation.endTime);
+    const rawPrice = PaymentService.calculatePrice(parkingCapacity.price, reservation.startTime, reservation.endTime);
+    const price = Math.floor(rawPrice);
 
     if (user.tokens >= price) {
       user.tokens -= price;

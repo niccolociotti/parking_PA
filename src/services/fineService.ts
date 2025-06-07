@@ -30,6 +30,8 @@ export class FineService {
       price = 50;
     } else if(reason === "Transito fuori orario prenotazione") {
       price = 30;
+    } else if(reason === "Transito con prenotazione non pagata") {
+      price = 70;
     }
     
     return await this.fineDAO.create({

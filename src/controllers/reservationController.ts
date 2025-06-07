@@ -27,7 +27,9 @@ export class ReservationController {
    */
   create = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const { userId, parkingId, licensePlate, vehicle} = req.body;
+
+      const userId = (req as any).user.id as string;
+      const { parkingId, licensePlate, vehicle} = req.body;
 
       const capacityRejected = res.locals.capacityRejected;
 
@@ -35,7 +37,7 @@ export class ReservationController {
 
       const reservation = await this.reservationService.createReservation( userId, parkingId, licensePlate, vehicle,finalStatus);
       if(!res.locals.capacityRejected){
-        res.status(StatusCodes.CREATED).json(reservation);
+        res.status(StatusCodes.CREATED).json({Prenotazione:reservation});
       }else{
         throw ErrorFactory.customMessage("Prenotazione rifiutata per mancanza di posti disponibili.", StatusCodes.BAD_REQUEST);
           
@@ -55,7 +57,7 @@ export class ReservationController {
    * @returns Restituisce una risposta HTTP con l'elenco delle prenotazioni dell'utente o un errore se non trovate
    */
   listByUser = async (req: Request, res: Response, next: NextFunction) => {
-    const userId = req.params.userId;
+    const userId = (req as any).user.id as string;
     try {
       const reservations = await this.reservationService.findReservationsByUserId(userId);
       if (reservations.length > 0) {
@@ -140,7 +142,9 @@ export class ReservationController {
    */
   update = async (req: Request, res: Response, next: NextFunction) => {
     const reservationId = req.params.id;
-    const { userId, parkingId, licensePlate, vehicle, startTime, endTime} = req.body;
+    const userId = (req as any).user.id as string;
+
+    const {parkingId, licensePlate, vehicle, startTime, endTime} = req.body;
 
     const updates = {
       userId,
@@ -151,8 +155,6 @@ export class ReservationController {
       endTime
     };
 
-    console.log("Updates:", updates);
-
     const allUndefined = Object.values(updates).every(val => val === undefined);
     if (allUndefined) {
       throw ErrorFactory.badRequest("Nessun campo da aggiornare.");
@@ -162,7 +164,7 @@ export class ReservationController {
       const updatedReservation = await this.reservationService.updateReservation(reservationId, updates);
 
       if (updatedReservation) {
-        res.status(StatusCodes.OK).json(updatedReservation);
+        res.status(StatusCodes.OK).json({Prenotazione:updatedReservation});
       } else {
         throw ErrorFactory.entityNotFound("Reservation");
       }
@@ -182,16 +184,16 @@ export class ReservationController {
    */
   postReservationsReport = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const { plates: platesRaw, start: startRaw, end: endRaw, format: fmtRaw } = req.body;
+      const { licensePlates: licensePlatesRaw, start: startRaw, end: endRaw, format: fmtRaw } = req.body;
 
-      if (!Array.isArray(platesRaw) || platesRaw.length === 0) {
+      if (!Array.isArray(licensePlatesRaw) || licensePlatesRaw.length === 0) {
         throw ErrorFactory.badRequest('Il campo “plates” è obbligatorio e deve essere un array di stringhe.');
       }
       // controllo che ogni elemento di platesRaw sia stringa non vuota
-      const plates = platesRaw
+      const licensePlates = licensePlatesRaw
         .map((p: any) => (typeof p === 'string' ? p.trim().toUpperCase() : ''))
         .filter((p: string) => p.length > 0);
-      if (plates.length === 0) {
+      if (licensePlates.length === 0) {
         throw ErrorFactory.badRequest('Almeno una targa valida nel campo “plates”.');
       }
 
@@ -208,7 +210,7 @@ export class ReservationController {
       const format = (typeof fmtRaw === 'string' && fmtRaw.toLowerCase() === 'pdf') ? 'pdf' : 'json';
 
       const reservations = await this.reservationService.getReservationsByPlatesPeriod(
-        plates,
+        licensePlates,
         startTime,
         endTime,
       );
@@ -271,7 +273,7 @@ export class ReservationController {
           align: 'left',
         });
         doc.moveDown(0.2);
-        doc.text(`Targhe: ${plates.join(', ')}`, { align: 'left' });
+        doc.text(`Targhe: ${licensePlates.join(', ')}`, { align: 'left' });
         doc.moveDown(0.2);
         
         doc.moveDown(0.6);

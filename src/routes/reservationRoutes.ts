@@ -39,15 +39,6 @@ router.use(authMiddleware.isUser);
 router.post("/reservation", parkingMiddleware.checkCapacity, parkingMiddleware.checkParkingClosed, reservationController.create);
 
 /**
- * Rotta per ottenere tutte le prenotazioni
- * @route GET /reservations - Restituisce tutte le prenotazioni
- * @param req - Richiesta per ottenere le prenotazioni
- * @param res - Risposta contenente l'elenco delle prenotazioni
- * @param next - Funzione per passare al middleware successivo
- */
-router.get("/reservations", reservationController.list);
-
-/**
  * Rotta per ottenere una prenotazione specifica
  * @route GET /reservation/:id - Restituisce i dettagli di una prenotazione specifica
  * @param req - Richiesta contenente l'ID della prenotazione
@@ -58,12 +49,12 @@ router.get("/reservation/:id", reservationController.listById);
 
 /**
  * Rotta per ottenere le prenotazioni di un utente specifico
- * @route GET /reservations/user/:userId - Restituisce le prenotazioni di un utente specifico
+ * @route GET /reservations - Restituisce le prenotazioni di un utente specifico
  * @param req - Richiesta contenente l'ID dell'utente
  * @param res - Risposta contenente le prenotazioni dell'utente
  * @param next - Funzione per passare al middleware successivo
  */
-router.get("/reservations/user/:userId", reservationController.listByUser);
+router.get("/reservations", reservationController.listByUser);
 
 /**
  * Rotta per eliminare una prenotazione

@@ -135,7 +135,6 @@ export class ReservationService {
    */
   async deletePayment(id: string): Promise<number> {
     const deleted = await this.reservationDAO.deleteByIdStatus(id);
-    console.log(deleted);
     if (deleted === 0) {
       throw ErrorFactory.customMessage('Pagamento non confermato o già eliminato',StatusCodes.NOT_FOUND);
     }

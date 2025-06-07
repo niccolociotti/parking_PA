@@ -56,22 +56,23 @@ router.use(authMiddleware.authenticateToken);
 router.use(authMiddleware.isOperator);
 
 /**
- * @route GET /reports/reservations
- * @description Questa rotta consente agli operatori di ottenere un report sulle prenotazioni.
- * Gli operatori possono inviare una richiesta GET con i parametri necessari per filtrare le prenotazioni.
- * Il controller `reservationController` gestisce la logica per generare il report e restituirlo come risposta.
- * @returns Un oggetto contenente i dati del report sulle prenotazioni.
- * @throws Error Se si verifica un errore durante la generazione del report.
- */
-router.post('/reports/reservations',reservationController.postReservationsReport);
-
-/**
  * @route POST /reports/reservations
  * @description Questa rotta consente agli operatori di generare un report sulle prenotazioni.
  * Gli operatori possono inviare una richiesta POST con i parametri necessari per filtrare le prenotazioni.
  * Il controller `reservationController` gestisce la logica per generare il report e restituirlo come risposta.
  * @returns Un oggetto contenente i dati del report sulle prenotazioni.
  * @throws Se si verifica un errore durante la generazione del report.
+ */
+router.post('/reports/reservations',reservationController.postReservationsReport);
+
+/**
+ * @route GET /stats/:parkingId
+ * @description Questa rotta consente agli operatori di ottenere le statistiche di un parcheggio specifico.
+ * Gli operatori possono inviare una richiesta GET con l'ID del parcheggio come parametro.
+ * Il controller `parkingController` gestisce la logica per recuperare le statistiche del parcheggio e restituirle come risposta.
+ * @param {string} parkingId - ID del parcheggio di cui ottenere le statistiche.
+ * @returns Un oggetto contenente le statistiche del parcheggio richiesto.
+ * @throws Se si verifica un errore durante il recupero delle statistiche del parcheggio.
  */
 router.get('/stats/:parkingId',parkingController.getStats);
 

@@ -144,14 +144,13 @@ export class ReservationDAO implements ReservationDAOInterface {
    * @param plates - Array di targhe
    * @param startTime - Data di inizio periodo
    * @param endTime - Data di fine periodo
-   * @param parkingIds - (Opzionale) Array di ID parcheggi
    * @returns Array di prenotazioni trovate
    */
-  async findByPlatesAndPeriod( plates: string[], startTime: Date, endTime: Date, parkingIds?: string[]): Promise<Reservation[]> {
+  async findByPlatesAndPeriod( licensePlates: string[], startTime: Date, endTime: Date): Promise<Reservation[]> {
 
+    console.log("findByPlatesAndPeriod called with plates:", licensePlates, "startTime:", startTime, "endTime:", endTime);
     const whereClause: any = {
-    licensePlate: { [Op.in]: plates },
-    status:       { [Op.in]: [Status.PENDING, Status.CONFIRMED] },
+    licensePlate: { [Op.in]: licensePlates },
     // Confrontiamo solo la parte “data” di startTime e endTime, 
     // escludendo l’orario:
     [Op.and]: [
@@ -161,10 +160,6 @@ export class ReservationDAO implements ReservationDAOInterface {
       seqWhere(fn("DATE", col("endTime")),   { [Op.lte]: endTime   }),
     ],
   };
-
-  if (parkingIds && parkingIds.length > 0) {
-    whereClause.parkingId = { [Op.in]: parkingIds };
-  }
 
   return await Reservation.findAll({
     where: whereClause,

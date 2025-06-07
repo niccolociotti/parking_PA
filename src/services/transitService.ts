@@ -35,14 +35,8 @@ export class TransitService {
         // Cerca una prenotazione attiva per la targa, data e parcheggio
         const reservation = await this.reservationDAO.findActiveReservation(licensePlate, time, parkingId);
        
-        if (!reservation) {
-           throw ErrorFactory.customMessage("License Plate or Parking not found", StatusCodes.NOT_FOUND);
-        }
+        console.log("Prenotazione trovata:", reservation);
         
-        // La prenotazione deve essere CONFIRMED o PENDING
-        if (reservation?.status !== Status.CONFIRMED && reservation?.status !== Status.PENDING) {
-            throw ErrorFactory.customMessage("Reservation must be CONFIRMED or PENDING", StatusCodes.BAD_REQUEST);
-        }
         if(!reservation) {
             // Se non c'è prenotazione valida, genera una multa
             const fine = await this.fineService.createFine(
@@ -69,6 +63,19 @@ export class TransitService {
             return fine;
         }
 
+         // La prenotazione deve essere CONFIRMED o PENDING
+        if (reservation?.status !== Status.CONFIRMED && reservation?.status !== Status.PENDING) {
+            const fine = await this.fineService.createFine(
+                licensePlate,
+                parkingId,
+                "Transito con prenotazione non pagata"
+            );
+            if (!fine) {
+                throw new Error("Errore nella creazione della multa");
+            }
+            return fine;
+        }
+        
         // Se tutto è valido, registra il transito
         const transitData ={
             id: randomUUID(), 
