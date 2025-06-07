@@ -143,32 +143,30 @@ Il pattern Chain of Responsibility è stato adottato per gestire il flusso delle
 # Diagramma E-R
 # Diagrammi delle sequenze
 # API Routes
-| Verbo HTTP | Endpoint | Descrzione  | Autenticazione JWT|
+| Verbo HTTP | Endpoint | Descrzione | Autenticazione JWT |
 |:----------:|:--------:|:-----------:|:------------------:|
-| POST| /login| | ❌ |
-| POST| /park/parking| | ✅ |
-| GET| /park/parkings| | ✅|
-| DELETE| /park/parking:id| | ✅|
-| GET| /park/parking/:id| | ✅ |
-| POST| /park/parking/update/:id| | ✅ |
-| GET| /info/parcheggi/:id/:vehicle/:data/:period| | ❌ |
-| POST| /api/reservation| | ✅ |
-| GET| /api/reservations| | ✅ |
-| GET| /api/reservation/:id| | ✅ |
-| GET| /api/reservations/user/:userId| | ✅ |
-| DELETE| /api/reservation/:id| | ✅ |
-| POST| /api/reservation/update/:id| | ✅ |
-| GET| /api/pay/:reservationId| | ✅ |
-| GET| /api/paymentslip/:id| | ✅ |
-| DELETE| /api/pay/:reservationId| | ✅ |
-| GET| /api/reservationsReport/:id/:format| | ✅ |
-| POST| /operator/reservations| | ✅ |
-| GET| /operator/stats/:parkingId| | ✅ |
-| POST| /check/transit/:type| | ✅ |
+| POST| /login|Autenticazione dell'utente tramite email e password. | ❌ |
+| POST| /park/parking| Creazione di un nuovo parcheggio. | ✅ |
+| GET| /park/parkings| Recupero della lista dei parcheggi | ✅|
+| DELETE| /park/parking:id| Cancellazione di un parcheggio| ✅|
+| GET| /park/parking/:id| Recupero infomazioni di un parcheggio| ✅ |
+| POST| /park/parking/update/:id| Aggiornamento parametri percheggio | ✅ |
+| GET| /info/parcheggi/:id/:vehicle/:data/:period| Verifica della disponibilità di un parcheggio | ❌ |
+| POST| /api/reservation| Creazione di una prenotazione | ✅ |
+| GET| /api/reservations| Recupero della lista delle prenotazioni | ✅ |
+| GET| /api/reservation/:id| Recupero informazioni di una prenotazione | ✅ |
+| GET| /api/reservations/user/:userId| Recupero prenotazioni di un utente| ✅ |
+| DELETE| /api/reservation/:id| Cancellazione di una prenotazione| ✅ |
+| POST| /api/reservation/update/:id| Aggiornamenot della prenotazione | ✅ |
+| GET| /api/pay/:reservationId| Esecuzione del pagamento della prenotazione | ✅ |
+| GET| /api/paymentslip/:id| Generazione del bollettino di una prenotazione | ✅ |
+| DELETE| /api/pay/:reservationId| Cancellazione del pagamento di una prenotazione | ✅ |
+| GET| /api/reservationsReport/:id/:format| Generazione di una report sulle prenotazioni | ✅ |
+| POST| /operator/reports/reservations| Generazione di una report sulle prenotazioni degli utenti| ✅ |
+| GET| /operator/stats/:parkingId|Generazione di una report sulle prenotazioni di un parcheggio | ✅ |
+| POST| /check/transit/:type|Acquisizione del trasito di un vericolo per la generazione di una multa | ✅ |
 
-
-
-
+# POST /login
 
 
 
