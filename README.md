@@ -194,7 +194,7 @@ Il pattern Chain of Responsibility è stato adottato per gestire il flusso delle
 |Richiesta nel body| name| string|Nome del parcheggio| ✅ |
 |Richiesta nel body| address| string|Indirizzo del parcheggio| ✅ |
 |Richiesta nel body| capacity| string|Capacità del parcheggio| ✅ |
-|Richiesta nel body| closedData| string|Date di chiusura del parcheggio| ✅ |
+|Richiesta nel body| closedData| Date[]|Date di chiusura del parcheggio. Formato YYYY-MM-DD| ✅ |
 |Header|	Authorization|	string|	Token JWT per autenticazione	| ✅|
 
 ** Esempio di richiesta**
@@ -298,7 +298,7 @@ Il pattern Chain of Responsibility è stato adottato per gestire il flusso delle
 |Richiesta nel body| name| string|Nome del parcheggio| ✅ |
 |Richiesta nel body| address| string|Indirizzo del parcheggio| ✅ |
 |Richiesta nel body| capacity| string|Capacità del parcheggio| ✅ |
-|Richiesta nel body| closedData| string|Date di chiusura del parcheggio| ✅ |
+|Richiesta nel body| closedData| Date[]|Date di chiusura del parcheggio. Formato YYYY-MM-DD| ✅ |
 |Header|	Authorization|	string|	Token JWT per autenticazione	| ✅|
 
 ** Esempio di richiesta**
@@ -325,6 +325,30 @@ Il pattern Chain of Responsibility è stato adottato per gestire il flusso delle
     "updatedAt": "2025-06-07T15:54:50.932Z"
 }
 ```
+# GET /parcheggi/:id/:vehicle/:data/:period
+**Parametri**
+| Posizione | Nome    | Tipo     | Descrizione  |Obbligatorio  |
+|:---------:|:-------:|:--------:|:------------:|:------------:|
+|Path Param| id| string|Id del parcheggio| ✅ |
+|Path Param| vehicle| string|Tipologia di veicolo| ✅ |
+||Path Param| data| string|Data di arrivo. Formato YYYY-MM-DD| ✅ |
+||Path Param| period| integer |Durata della prenotazione| ✅ |
+
+** Esempio di risposta**
+```json
+{
+  "Disponibilità":"14"
+}
+```
+# GET	/api/paymentslip/:id
+**Parametri**
+| Posizione | Nome    | Tipo     | Descrizione  |Obbligatorio  |
+|:---------:|:-------:|:--------:|:------------:|:------------:|
+|Path Param| id| string|Id della prenotazione| ✅ |
+|Header|	Authorization|	string|	Token JWT per autenticazione	| ✅|
+
+** Esempio di risposta (Formato PDF) **
+
 
 # Configurazione e uso
 # Strumenti utilizzati
