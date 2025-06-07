@@ -1,6 +1,6 @@
-# Sviluppo Sviluppo di un sistema backend per la gestione dei parcheggi
+# Sviluppo di un sistema backend per la gestione di parcheggi
 
-Il seguente progetto è stato sviluppato come parte dell’esame di Programmazione Avanzata (A.A. 2024/2025) presso l'Università Politecnica delle Marche, all’interno del corso di Laurea Magistrale in Ingegneria Informatica e dell’Automazione (LM-32). Il sistema realizzato è un back-end che permette la gestione delle prenotazioni dei parcheggi.
+Il presente progetto è stato realizzato per l’esame di Programmazione Avanzata (A.A. 2024/2025) presso il corso di Laurea Magistrale in Ingegneria Informatica e Automazione (LM-32) dell’Università Politecnica delle Marche. Si tratta di un sistema back-end per la gestione delle prenotazioni dei parcheggi.
 
 L'idea del progetto si basa sulla realizzazione di un sistema in grado di gestire le prenotazioni per diversi parcheggi. Il sistema prevede due ruoli principali:
 - Operatore
@@ -12,7 +12,7 @@ Ogni parcheggio può ospitare diverse tipologie di veicoli, tra cui: moto, auto,
 
 Per effettuare una prenotazione, l’automobilista verifica la disponibilità di posti in uno specifico parcheggio, in base al tipo di veicolo. Se trova disponibilità, la prenotazione viene creata e passa in uno stato di attesa di pagamento. Nel momento del pagamento, l’utente può scaricare un bollettino contenente i dettagli del veicolo e l’importo da versare. Il pagamento avviene utilizzando un credito preassegnato all’utente, composto da gettoni o token, che fungono da moneta virtuale interna. Infine, il sistema genera un report con varie statistiche aggregate relative ai parcheggi, utile per gli operatori e per l’analisi delle prenotazioni.
 
-Il progetto è stato interamente concepito e realizzato da Niccolò Ciotti e Luca Renzi. Entrambi gli autori hanno collaborato attivamente in tutte le fasi di sviluppo, dalla progettazione iniziale dell’architettura del sistema, alla scrittura del codice, fino all’integrazione dei diversi componenti e alla fase di testing. La sinergia tra i due ha permesso di affrontare e risolvere problematiche complesse legate alla gestione delle partite e all’ottimizzazione delle prestazioni del sistema. Il contributo di entrambi ha garantito la creazione di un progetto solido e ben strutturato, rispettando gli obiettivi e i requisiti del progetto richiesto dal Prof. Mancini Adriano.
+Il progetto è stato interamente realizzato da Niccolò Ciotti e Luca Renzi. Il contributo di entrambi ha garantito la creazione di un progetto solido e ben strutturato, rispettando gli obiettivi e i requisiti del progetto richiesto dal Prof. Mancini Adriano.
 
 ## Indice
 
@@ -57,7 +57,6 @@ PARKING_PA/
 │
 ├── config
 ├── migrations
-├── node_modules
 ├── pdf
 ├── csv
 ├── postman
@@ -96,25 +95,30 @@ Il sistema di gestione delle prenotazioni dei parcheggi è basato su un'architet
 
 1. Server (Node.js con Express)
    
-Il server riceve e gestisce le richieste degli utenti tramite API REST. Gli utenti possono   autenticarsi, creare e getire le proprie prenotazioni. Gli operatori possono creare e gestire paarcheggi e visualizzare le statistiche. Tutte le interazioni sono protette da un sistema di autenticazione basato su token JWT, che garantisce che solo gli utenti autorizzati possano accedere alle funzionalità protette.
+Il cuore dell’applicazione è un server costruito con Node.js e Express, che espone API REST per gestire le richieste degli utenti. Gli automobilisti possono autenticarsi, creare e monitorare le proprie prenotazioni, mentre gli operatori hanno la possibilità di aggiungere nuovi parcheggi, modificarne i dettagli e consultare report statistici. L’accesso alle risorse protette è regolato da un meccanismo di autenticazione basato su JSON Web Token, in modo da garantire che soltanto utenti con credenziali valide possano sfruttare le funzionalità riservate.
 
 2. Database (PostgreSQL)
 
-La persistenza dei dati viene gestita tramite un database PostgreSQL,  integrato tramite l’ORM Sequelize. Le principali entità memorizzate includono:
-- Parcheggi: contiene informazioni identificative, indirizzo, capacità massima e giorni di chiusura.
-- Posti: rappresenta la capacità e il prezzo associati a un tipo di veicolo per uno specifico parcheggio.
-- Utenti: contiene infomazioni identificative dell'utente, ruolo e il saldo dei token
-- Multa: contine le infoamizioni sull'importo, la targa del veicolo e il motibvo della sanzione.
-- Transito: rappresenta un transito di un veicolo (ingresso o uscita) in un parcheggio, con eventuale riferimento alla prenotazione associata.
-- Prenotazioni: contiene informazioni sull'utente, il parcheggio, il veicolo, lo stato della prenotazione, i tentativi di pagamento e il periodo di validità.
+Tutti i dati vengono memorizzati in un’istanza PostgreSQL, manipolata attraverso l’ORM Sequelize. Le entità principali modellate nel database sono:
+- Parcheggi: informazioni identificative, indirizzo, capacità massima e giorni di chiusura.
+- Posti: tipologie di posti auto, con relativo prezzo e capacità per veicolo.
+- Utenti: dati identificativi, ruolo (es. automobilista, operatore) e saldo dei token.
+- Multe: importo della sanzione, targa del veicolo e motivazione.
+- Transiti: registrazione di entrate/uscite dei veicoli, con eventuale collegamento a una prenotazione.
+- Prenotazioni: dettagli su utente, parcheggio, veicolo, stato della prenotazione, tentativi di pagamento e periodo di validità.
 
 3. Autenticazion JWT
 
-Gli utenti si autenticano tramite JSON Web Tokens (JWT), ottenuti tramite il login con email e password. Il token JWT viene poi utilizzato per ogni richiesta successiva, permettendo al sistema di identificare facilmente il ruolo dell’utente (ad esempio, automobilista o operatore) e di garantire l’accesso solo alle risorse permesse in base ai privilegi associati.
+Gli utenti effettuano il login tramite email e password, ottenendo in risposta un token JWT. Questo token va poi allegato a ogni chiamata successiva, consentendo al server di riconoscere l’identità e il ruolo dell’utente (es. automobilista o operatore) e di applicare controlli di autorizzazione sulle risorse richieste.
 
 # Pattern utilizzati
-Nel progetto sono stati applicati diversi pattern architetturali e design pattern per garantire una struttura flessibile, manutenibile e facilmente estendibile. I pattern utilizzati verranno elencati di seguito.
+Per assicurare un’architettura flessibile, di facile manutenzione e facilmente estendibile, il progetto fa uso di diversi pattern sia architetturali sia di design. Di seguito vengono presentati quelli impiegati.
 ##  Model-View-Controler (MVC)
+Nel progetto il pattern MVC è stato adattato a un contesto esclusivamente back-end: il tradizionale livello “View” è stato sostituito da un layer “Service”, incaricato di gestire la logica di presentazione e di orchestrare tutte le operazioni.
+
+- Model: rappresenta in maniera fedele le entità del dominio—parcheggi, posti auto, utenti, multe, transiti e prenotazioni—definendone strutture, vincoli e relazioni tramite Sequelize.
+- Controller: funge da interfaccia verso il mondo esterno: riceve le richieste HTTP (GET, POST, DELETE), estrae e convalida i parametri in ingresso (dai path, dal body JSON o dagli header) e decide quale operazione eseguire. Invece di occuparsi di logiche complesse, il controller si limita a chiamare i metodi del Service corrispondenti all’azione richiesta.
+- Service:  è il centro dell’applicazione, dove vengono gestite tutte le operazioni principali. Si occupa di far interagire i diversi componenti, applicare le regole di business. In questo modo i controller restano snelli e concentrati sulla gestione delle richieste HTTP, mentre tutte le logiche complesse rimangono in un unico punto, facilmente testabile ed estendibile.
 
 ## Data Access Object (DAO)
 Il pattern Data Access Object (DAO) è stato adottato e implementato tramite Sequelize, che fornisce un’interfaccia ad alto livello per l’accesso ai dati. Questo pattern permette di astrarre e isolare la logica di accesso al database dal resto dell’applicazione, promuovendo una chiara separazione delle responsabilità. In questo constesto, Sequelize agisce come il DAO, poiché gestisce tutte le operazioni CRUD (Create, Read, Update, Delete) per i modelli. Il vantaggio dell’utilizzo del DAO è la modularità e la facilità di sostituzione o aggiornamento della logica di accesso ai dati senza influenzare la logica di business.
@@ -160,7 +164,7 @@ Il pattern Chain of Responsibility è stato adottato per gestire il flusso delle
 | POST| /api/reservation/update/:id| Aggiornamenot della prenotazione | ✅ |
 | GET| /api/pay/:reservationId| Esecuzione del pagamento della prenotazione | ✅ |
 | GET| /api/paymentslip/:id| Generazione del bollettino di una prenotazione | ✅ |
-| DELETE| /api/pay/:reservationId| Cancellazione del pagamento di una prenotazione | ✅ |
+| DELETE| /api/pay/:reservationId| Annullamento del pagamento di una prenotazione esclusivamente se il suo stato è in attesa.| ✅ |
 | GET| /api/reservationsReport/:id/:format| Generazione di una report sulle prenotazioni | ✅ |
 | POST| /operator/reports/reservations| Generazione di una report sulle prenotazioni degli utenti| ✅ |
 | GET| /operator/stats/:parkingId|Generazione di una report sulle prenotazioni di un parcheggio | ✅ |
@@ -350,6 +354,621 @@ Il pattern Chain of Responsibility è stato adottato per gestire il flusso delle
 ** Esempio di risposta (Formato PDF) **
 
 [Scarica il PDF](./pdf/payment-slip-938c89e4-7bbb-4143-b873-d5a56ff1a4fb.pdf)
+
+# POST /api/reservation
+### Parametri
+
+| **Posizione**      | **Nome**   | **Tipo**  | **Descrizione**                                                                                    | **Obbligatorio** |
+|--------------------|------------|-----------|----------------------------------------------------------------------------------------------------|------------------|
+| Richiesta nel body | `email`    | `string`  | Indirizzo email dell'utente. Formato: `username@example.com`.                                      | ✅               |
+| Richiesta nel body | `password` | `string`  | Password dell'utente                                                                               | ✅               |
+| Richiesta nel header | `Authorization` | `string`  | 	JWT di autenticazione: Bearer <token>                                                                              | ✅               |
+
+Esempio di richiesta
+
+```http
+POST /api/reservation HTTP/1.1
+Content-Type: application/json
+Authorization: Bearer {{JWT_TOKEN}}
+```
+
+```json
+{
+    "parkingId": "a4b69567-1fa7-43ef-b222-90db6a17ab76",
+    "licensePlate": "ATRYSA",
+    "vehicle": "auto",
+    "startTime": "23-06-2025",
+    "endTime": "25-06-2025"
+}
+
+```
+
+Esempio di risposta 
+
+```json
+{
+    "Prenotazione": {
+        "id": "e40fa6c9-8e16-4305-86a6-14f10bdbb4e1",
+        "userId": "e603cb6d-97e3-435f-bdc3-38f28823e7cc",
+        "parkingId": "a4b69567-1fa7-43ef-b222-90db6a17ab76",
+        "licensePlate": "ATRYSA",
+        "vehicle": "auto",
+        "status": "In attesa di pagamento",
+        "startTime": "2025-06-07T15:49:41.865Z",
+        "endTime": "2025-06-12T15:49:41.865Z",
+        "paymentAttemps": 0,
+        "updatedAt": "2025-06-07T15:49:41.866Z",
+        "createdAt": "2025-06-07T15:49:41.866Z"
+    }
+}
+```
+# GET /api/reservations
+### Parametri
+
+| **Posizione**      | **Nome**   | **Tipo**  | **Descrizione**                                                                                    | **Obbligatorio** |
+|--------------------|------------|-----------|----------------------------------------------------------------------------------------------------|------------------|
+| Richiesta nel header | `Authorization` | `string`  | 	JWT di autenticazione: Bearer <token>                                                                              | ✅               |
+| Richiesta nel payload token | `userId` | `string`  | 	JWT di autenticazione: Bearer <token>                                                                              | ✅               |
+
+Esempio di richiesta
+
+```http
+GET /api/reservations HTTP/1.1
+Authorization: Bearer {{JWT_TOKEN}}
+```
+Esempio di risposta 
+
+```json
+{
+    {
+        "id": "95c48683-8d0c-4bee-976b-a1500e7c5656",
+        "status": "In attesa di pagamento",
+        "licensePlate": "AB124CD",
+        "vehicle": "auto",
+        "paymentAttemps": 0,
+        "userId": "e603cb6d-97e3-435f-bdc3-38f28823e7cc",
+        "parkingId": "00bf5ef9-3198-444d-91bf-b080a6b6bde8",
+        "startTime": "2025-07-01T10:00:00.000Z",
+        "endTime": "2025-07-02T20:00:00.000Z",
+        "createdAt": "2025-06-06T18:36:43.885Z",
+        "updatedAt": "2025-06-06T18:36:43.885Z"
+    },
+    {
+        "id": "22601805-6962-41a0-ad42-17c7f848e248",
+        "status": "Prenotazione rifiutata",
+        "licensePlate": "AB124CD",
+        "vehicle": "auto",
+        "paymentAttemps": 0,
+        "userId": "e603cb6d-97e3-435f-bdc3-38f28823e7cc",
+        "parkingId": "00bf5ef9-3198-444d-91bf-b080a6b6bde8",
+        "startTime": "2025-07-04T10:00:00.000Z",
+        "endTime": "2025-07-06T20:00:00.000Z",
+        "createdAt": "2025-06-06T18:36:43.885Z",
+        "updatedAt": "2025-06-06T18:36:43.885Z"
+    },
+    {
+        "id": "1f9f3edc-e2b1-4b54-b9ce-285ef53117e0",
+        "status": "In attesa di pagamento",
+        "licensePlate": "ATRYSA",
+        "vehicle": "auto",
+        "paymentAttemps": 0,
+        "userId": "e603cb6d-97e3-435f-bdc3-38f28823e7cc",
+        "parkingId": "a4b69567-1fa7-43ef-b222-90db6a17ab76",
+        "startTime": "2025-06-07T15:46:34.885Z",
+        "endTime": "2025-06-12T15:46:34.885Z",
+        "createdAt": "2025-06-07T15:46:34.889Z",
+        "updatedAt": "2025-06-07T15:46:34.889Z"
+    },
+    {
+        "id": "e40fa6c9-8e16-4305-86a6-14f10bdbb4e1",
+        "status": "In attesa di pagamento",
+        "licensePlate": "ATRYSA",
+        "vehicle": "auto",
+        "paymentAttemps": 0,
+        "userId": "e603cb6d-97e3-435f-bdc3-38f28823e7cc",
+        "parkingId": "a4b69567-1fa7-43ef-b222-90db6a17ab76",
+        "startTime": "2025-06-07T15:49:41.865Z",
+        "endTime": "2025-06-12T15:49:41.865Z",
+        "createdAt": "2025-06-07T15:49:41.866Z",
+        "updatedAt": "2025-06-07T15:49:41.866Z"
+    }
+}
+```
+
+# GET /api/reservation/:id
+### Parametri
+
+| **Posizione**      | **Nome**   | **Tipo**  | **Descrizione**                                                                                    | **Obbligatorio** |
+|--------------------|------------|-----------|----------------------------------------------------------------------------------------------------|------------------|
+| Richiesta nel path | `id` | `string`  | 	ID della prenotazione da ottenere                                                                         | ✅               |
+| Richiesta nel header | `Authorization` | `string`  | 	JWT di autenticazione: Bearer <token>                                                                              | ✅               |
+
+Esempio di richiesta
+
+```http
+GET /api/reservation/95c48683-8d0c-4bee-976b-a1500e7c5656 HTTP/1.1
+Authorization: Bearer {{JWT_TOKEN}}
+```
+Esempio di risposta 
+
+```json
+{
+    "id": "95c48683-8d0c-4bee-976b-a1500e7c5656",
+    "status": "In attesa di pagamento",
+    "licensePlate": "AB124CD",
+    "vehicle": "auto",
+    "paymentAttemps": 0,
+    "userId": "e603cb6d-97e3-435f-bdc3-38f28823e7cc",
+    "parkingId": "00bf5ef9-3198-444d-91bf-b080a6b6bde8",
+    "startTime": "2025-07-01T10:00:00.000Z",
+    "endTime": "2025-07-02T20:00:00.000Z",
+    "createdAt": "2025-06-06T18:36:43.885Z",
+    "updatedAt": "2025-06-06T18:36:43.885Z"
+}
+```
+
+# DELETE /api/reservation/:id
+### Parametri
+
+| **Posizione**      | **Nome**   | **Tipo**  | **Descrizione**                                                                                    | **Obbligatorio** |
+|--------------------|------------|-----------|----------------------------------------------------------------------------------------------------|------------------|
+| Richiesta nel path | `id` | `string`  | 	ID della prenotazione che si vuole eliminare                                                                    | ✅               |
+| Richiesta nel header | `Authorization` | `string`  | 	JWT di autenticazione: Bearer <token>                                                                              | ✅               |
+
+Esempio di richiesta
+
+```http
+DELETE /api/reservation/95c48683-8d0c-4bee-976b-a1500e7c5656 HTTP/1.1
+Authorization: Bearer {{JWT_TOKEN}}
+```
+Esempio di risposta 
+
+```json
+{
+   "message": "Reservation with ID 95c48683-8d0c-4bee-976b-a1500e7c5656 deleted."
+}
+```
+
+# POST /api/reservation/update/:id
+### Parametri
+
+| **Posizione**      | **Nome**   | **Tipo**  | **Descrizione**                                                                                    | **Obbligatorio** |
+|--------------------|------------|-----------|----------------------------------------------------------------------------------------------------|------------------|
+| Richiesta nel path | `id` | `string`  | 	ID della prenotazione che si vuole aggiornare                                                                    | ✅               |
+| Richiesta nel body | `param` | `string`  | 	paramaetri che si vogliono aggiornare                                                                    | ✅               |
+| Richiesta nel header | `Authorization` | `string`  | 	JWT di autenticazione: Bearer <token>                                                                              | ✅               |
+
+Esempio di richiesta
+
+```http
+POST /api/reservation/update/e40fa6c9-8e16-4305-86a6-14f10bdbb4e1 HTTP/1.1
+Authorization: Bearer {{JWT_TOKEN}}
+```
+```json
+{
+"licensePlate": "CC123FF",
+    "vehicle": "moto"
+}
+```
+Esempio di risposta 
+
+```json
+{
+   "Prenotazione": {
+        "id": "e40fa6c9-8e16-4305-86a6-14f10bdbb4e1",
+        "status": "In attesa di pagamento",
+        "licensePlate": "CC123FF",
+        "vehicle": "moto",
+        "paymentAttemps": 0,
+        "userId": "e603cb6d-97e3-435f-bdc3-38f28823e7cc",
+        "parkingId": "a4b69567-1fa7-43ef-b222-90db6a17ab76",
+        "startTime": "2025-06-07T15:49:41.865Z",
+        "endTime": "2025-06-12T15:49:41.865Z",
+        "createdAt": "2025-06-07T15:49:41.866Z",
+        "updatedAt": "2025-06-07T16:18:11.451Z"
+    }
+}
+```
+
+# GET /api/pay/:reservationId
+### Parametri
+
+| **Posizione**      | **Nome**   | **Tipo**  | **Descrizione**                                                                                    | **Obbligatorio** |
+|--------------------|------------|-----------|----------------------------------------------------------------------------------------------------|------------------|
+| Richiesta nel path | `reservationId` | `string`  | 	ID della prenotazione che si vuole pagare                                                                    | ✅               |
+| Richiesta nel header | `Authorization` | `string`  | 	JWT di autenticazione: Bearer <token>                                                                              | ✅               |
+
+Esempio di richiesta
+
+```http
+GET /api/reservation/pay/e40fa6c9-8e16-4305-86a6-14f10bdbb4e1 HTTP/1.1
+Authorization: Bearer {{JWT_TOKEN}}
+```
+Esempio di risposta 
+
+```json
+{
+   "message": "Pagamento effettuato.",
+    "reservation": {
+        "id": "e40fa6c9-8e16-4305-86a6-14f10bdbb4e1",
+        "status": "Prenotazione confermata",
+        "licensePlate": "CC123FF",
+        "vehicle": "moto",
+        "paymentAttemps": 0,
+        "userId": "e603cb6d-97e3-435f-bdc3-38f28823e7cc",
+        "parkingId": "a4b69567-1fa7-43ef-b222-90db6a17ab76",
+        "startTime": "2025-06-07T15:49:41.865Z",
+        "endTime": "2025-06-12T15:49:41.865Z",
+        "createdAt": "2025-06-07T15:49:41.866Z",
+        "updatedAt": "2025-06-07T16:30:48.536Z"
+    }
+}
+```
+
+# DELETE /api/pay/:reservationId
+### Parametri
+
+| **Posizione**      | **Nome**   | **Tipo**  | **Descrizione**                                                                                    | **Obbligatorio** |
+|--------------------|------------|-----------|----------------------------------------------------------------------------------------------------|------------------|
+| Richiesta nel path | `reservationId` | `string`  | 	ID della prenotazione che si vuole annullare                                                                    | ✅               |
+| Richiesta nel header | `Authorization` | `string`  | 	JWT di autenticazione: Bearer <token>                                                                              | ✅               |
+
+Esempio di richiesta
+
+```http
+DELETE /api/reservation/pay/e40fa6c9-8e16-4305-86a6-14f10bdbb4e1 HTTP/1.1
+Authorization: Bearer {{JWT_TOKEN}}
+```
+Esempio di risposta 
+
+```json
+{
+   "message": "Reservation with ID e40fa6c9-8e16-4305-86a6-14f10bdbb4e1 deleted."
+}
+```
+
+# POST /operator/reports/reservations
+### Parametri
+
+| **Posizione**      | **Nome**   | **Tipo**  | **Descrizione**                                                                                    | **Obbligatorio** |
+|--------------------|------------|-----------|----------------------------------------------------------------------------------------------------|------------------|
+| Richiesta nel body | `licensePlate` | `string`  | 	targhe dei vicoli con cui si vuole filtrare                                                                    | ✅               |
+| Richiesta nel body | `start` | `string`  | 	data di inizio del periodo temporale                                                                  | ✅               |
+| Richiesta nel body | `end` | `string`  | 	data di fine del periodo temporale                                                                        | ✅               |
+| Richiesta nel body | `format` | `string`  | 	formato in cui si vuole ottenere il report(json,pdf)                                                                    | ✅               |
+| Richiesta nel header | `Authorization` | `string`  | 	JWT di autenticazione: Bearer <token>                                                                              | ✅               |
+
+Esempio di richiesta
+
+```http
+POST /operator/reports/reservations HTTP/1.1
+Authorization: Bearer {{JWT_TOKEN}}
+```
+Esempio di richiesta
+
+```json
+{
+   {
+    "licensePlates": [
+        "AB124CD",
+        "ZZ123YY"
+    ],
+    "start": "14-05-2025",
+    "end": "02-09-2025",
+    "format": "json"
+}
+}
+```
+
+Esempio di risposta
+
+```json
+{
+   "reservations": [
+        {
+            "id": "a9ff78ba-be89-43de-9c96-030e54f19e08",
+            "status": "Prenotazione confermata",
+            "licensePlate": "ZZ123YY",
+            "vehicle": "camion",
+            "paymentAttemps": 0,
+            "userId": "9f06cb27-7039-46e0-aa01-24323c821e9f",
+            "parkingId": "704d3fed-935a-409b-994d-2d7bc794e42e",
+            "startTime": "2025-05-15T06:00:00.000Z",
+            "endTime": "2025-07-15T14:00:00.000Z",
+            "createdAt": "2025-06-06T18:36:43.885Z",
+            "updatedAt": "2025-06-06T18:36:43.885Z"
+        },
+        {
+            "id": "22601805-6962-41a0-ad42-17c7f848e248",
+            "status": "Prenotazione rifiutata",
+            "licensePlate": "AB124CD",
+            "vehicle": "auto",
+            "paymentAttemps": 0,
+            "userId": "e603cb6d-97e3-435f-bdc3-38f28823e7cc",
+            "parkingId": "00bf5ef9-3198-444d-91bf-b080a6b6bde8",
+            "startTime": "2025-07-04T10:00:00.000Z",
+            "endTime": "2025-07-06T20:00:00.000Z",
+            "createdAt": "2025-06-06T18:36:43.885Z",
+            "updatedAt": "2025-06-06T18:36:43.885Z"
+        }
+    ]
+}
+```
+oppure un file [pdf](pdf/report_1749130994650.pdf)
+# GET /operator/stats/:parkingId
+### Parametri
+
+| **Posizione**      | **Nome**   | **Tipo**  | **Descrizione**                                                                                    | **Obbligatorio** |
+|--------------------|------------|-----------|----------------------------------------------------------------------------------------------------|------------------|
+| Richiesta nel path | `parkingId` | `string`  | 	Id del parcheggio di cui si vogliono ottenere le statistiche                                                                 | ✅               |
+| Richiesta nella query | `start` | `string`  | 	targa del veicolo che transita                                                                    | ❌               |
+| Richiesta nella query | `end` | `string`  | 	ID del parcheggio dove si transita                                                                   | ❌               |
+| Richiesta nel header | `Authorization` | `string`  | 	JWT di autenticazione: Bearer <token>                                                                              | ✅               |
+
+Esempio di richiesta
+
+```http
+GET /operator/stats/a4b69567-1fa7-43ef-b222-90db6a17ab76?start=31-05-2025 08:00&end=02-08-2025 20:00 HTTP/1.1
+Authorization: Bearer {{JWT_TOKEN}}
+```
+
+Esempio di risposta
+
+```json
+{
+   "parkingId": "a4b69567-1fa7-43ef-b222-90db6a17ab76",
+    "stats": {
+        "averageOccupancy": {
+            "Lun": {
+                "00:00-01:00": 0.33,
+                "01:00-02:00": 0.33,
+                "02:00-03:00": 0.33,
+                "03:00-04:00": 0.33,
+                "04:00-05:00": 0.33,
+                "05:00-06:00": 0.33,
+                "06:00-07:00": 0.33,
+                "07:00-08:00": 0.33,
+                "08:00-09:00": 0.33,
+                "09:00-10:00": 0.33,
+                "10:00-11:00": 0.33,
+                "11:00-12:00": 0.33,
+                "12:00-13:00": 0.33,
+                "13:00-14:00": 0.33,
+                "14:00-15:00": 0.33,
+                "15:00-16:00": 0.33,
+                "16:00-17:00": 0.33,
+                "17:00-18:00": 0.33,
+                "18:00-19:00": 0.33,
+                "19:00-20:00": 0.33,
+                "20:00-21:00": 0.33,
+                "21:00-22:00": 0.33,
+                "22:00-23:00": 0.33,
+                "23:00-24:00": 0.33
+            },
+            "Mar": {
+                "00:00-01:00": 0.33,
+                "01:00-02:00": 0.33,
+                "02:00-03:00": 0.33,
+                "03:00-04:00": 0.33,
+                "04:00-05:00": 0.33,
+                "05:00-06:00": 0.33,
+                "06:00-07:00": 0.33,
+                "07:00-08:00": 0.33,
+                "08:00-09:00": 0.33,
+                "09:00-10:00": 0.33,
+                "10:00-11:00": 0.33,
+                "11:00-12:00": 0.33,
+                "12:00-13:00": 0.33,
+                "13:00-14:00": 0.33,
+                "14:00-15:00": 0.33,
+                "15:00-16:00": 0.33,
+                "16:00-17:00": 0.33,
+                "17:00-18:00": 0.33,
+                "18:00-19:00": 0.33,
+                "19:00-20:00": 0.33,
+                "20:00-21:00": 0.33,
+                "21:00-22:00": 0.33,
+                "22:00-23:00": 0.33,
+                "23:00-24:00": 0.33
+            },
+            "Mer": {
+                "00:00-01:00": 0.33,
+                "01:00-02:00": 0.33,
+                "02:00-03:00": 0.33,
+                "03:00-04:00": 0.33,
+                "04:00-05:00": 0.33,
+                "05:00-06:00": 0.33,
+                "06:00-07:00": 0.33,
+                "07:00-08:00": 0.33,
+                "08:00-09:00": 0.33,
+                "09:00-10:00": 0.33,
+                "10:00-11:00": 0.33,
+                "11:00-12:00": 0.33,
+                "12:00-13:00": 0.33,
+                "13:00-14:00": 0.33,
+                "14:00-15:00": 0.33,
+                "15:00-16:00": 0.33,
+                "16:00-17:00": 0.33,
+                "17:00-18:00": 0.33,
+                "18:00-19:00": 0.33,
+                "19:00-20:00": 0.33,
+                "20:00-21:00": 0.33,
+                "21:00-22:00": 0.33,
+                "22:00-23:00": 0.33,
+                "23:00-24:00": 0.33
+            },
+            "Gio": {
+                "00:00-01:00": 0.33,
+                "01:00-02:00": 0.33,
+                "02:00-03:00": 0.33,
+                "03:00-04:00": 0.33,
+                "04:00-05:00": 0.33,
+                "05:00-06:00": 0.33,
+                "06:00-07:00": 0.33,
+                "07:00-08:00": 0.33,
+                "08:00-09:00": 0.33,
+                "09:00-10:00": 0.33,
+                "10:00-11:00": 0.33,
+                "11:00-12:00": 0.33,
+                "12:00-13:00": 0.33,
+                "13:00-14:00": 0.33,
+                "14:00-15:00": 0.33,
+                "15:00-16:00": 0.33,
+                "16:00-17:00": 0.33,
+                "17:00-18:00": 0.33,
+                "18:00-19:00": 0.22,
+                "19:00-20:00": 0.22,
+                "20:00-21:00": 0.11,
+                "21:00-22:00": 0.11,
+                "22:00-23:00": 0.11,
+                "23:00-24:00": 0.11
+            },
+            "Ven": {
+                "00:00-01:00": 0.11,
+                "01:00-02:00": 0.11,
+                "02:00-03:00": 0.11,
+                "03:00-04:00": 0.11,
+                "04:00-05:00": 0.11,
+                "05:00-06:00": 0.11,
+                "06:00-07:00": 0.11,
+                "07:00-08:00": 0.11,
+                "08:00-09:00": 0.11,
+                "09:00-10:00": 0.11,
+                "10:00-11:00": 0.11,
+                "11:00-12:00": 0.11,
+                "12:00-13:00": 0.11,
+                "13:00-14:00": 0.11,
+                "14:00-15:00": 0.11,
+                "15:00-16:00": 0.11,
+                "16:00-17:00": 0.11,
+                "17:00-18:00": 0.11,
+                "18:00-19:00": 0.11,
+                "19:00-20:00": 0.11,
+                "20:00-21:00": 0.11,
+                "21:00-22:00": 0.11,
+                "22:00-23:00": 0.11,
+                "23:00-24:00": 0.11
+            },
+            "Sab": {
+                "08:00-09:00": 0.1,
+                "09:00-10:00": 0.1,
+                "10:00-11:00": 0.1,
+                "11:00-12:00": 0.1,
+                "12:00-13:00": 0.1,
+                "13:00-14:00": 0.1,
+                "14:00-15:00": 0.1,
+                "15:00-16:00": 0.1,
+                "16:00-17:00": 0.1,
+                "17:00-18:00": 0.2,
+                "18:00-19:00": 0.2,
+                "19:00-20:00": 0.2,
+                "20:00-21:00": 0.2,
+                "21:00-22:00": 0.22,
+                "22:00-23:00": 0.22,
+                "23:00-24:00": 0.22,
+                "00:00-01:00": 0.11,
+                "01:00-02:00": 0.11,
+                "02:00-03:00": 0.11,
+                "03:00-04:00": 0.11,
+                "04:00-05:00": 0.11,
+                "05:00-06:00": 0.11,
+                "06:00-07:00": 0.11,
+                "07:00-08:00": 0.11
+            },
+            "Dom": {
+                "00:00-01:00": 0.22,
+                "01:00-02:00": 0.22,
+                "02:00-03:00": 0.22,
+                "03:00-04:00": 0.22,
+                "04:00-05:00": 0.22,
+                "05:00-06:00": 0.22,
+                "06:00-07:00": 0.22,
+                "07:00-08:00": 0.22,
+                "08:00-09:00": 0.22,
+                "09:00-10:00": 0.22,
+                "10:00-11:00": 0.33,
+                "11:00-12:00": 0.33,
+                "12:00-13:00": 0.33,
+                "13:00-14:00": 0.33,
+                "14:00-15:00": 0.33,
+                "15:00-16:00": 0.33,
+                "16:00-17:00": 0.33,
+                "17:00-18:00": 0.33,
+                "18:00-19:00": 0.33,
+                "19:00-20:00": 0.33,
+                "20:00-21:00": 0.33,
+                "21:00-22:00": 0.33,
+                "22:00-23:00": 0.33,
+                "23:00-24:00": 0.33
+            }
+        },
+        "contemporaryMaxOccupancy": 2,
+        "contemporaryMinOccupancy": 0,
+        "revenue": 0,
+        "rejectedCount": 0,
+        "mostRequestedSlot": "10:00-11:00"
+    }
+}
+```
+
+
+# POST /check/transit/:type
+### Parametri
+
+| **Posizione**      | **Nome**   | **Tipo**  | **Descrizione**                                                                                    | **Obbligatorio** |
+|--------------------|------------|-----------|----------------------------------------------------------------------------------------------------|------------------|
+| Richiesta nel path | `type` | `string`  | 	tipo di transito(ingresso,uscita)                                                                 | ✅               |
+| Richiesta nel body | `licensePlate` | `string`  | 	targa del veicolo che transita                                                                    | ✅               |
+| Richiesta nel body | `parkingId` | `string`  | 	ID del parcheggio dove si transita                                                                   | ✅               |
+| Richiesta nel header | `Authorization` | `string`  | 	JWT di autenticazione: Bearer <token>                                                                              | ✅               |
+
+Esempio di richiesta
+
+```http
+POST /check/transit/ingresso HTTP/1.1
+Authorization: Bearer {{JWT_TOKEN}}
+```
+Esempio di richiesta
+
+```json
+{
+    "licensePlate": "ZZ123YY",
+    "parkingId": "704d3fed-935a-409b-994d-2d7bc794e42e"
+}
+```
+
+Esempio di risposta
+
+```json
+{
+   "message": "Transito in ingresso",
+    "fineOrTransit": {
+        "id": "a18c8bf8-3426-46f8-ad13-08b25d075ab0",
+        "type": "ingresso",
+        "licensePlate": "ZZ123YY",
+        "parkingId": "704d3fed-935a-409b-994d-2d7bc794e42e",
+        "time": "2025-06-07 17:03:48.844 +00:00",
+        "reservationId": "a9ff78ba-be89-43de-9c96-030e54f19e08",
+        "updatedAt": "2025-06-07T17:03:48.855Z",
+        "createdAt": "2025-06-07T17:03:48.855Z"
+    }
+}
+```
+oppure
+```json
+{
+   "message": "Multa",
+    "fineOrTransit": {
+        "id": "a7f84fd1-3710-4a52-b031-fadcba1578e2",
+        "licensePlate": "ZZ123YY",
+        "parkingId": "704d3fed-935a-409b-994d-2d7bc794e42e",
+        "price": 50,
+        "reason": "Transito senza prenotazione valida",
+        "updatedAt": "2025-06-07T17:08:57.332Z",
+        "createdAt": "2025-06-07T17:08:57.332Z"
+    }
+}
+```
 
 # Configurazione e uso
 # Strumenti utilizzati
