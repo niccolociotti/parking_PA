@@ -157,7 +157,79 @@ Questa suddivisione rende la pipeline chiara e modulare.
 # Diagrammi UML
 # Diagramma dei casi d'uso
 # Diagramma E-R
-![Schema E-R](./images/parkingdb .png)
+
+```mermaid
+erDiagram
+    USERS {
+        INT id PK
+        VARCHAR name
+        VARCHAR email
+        VARCHAR password
+        VARCHAR role
+        INT tokens
+        DATETIME createdAt
+        DATETIME updatedAt
+    }
+    PARKINGS {
+        INT id PK
+        VARCHAR name
+        VARCHAR address
+        INT capacity
+        DATE closedData
+        DATETIME createdAt
+        DATETIME updatedAt
+    }
+    RESERVATIONS {
+        INT id PK
+        VARCHAR status
+        INT userId FK
+        INT parkingId FK
+        VARCHAR licensePlate
+        VARCHAR vehicle
+        DATETIME startTime
+        DATETIME endTime
+        DATETIME createdAt
+        DATETIME updatedAt
+        INT paymentAttempts
+    }
+    TRANSITS {
+        INT id PK
+        VARCHAR licensePlate
+        DATETIME time
+        INT parkingId FK
+        VARCHAR type
+        INT reservationId FK
+        DATETIME createdAt
+        DATETIME updatedAt
+    }
+    FINES {
+        INT id PK
+        DECIMAL price
+        VARCHAR licensePlate
+        INT parkingId FK
+        VARCHAR reason
+        DATETIME createdAt
+        DATETIME updatedAt
+    }
+    PARKINGCAPACITIES {
+        INT id PK
+        INT parkingId FK
+        VARCHAR vehicle
+        INT capacity
+        DECIMAL price
+        DATETIME createdAt
+        DATETIME updatedAt
+    }
+
+    USERS ||--o{ RESERVATIONS : ha
+    PARKINGS ||--o{ RESERVATIONS : ha
+    RESERVATIONS ||--o{ TRANSITS : ha
+    PARKINGS ||--o{ TRANSITS : registra
+    PARKINGS ||--o{ FINES : emette
+    PARKINGS ||--o{ PARKINGCAPACITIES : ha
+
+```
+
 # Diagrammi delle sequenze
 # API Routes
 | Verbo HTTP | Endpoint | Descrzione | Autenticazione JWT |
