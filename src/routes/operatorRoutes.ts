@@ -9,6 +9,8 @@ import { ParkingDao } from "../dao/ParkingDao";
 import { ParkingController } from "../controllers/ParkingController";
 import { ParkingService } from "../services/ParkingService";
 import { ParkingCapacityDao } from "../dao/parkingCapacityDAO";
+import { OperatorController } from "../controllers/operatorController";
+import { OperatorService } from "../services/operatorService";
 
 const router = Router();  // nuova istanza di Express Router
 
@@ -36,6 +38,8 @@ const reservationController = new ReservationController(reservationService);
 const userDAO = new UserDAO();
 const authService = new AuthService(userDAO);
 const authMiddleware = new AuthMiddleware(authService);
+const operatoService = new OperatorService(userDAO);
+const operatorController = new OperatorController(operatoService);
 
 /**
  * Middleware per autenticare l'utente.
@@ -75,5 +79,16 @@ router.post('/reports/reservations',reservationController.postReservationsReport
  * @throws Se si verifica un errore durante il recupero delle statistiche del parcheggio.
  */
 router.get('/stats/:parkingId',parkingController.getStats);
+
+/**
+ * @route POST /updateTokens
+ * @description Questa rotta consente agli operatori di aggiornare i token degli utenti.
+ * Gli operatori possono inviare una richiesta POST per aggiornare i token associati agli utenti.
+ * Il controller `operatorController` gestisce la logica per aggiornare i token e restituire una risposta appropriata.
+ * @returns Un oggetto contenente un messaggio di conferma dell'aggiornamento dei token.
+ * @throws Se si verifica un errore durante l'aggiornamento dei token.
+ */
+
+router.post('/updateTokens',  operatorController.updateTokens);
 
 export default router;

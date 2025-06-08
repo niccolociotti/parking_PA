@@ -1,4 +1,4 @@
-import { User } from '../models/user';
+import { User } from '../models/User';
 
 /** 
  * Interfaccia per il Data Access Object (DAO) degli utenti.
@@ -49,6 +49,22 @@ export class UserDAO implements UserDAOInterface {
    */
   async findById(id: string): Promise<User | null> {
     return await User.findOne({where: {id}});
+  }
+  
+  /**
+   *  Metodo per aggiornare un utente nel database.
+   * * @description Questo metodo cerca un utente esistente in base all'ID fornito e aggiorna i suoi dati.
+   * * Se l'utente non esiste, viene sollevata un'eccezione.
+   * @param user 
+   * @return {Promise<User>} Una promessa che risolve con l'utente aggiornato.
+   * @throws Error Se l'utente con l'ID specificato non esiste.
+   */
+  async update(user: User): Promise<User> {
+    const existingUser = await User.findByPk(user.id);
+    if (!existingUser) {
+      throw new Error(`User with id ${user.id} not found`);
+    }
+    return await existingUser.update(user);
   }
 
 }
