@@ -156,6 +156,7 @@ Questa suddivisione rende la pipeline chiara e modulare.
 
 # Diagrammi UML
 # Diagramma dei casi d'uso
+Un diagramma dei casi d’uso è una rappresentazione grafica che serve a descrivere chi (gli attori) interagisce con il sistema e cosa il sistema fornisce loro (i casi d’uso).
 
 ```mermaid
 graph TD
@@ -318,6 +319,74 @@ erDiagram
 ```
 
 # Diagrammi delle sequenze
+
+I diagrammi delle sequenze sono dei diagrammi comportamentali utilizzati per descrivere come e in che ordine gli oggetti (o componenti) di un sistema collaborano per realizzare uno specifico flusso di esecuzione.
+## POST /api/reservation
+
+```mermaid
+sequenceDiagram
+    actor Client
+    participant App
+    participant Middleware
+    participant Controller
+    participant Service
+    participant DAO
+    participant ORM
+    participant ErrorFactory
+
+    Client->>App: POST /api/reservation ( reservationData )
+    App->>+Middleware: authenticateJWT
+    Middleware-->>-App: next()
+    App->>+Middleware: isUser
+    Middleware-->>-App: next()
+    App->>+Middleware: checkCapacity
+    Middleware-->>-App: next()
+    App->>+Middleware: checkParkingClosed
+    Middleware-->>-App: next()
+    App->>+Controller: create(req)
+    Controller->>+Service: createReservation(userId, parkingId, data)
+    alt data valid
+        Service->>+DAO: findByPk(userId)
+        DAO->>+ORM: findByPk(userId)
+        ORM-->>-DAO: User
+        alt user exists
+            Service->>DAO: findById(parkingId)
+            DAO->>+ORM: findByPk(parkingId)
+            ORM-->>-DAO: Parking
+            alt parking exists
+                Service->>DAO: createReservation(data)
+                DAO->>+ORM: create(data)
+                ORM-->>-DAO: Reservation
+                DAO-->>-Service: Reservation
+                Service-->>-Controller: Reservation
+                Controller-->>App: HTTP Response ( Reservation )
+                App-->>Client: HTTP Response new Reservation 
+            else parking not found
+                Service->>ErrorFactory: entityNotFound()
+                ErrorFactory-->>Service: NotFound Error
+                Service-->>Controller: throw NotFound Error
+                Controller-->>Middleware: next(error)
+                Middleware-->>App: HTTP Response
+                App-->>Client: HTTP Response
+            end
+        else user not found
+                Service->>ErrorFactory: entityNotFound()
+                ErrorFactory-->>Service: NotFound Error
+                Service-->>Controller: throw NotFound Error
+                Controller-->>Middleware: next(error)
+                Middleware-->>App: HTTP Response
+                App-->>Client: HTTP Response
+        end
+    else validation failed
+        Service->>ErrorFactory: customMessage("Prenotazione rifiutata per mancanza di posti disponibili.")
+        ErrorFactory-->>Service: ValidationError
+        Service-->>Controller: throw ValidationError
+        Controller-->>Middleware: next(error)
+        Middleware-->>Controller: HTTP Response
+        App-->>Client: HTTP Response
+    end
+```
+
 # API Routes
 | Verbo HTTP | Endpoint | Descrzione | Autenticazione JWT |
 |:----------:|:--------:|:-----------:|:------------------:|
@@ -1288,7 +1357,7 @@ jwtRS256.key.pub
 ```
 ### Passo 4
 
-Successivamente, a parire dalla cartella `parking_PA`(la directory principale del progetto), si può avviare l'applicazione eseguendo il seguente comando:
+Successivamente, a partire dalla cartella `parking_PA`(la directory principale del progetto), si può avviare l'applicazione eseguendo il seguente comando:
 
 ```
 docker-compose up --build
