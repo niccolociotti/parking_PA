@@ -362,28 +362,104 @@ sequenceDiagram
                 Controller-->>App: HTTP Response ( Reservation )
                 App-->>Client: HTTP Response new Reservation 
             else parking not found
-                Service->>ErrorFactory: entityNotFound()
-                ErrorFactory-->>Service: NotFound Error
+                Service->>+ErrorFactory: entityNotFound()
+                ErrorFactory-->>-Service: NotFound Error
                 Service-->>Controller: throw NotFound Error
                 Controller-->>Middleware: next(error)
                 Middleware-->>App: HTTP Response
                 App-->>Client: HTTP Response
             end
         else user not found
-                Service->>ErrorFactory: entityNotFound()
-                ErrorFactory-->>Service: NotFound Error
+                Service->>+ErrorFactory: entityNotFound()
+                ErrorFactory-->>-Service: NotFound Error
                 Service-->>Controller: throw NotFound Error
                 Controller-->>Middleware: next(error)
                 Middleware-->>App: HTTP Response
                 App-->>Client: HTTP Response
         end
     else validation failed
-        Service->>ErrorFactory: customMessage("Prenotazione rifiutata per mancanza di posti disponibili.")
-        ErrorFactory-->>Service: ValidationError
+        Service->>+ErrorFactory: customMessage("Prenotazione rifiutata per mancanza di posti disponibili.")
+        ErrorFactory-->>-Service: ValidationError
         Service-->>Controller: throw ValidationError
         Controller-->>Middleware: next(error)
         Middleware-->>Controller: HTTP Response
         App-->>Client: HTTP Response
+    end
+```
+
+## GET /api/reservation/:id
+
+```mermaid
+sequenceDiagram
+    actor Client
+    participant App
+    participant Middleware
+    participant Controller
+    participant Service
+    participant DAO
+    participant ORM
+    participant ErrorFactory
+
+    Client->>App: POST /api/reservation ( reservationData )
+    App->>+Middleware: authenticateJWT
+    Middleware-->>-App: next()
+    App->>+Middleware: isUser
+    Middleware-->>-App: next()
+    App->>+Controller: listById(req)
+    Controller->>+Service: findReservationById(reservationId)
+        Service->>+DAO: findById(reservationId)
+        DAO->>+ORM: findByPk(reservationId)
+        ORM-->>-DAO: Reservation
+        alt reservation exists
+            DAO-->>-Service: Reservation
+            Service-->>-Controller: Reservation
+            Controller-->>App: HTTP Response ( Reservation )
+            App-->>Client: HTTP Response
+            else reservation not found
+                Service->>+ErrorFactory: entityNotFound()
+                ErrorFactory-->>-Service: NotFound Error
+                Service-->>Controller: throw NotFound Error
+                Controller-->>Middleware: next(error)
+                Middleware-->>App: HTTP Response
+                App-->>Client: HTTP Response
+    end
+
+```
+
+## GET /api/reservations
+```mermaid
+sequenceDiagram
+    actor Client
+    participant App
+    participant Middleware
+    participant Controller
+    participant Service
+    participant DAO
+    participant ORM
+    participant ErrorFactory
+
+    Client->>App: POST /api/reservation ( reservationData )
+    App->>+Middleware: authenticateJWT
+    Middleware-->>-App: next()
+    App->>+Middleware: isUser
+    Middleware-->>-App: next()
+    App->>+Controller: listByUser(req)
+    Controller->>+Service: findReservationByUserId(userId)
+        Service->>+DAO: findAllByUser(userId)
+        DAO->>+ORM: findAll(userId)
+        ORM-->>-DAO: Reservations
+        alt reservation exists
+            DAO-->>-Service: Reservations
+            Service-->>-Controller: Reservations
+            Controller-->>App: HTTP Response ( Reservations )
+            App-->>Client: HTTP Response
+            else reservation not found
+                Service->>+ErrorFactory: entityNotFound()
+                ErrorFactory-->>-Service: NotFound Error
+                Service-->>Controller: throw NotFound Error
+                Controller-->>Middleware: next(error)
+                Middleware-->>App: HTTP Response
+                App-->>Client: HTTP Response
     end
 ```
 
