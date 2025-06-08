@@ -1,4 +1,19 @@
 # Sviluppo di un sistema backend per la gestione di parcheggi
+<div align="center">
+  <img src="https://mobipar.it/wp-content/uploads/2024/10/Service_Featured_Image_progettazione_parcheggi.svg" alt="Logo del progetto" width="400"/>
+</div>
+
+######
+[![Postgres](https://img.shields.io/badge/Made%20with-postgres-%23316192.svg?style=plastic&logo=postgresql&logoColor=white)](https://www.postgresql.org/)
+[![NPM](https://img.shields.io/badge/Made%20with-NPM-%23CB3837.svg?style=plastic&logo=npm&logoColor=white)](https://www.npmjs.com/)
+[![NodeJS](https://img.shields.io/badge/Made%20with-node.js-6DA55F?style=plastic&logo=node.js&logoColor=white)](https://nodejs.org/en)
+[![Express.js](https://img.shields.io/badge/Made%20with-express.js-%23404d59.svg?style=plastic&logo=express&logoColor=%2361DAFB)](https://expressjs.com/it/)
+[![JWT](https://img.shields.io/badge/Made%20with-JWT-black?style=plastic&logo=JSON%20web%20tokens)](https://jwt.io/)
+[![TypeScript](https://img.shields.io/badge/Made%20with-typescript-%23007ACC.svg?style=plastic&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![Sequelize](https://img.shields.io/badge/Made%20with-Sequelize-52B0E7?style=plastic&logo=Sequelize&logoColor=white)](https://sequelize.org/)
+[![Docker](https://img.shields.io/badge/Made%20with-docker-%230db7ed.svg?style=plastic&logo=docker&logoColor=white)](https://www.docker.com/)
+[![Postman](https://img.shields.io/badge/Made%20with-Postman-FF6C37?style=plastic&logo=postman&logoColor=white)](https://www.postman.com/)
+
 
 Il presente progetto è stato realizzato per l’esame di Programmazione Avanzata (A.A. 2024/2025) presso il corso di Laurea Magistrale in Ingegneria Informatica e Automazione (LM-32) dell’Università Politecnica delle Marche. Si tratta di un sistema back-end per la gestione delle prenotazioni dei parcheggi.
 
@@ -400,7 +415,7 @@ sequenceDiagram
     participant ORM
     participant ErrorFactory
 
-    Client->>App: POST /api/reservation ( reservationData )
+    Client->>App: GET /api/reservation/:id 
     App->>+Middleware: authenticateJWT
     Middleware-->>-App: next()
     App->>+Middleware: isUser
@@ -438,7 +453,7 @@ sequenceDiagram
     participant ORM
     participant ErrorFactory
 
-    Client->>App: POST /api/reservation ( reservationData )
+    Client->>App: GET /api/reservations 
     App->>+Middleware: authenticateJWT
     Middleware-->>-App: next()
     App->>+Middleware: isUser
@@ -462,6 +477,94 @@ sequenceDiagram
                 App-->>Client: HTTP Response
     end
 ```
+
+## DELETE /api/reservation/:id
+```mermaid
+sequenceDiagram
+    actor Client
+    participant App
+    participant Middleware
+    participant Controller
+    participant Service
+    participant DAO
+    participant ORM
+    participant ErrorFactory
+
+    Client->>App: DELETE /api/reservation/:id 
+    App->>+Middleware: authenticateJWT
+    Middleware-->>-App: next()
+    App->>+Middleware: isUser
+    Middleware-->>-App: next()
+    App->>+Controller: delete(req)
+    Controller->>+Service: deleteReservation(reservationId)
+        Service->>+DAO: delete(reservationId)
+        DAO->>+ORM: destroy()
+        ORM-->>-DAO: Reservation deleted
+        alt reservation exists
+            DAO-->>-Service: Reservation deleted
+            Service-->>-Controller: Reservations
+            Controller-->>App: HTTP Response ( Reservations )
+            App-->>Client: HTTP Response
+            else reservation not found
+                Service->>+ErrorFactory: entityNotFound()
+                ErrorFactory-->>-Service: NotFound Error
+                Service-->>Controller: throw NotFound Error
+                Controller-->>Middleware: next(error)
+                Middleware-->>App: HTTP Response
+                App-->>Client: HTTP Response
+    end
+
+```
+
+## POST /api/reservation/update/:id
+```mermaid
+sequenceDiagram
+    actor Client
+    participant App
+    participant Middleware
+    participant Controller
+    participant Service
+    participant DAO
+    participant ORM
+    participant ErrorFactory
+
+    Client->>App: POST /api/reservation/update/:id
+    App->>+Middleware: authenticateJWT
+    Middleware-->>-App: next()
+    App->>+Middleware: isUser
+    Middleware-->>-App: next()
+    App->>+Controller: update(req)
+    alt data valid
+    Controller->>+Service: updateReservation(reservationId,updates)
+        Service->>+DAO: update(reservationId,updates)
+        DAO->>+ORM: findByPk(reservationId)
+        ORM-->>-DAO: Reservation
+        alt reservation exists
+        DAO->>+ORM: update(updates)
+        ORM-->>-DAO: Reservation updated
+            DAO-->>-Service: Reservation updated
+            Service-->>-Controller: Reservation
+            Controller-->>App: HTTP Response ( Reservation )
+            App-->>Client: HTTP Response
+            else reservation not found
+                Service->>+ErrorFactory: entityNotFound()
+                ErrorFactory-->>-Service: NotFound Error
+                Service-->>Controller: throw NotFound Error
+                Controller-->>Middleware: next(error)
+                Middleware-->>App: HTTP Response
+                App-->>Client: HTTP Response
+                end
+    else validation failed
+    Service->>+ErrorFactory: badRequest("Nessun campo da aggiornare.")
+        ErrorFactory-->>-Service: ValidationError
+        Service-->>Controller: throw ValidationError
+        Controller-->>Middleware: next(error)
+        Middleware-->>Controller: HTTP Response
+        App-->>Client: HTTP Response
+    end
+
+```
+
 
 # API Routes
 | Verbo HTTP | Endpoint | Descrzione | Autenticazione JWT |
