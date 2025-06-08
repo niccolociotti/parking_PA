@@ -6,7 +6,11 @@
     "start": "node dist/app.js",
     "dev": "ts-node src/app.ts",
     "build": "tsc",
-    "devTS": "ts-node-dev --respawn --transpile-only src/app.ts"
+    "devTS": "ts-node-dev --respawn --transpile-only src/app.ts",
+    "migrate": "npx sequelize-cli db:migrate",
+    "seed":    "npx sequelize-cli db:seed:all",
+    "migrate-undo": "npx sequelize-cli db:migrate:undo",
+    "seed-undo": "npx sequelize-cli db:seed:undo:all"
   },
   "keywords": [],
   "author": "",

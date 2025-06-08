@@ -13,11 +13,16 @@ RUN npm install
 # Copia il resto del codice sorgente nel container
 COPY . .
 
+
 # Compila TypeScript in JavaScript
 RUN npm run build
 
 # Espone la porta 3000
 EXPOSE 3000
+
+COPY docker-entrypoint.sh /usr/src/app/entrypoint.sh
+RUN chmod +x /usr/src/app/entrypoint.sh
+ENTRYPOINT ["/usr/src/app/entrypoint.sh"]
 
 # Comando per avviare l'applicazione
 CMD ["npm", "start"]
