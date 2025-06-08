@@ -156,7 +156,94 @@ Questa suddivisione rende la pipeline chiara e modulare.
 
 # Diagrammi UML
 # Diagramma dei casi d'uso
+
+```mermaid
+graph TD
+    %% Attori
+    Utente_pubblico["Utente_pubblico"]
+    Automobilista["Automobilista"]
+    Operatore["Operatore"]
+    System["System"]
+
+    %% Casi d'uso - autenticazione e scoperta
+    login 
+    infoParkings
+
+    %% Casi d'uso - Automobilista
+    createReservation
+    getReservation
+    listReservations 
+    updateReservation
+    deleteReservation
+    payReservation
+    cancelPayment
+    checkTransit
+    paymentSlip
+    reportReservations
+
+    %% Casi d'uso - Operatore
+    createParking
+    listParkings
+    deleteParking
+    updateParking
+    getParking
+    ReservationsReport  
+    parkingStats  
+    updateTokens
+
+    %% Relazioni actor → use case
+    Utente_pubblico --> login
+    Utente_pubblico --> infoParkings
+
+    Automobilista --> createReservation
+    Automobilista --> getReservation
+    Automobilista --> listReservations
+    Automobilista --> updateReservation
+    Automobilista --> deleteReservation
+    Automobilista --> payReservation
+    Automobilista --> cancelPayment
+    Automobilista --> checkTransit
+    Automobilista --> paymentSlip
+    Automobilista --> reportReservations
+
+    Operatore -->createParking
+    Operatore -->listParkings
+    Operatore -->deleteParking
+    Operatore -->updateParking
+    Operatore -->getParking
+    Operatore -->ReservationsReport
+    Operatore -->parkingStats 
+    Operatore -->updateTokens
+
+    %% Relazioni sistema interne
+    System --> GenerateJSON
+    System --> GeneratePDF
+    System --> GenerateCSV
+
+    createReservation -->authenticateJWT
+    getReservation -->authenticateJWT
+    listReservations -->authenticateJWT
+    updateReservation -->authenticateJWT
+    deleteReservation -->authenticateJWT
+    payReservation -->authenticateJWT
+    cancelPayment -->authenticateJWT
+    checkTransit -->authenticateJWT
+    paymentSlip -->authenticateJWT
+    reportReservations -->authenticateJWT
+    createParking-->authenticateJWT
+    listParkings-->authenticateJWT
+    deleteParking-->authenticateJWT
+    updateParking-->authenticateJWT
+    getParking-->authenticateJWT
+    ReservationsReport-->authenticateJWT
+    parkingStats -->authenticateJWT
+    updateTokens-->authenticateJWT
+
+```
+
 # Diagramma E-R
+Il progetto utilizza PostgreSQL come sistema di gestione di database relazionale (RDBMS). PostgreSQL è un database open-source maturo e conforme allo standard SQL, noto per la sua affidabilità, le garanzie ACID e l’elevata estensibilità.
+Il modello è centrato su chi utilizza un parcheggio, ciò che prenota e come ci si muove al suo interno. Sono presenti utenti che fanno prenotazioni sui vari parcheggi; ogni prenotazione tiene traccia di quando inizia e finisce e di eventuali tentativi di pagamento. I transiti registrano le entrate e le uscite dei veicoli, collegandosi sia al parcheggio sia alla prenotazione. Sul lato amministrativo, vengono annotate eventuali multe emesse per targa e parcheggio, mentre per ciascun tipo di veicolo è definita la capacità e il costo associato in ogni struttura. Insieme, queste entità permettono di gestire accessi, prenotazioni, tariffe e sanzioni in modo integrato.
 
 ```mermaid
 erDiagram
