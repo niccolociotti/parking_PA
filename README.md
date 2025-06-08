@@ -1266,19 +1266,47 @@ Authorization: Bearer {{JWT_TOKEN}}
 
 # Configurazione e uso
 Per eseguire correttamente l'applicazione, è necessario seguire alcuni passaggi preliminari. Innanzitutto, bisogna installare **Docker** e **Postman**.
+### Passo 1
+Il primo passo è la clonazione della repository Github tramite il seguente comando:
+```
+git clone https://github.com/niccolociotti/parkingPA.git
+```
+### Passo 2
+Una volta clonato il repository, si deve creare un file `.env` che contiene le variabili necessarie per configurare l'applicazione, che devono essere configurate in base alle esigenze.
 
-Il passo successivo è la clonazione della repository Github tramite il seguente comando:
+### Passo 3
+Devono essere creati nella directory del progetto due file che rappresentano rispettivamente la chiave pubblica e privata
+
+Chiave privata
+```bash
+ssh-keygen -t rsa -b 4096 -m PEM -f jwtRS256.key
 ```
-git clone https://github.com/
+Chiave pubblica
+```bash
+openssl rsa -in jwtRS256.key -pubout -outform PEM -out
+jwtRS256.key.pub
 ```
-Una volta clonato il repository, si importa il file `.env` che contiene le variabili necessario per configurare l'applicazione. Successivamente, a parire dalla cartella `parking_PA`(la directory principale del progetto), si può avviare l'applicazione eseguendo il seguente comando:
+### Passo 4
+
+Successivamente, a parire dalla cartella `parking_PA`(la directory principale del progetto), si può avviare l'applicazione eseguendo il seguente comando:
 
 ```
 docker-compose up --build
 ```
 L’applicazione sarà in ascolto all’indirizzo `http://localhost:3000` .
+All'avvio verranno generate in automatico sia le migration che il seeder del database, creando utenti, parcheggi e prenotazioni.
+Si possono testare le rotte utilizzando l'utente operatore
+```
+email: mario.rossi@example.com
+password: mario
+```
+oppure l'utente automobilista
+```
+email: luigi.bianchi@example.com
+password: luigi
+```
 
-Per testare le rotte dell'applicazione si utilizza Postman, attarverso i file che si trovano nella directory `postman`:
+Per testare le rotte dell'applicazione si utilizza Postman, attraverso i file che si trovano nella directory `postman`:
 - `env.postman_environment.json`: contine le variabili ambiente utilizzate nelle rotte
 - `ProgettoPA_parking.postman_collection.json`: contiene la collecion di rotte relative all'applicazione.
 
