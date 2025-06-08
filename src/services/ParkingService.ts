@@ -105,7 +105,6 @@ export class ParkingService {
     if (!parking) {
       throw ErrorFactory.entityNotFound('Parking');
     }
-    const maxCapacity = parking.capacity;
 
     const parkingCapacity = await this.parkingCapacityDAO?.findByParkingsById(parkingId);
     if (!parkingCapacity || parkingCapacity.length === 0) {
@@ -150,12 +149,7 @@ export class ParkingService {
       cursor.setHours(cursor.getHours() + 1);
     }
 
-    // 4) Rilevo occupazione in ciascun bin orario
-    interface OccupationPoint {
-      timestamp: Date;
-      occupied: number;
-    }
-    const occupationPoints: OccupationPoint[] = [];
+    const occupationPoints: { timestamp: Date; occupied: number }[] = [];
 
     hourBins.forEach(hourStart => {
       const hourEnd = new Date(hourStart);

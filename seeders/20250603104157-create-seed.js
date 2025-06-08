@@ -192,7 +192,7 @@ module.exports = {
         // Luigi Bianchi
         {
           id: uuidv4(),
-          status: 'In attesa di pagamento',
+          status: 'Prenotazione confermata',
           userId: userDriver1Id,
           parkingId: parking1Id,
           licensePlate: 'AB124CD',
