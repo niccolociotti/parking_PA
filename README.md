@@ -149,34 +149,40 @@ Il pattern Chain of Responsibility è stato adottato per gestire il flusso delle
 # API Routes
 | Verbo HTTP | Endpoint | Descrzione | Autenticazione JWT |
 |:----------:|:--------:|:-----------:|:------------------:|
-| POST| /login|Autenticazione dell'utente tramite email e password. | ❌ |
-| POST| /park/parking| Creazione di un nuovo parcheggio. | ✅ |
-| GET| /park/parkings| Recupero della lista dei parcheggi | ✅|
-| DELETE| /park/parking:id| Cancellazione di un parcheggio| ✅|
-| GET| /park/parking/:id| Recupero infomazioni di un parcheggio| ✅ |
-| POST| /park/parking/update/:id| Aggiornamento parametri percheggio | ✅ |
-| GET| /info/parcheggi/:id/:vehicle/:data/:period| Verifica della disponibilità di un parcheggio | ❌ |
-| POST| /api/reservation| Creazione di una prenotazione | ✅ |
-| GET| /api/reservation/:id| Recupero informazioni di una prenotazione | ✅ |
-| GET| /api/reservations| Recupero prenotazioni di un utente| ✅ |
-| DELETE| /api/reservation/:id| Cancellazione di una prenotazione| ✅ |
-| POST| /api/reservation/update/:id| Aggiornamenot della prenotazione | ✅ |
-| GET| /api/pay/:reservationId| Esecuzione del pagamento della prenotazione | ✅ |
-| GET| /api/paymentslip/:id| Generazione del bollettino di una prenotazione | ✅ |
-| DELETE| /api/pay/:reservationId| Annullamento del pagamento di una prenotazione esclusivamente se il suo stato è in attesa.| ✅ |
-| GET| /api/reservationsReport/:format| Generazione di una report sulle prenotazioni | ✅ |
-| POST| /operator/reports/reservations| Generazione di una report sulle prenotazioni degli utenti| ✅ |
-| GET| /operator/stats/:parkingId|Generazione di una report sulle prenotazioni di un parcheggio | ✅ |
-| POST| /check/transit/:type|Acquisizione del trasito di un vericolo per la generazione di una multa | ✅ |
+| POST| `/login`|Autenticazione dell'utente tramite email e password. | ❌ |
+| POST| `/park/parking`| Creazione di un nuovo parcheggio. | ✅ |
+| GET| `/park/parkings`| Recupero della lista dei parcheggi | ✅|
+| DELETE| `/park/parking:id`| Cancellazione di un parcheggio| ✅|
+| GET| `/park/parking/:id`| Recupero infomazioni di un parcheggio| ✅ |
+| POST| `/park/parking/update/:id`| Aggiornamento parametri percheggio | ✅ |
+| GET| `/info/parcheggi/:id/:vehicle/:data/:period`| Verifica della disponibilità di un parcheggio | ❌ |
+| POST| `/api/reservation`| Creazione di una prenotazione | ✅ |
+| GET| `/api/reservation/:id`| Recupero informazioni di una prenotazione | ✅ |
+| GET| `/api/reservations`| Recupero prenotazioni di un utente| ✅ |
+| DELETE| `/api/reservation/:id`| Cancellazione di una prenotazione| ✅ |
+| POST| `/api/reservation/update/:id`| Aggiornamenot della prenotazione | ✅ |
+| GET| `/api/pay/:reservationId`| Esecuzione del pagamento della prenotazione | ✅ |
+| GET| `/api/paymentslip/:id`| Generazione del bollettino di una prenotazione | ✅ |
+| DELETE| `/api/pay/:reservationId`| Annullamento del pagamento di una prenotazione esclusivamente se il suo stato è in attesa.| ✅ |
+| GET| `/api/reservationsReport/:format`| Generazione di una report sulle prenotazioni | ✅ |
+| POST| `/operator/reports/reservations`| Generazione di una report sulle prenotazioni degli utenti| ✅ |
+| GET| `/operator/stats/:parkingId`|Generazione di una report sulle prenotazioni di un parcheggio | ✅ |
+| POST| `/check/transit/:type`|Acquisizione del trasito di un vericolo per la generazione di una multa | ✅ |
+| POST| `/operator/updateTokens` | Modifica dei token dell'utente| ✅ |
 
 # POST /login
 **Parametri**
 | Posizione | Nome    | Tipo     | Descrizione  |Obbligatorio  |
 |:---------:|:-------:|:--------:|:------------:|:------------:|
-|Richiesta nel body| email| string|Indirizzo email dell'utente| ✅ |
-|Richiesta nel body| password| string|Password dell'utente| ✅ |
+|Richiesta nel body|  `email`| `string`|Indirizzo email dell'utente| ✅ |
+|Richiesta nel body|  `password`| `string`|Password dell'utente| ✅ |
 
 **Esempio di richiesta**
+
+```http
+GET /login HTTP/1.1
+Content-Type: application/json
+```
 ```json
 {
   "email": "luigi@example.com",
@@ -194,13 +200,19 @@ Il pattern Chain of Responsibility è stato adottato per gestire il flusso delle
 **Parametri**
 | Posizione | Nome    | Tipo     | Descrizione  |Obbligatorio  |
 |:---------:|:-------:|:--------:|:------------:|:------------:|
-|Richiesta nel body| name| string|Nome del parcheggio| ✅ |
-|Richiesta nel body| address| string|Indirizzo del parcheggio| ✅ |
-|Richiesta nel body| capacity| string|Capacità del parcheggio| ✅ |
-|Richiesta nel body| closedData| Date[]|Date di chiusura del parcheggio. Formato YYYY-MM-DD| ✅ |
-|Header|	Authorization|	string|	Token JWT per autenticazione	| ✅|
+|Richiesta nel body|  `name`| `string`|Nome del parcheggio| ✅ |
+|Richiesta nel body| `address`| `string`|Indirizzo del parcheggio| ✅ |
+|Richiesta nel body| `capacity`| `string`|Capacità del parcheggio| ✅ |
+|Richiesta nel body| `closedData`| `Date[]`|Date di chiusura del parcheggio. Formato YYYY-MM-DD| ✅ |
+|Header|	`Authorization`|	`string`|	Token JWT per autenticazione	| ✅|
 
-** Esempio di richiesta**
+**Esempio di richiesta**
+
+```http
+POST /park/parking HTTP/1.1
+Content-Type: application/json
+Authorization: Bearer {{jwt_token}}
+```
 ```json
 {
   "name": "Parcheggio Stamira",
@@ -210,7 +222,7 @@ Il pattern Chain of Responsibility è stato adottato per gestire il flusso delle
 }
 ```
 
-** Esempio di risposta**
+**Esempio di risposta**
 ```json
 {
     "id": "d6a7239f-78c5-413e-b479-f7b6eb3988fd",
@@ -228,9 +240,17 @@ Il pattern Chain of Responsibility è stato adottato per gestire il flusso delle
 **Parametri**
 | Posizione | Nome    | Tipo     | Descrizione  |Obbligatorio  |
 |:---------:|:-------:|:--------:|:------------:|:------------:|
-|Header|	Authorization|	string|	Token JWT per autenticazione	| ✅|
+|Header|	`Authorization`|	`string`|	Token JWT per autenticazione	| ✅|
 
-** Esempio di risposta**
+**Esempio di richiesta**
+
+```http
+GET /park/parkings HTTP/1.1
+Content-Type: application/json
+Authorization: Bearer {{JWT_TOKEN}}
+```
+
+**Esempio di risposta**
 ```json
 [
     {
@@ -259,14 +279,22 @@ Il pattern Chain of Responsibility è stato adottato per gestire il flusso delle
 ]
 ```
 
-# DELETE /park/parking:id
+# DELETE /park/parking/:id
 **Parametri**
 | Posizione | Nome    | Tipo     | Descrizione  |Obbligatorio  |
 |:---------:|:-------:|:--------:|:------------:|:------------:|
-|Path Param| id| string|Id del parcheggio| ✅ |
-|Header|	Authorization|	string|	Token JWT per autenticazione	| ✅|
+|Path Param| `id`| `string`|Id del parcheggio| ✅ |
+|Header|	`Authorization`|	`string`|	Token JWT per autenticazione	| ✅|
 
-** Esempio di risposta**
+**Esempio di richiesta**
+
+```http
+DELETE /park/parking/66fe25c9-a390-4326-8193-99b0513ad973 HTTP/1.1
+Content-Type: application/json
+Authorization: Bearer {{JWT_TOKEN}}
+```
+
+**Esempio di risposta**
 ```json
 {
     "message": "Parking with ID aaf28cf9-eeb9-4d4f-8d96-3a5345551e9b deleted."
@@ -276,10 +304,18 @@ Il pattern Chain of Responsibility è stato adottato per gestire il flusso delle
 **Parametri**
 | Posizione | Nome    | Tipo     | Descrizione  |Obbligatorio  |
 |:---------:|:-------:|:--------:|:------------:|:------------:|
-|Path Param| id| string|Id del parcheggio| ✅ |
-|Header|	Authorization|	string|	Token JWT per autenticazione	| ✅|
+|Path Param| `id`| `string`|Id del parcheggio| ✅ |
+|Header|	`Authorization`|	`string`|	Token JWT per autenticazione	| ✅|
 
-** Esempio di risposta**
+**Esempio di richiesta**
+
+```http
+GET /park/parking/66fe25c9-a390-4326-8193-99b0513ad973 HTTP/1.1
+Content-Type: application/json
+Authorization: Bearer {{JWT_TOKEN}}
+```
+
+**Esempio di risposta**
 ```json
 {
     "id": "d5ff1727-d01b-4b59-baa3-a800e244cd4f",
@@ -298,13 +334,20 @@ Il pattern Chain of Responsibility è stato adottato per gestire il flusso delle
 **Parametri**
 | Posizione | Nome    | Tipo     | Descrizione  |Obbligatorio  |
 |:---------:|:-------:|:--------:|:------------:|:------------:|
-|Richiesta nel body| name| string|Nome del parcheggio| ✅ |
-|Richiesta nel body| address| string|Indirizzo del parcheggio| ✅ |
-|Richiesta nel body| capacity| string|Capacità del parcheggio| ✅ |
-|Richiesta nel body| closedData| Date[]|Date di chiusura del parcheggio. Formato YYYY-MM-DD| ✅ |
-|Header|	Authorization|	string|	Token JWT per autenticazione	| ✅|
+|Richiesta nel body| `name`| `string`|Nome del parcheggio| ✅ |
+|Richiesta nel body| `address`| `string`|Indirizzo del parcheggio| ✅ |
+|Richiesta nel body| `capacity`| `string`|Capacità del parcheggio| ✅ |
+|Richiesta nel body| `closedData`| `Date[]`|Date di chiusura del parcheggio. Formato YYYY-MM-DD| ✅ |
+|Header|	`Authorization`|	`string`|	Token JWT per autenticazione	| ✅|
 
-** Esempio di richiesta**
+**Esempio di richiesta**
+
+```http
+POST /parking/update/66fe25c9-a390-4326-8193-99b0513ad973 HTTP/1.1
+Content-Type: application/json
+Authorization: Bearer {{JWT_TOKEN}}
+```
+
 ```json
 {
   "name": "Parcheggio Arco",
@@ -314,7 +357,7 @@ Il pattern Chain of Responsibility è stato adottato per gestire il flusso delle
 }
 ```
 
-** Esempio di risposta**
+**Esempio di risposta**
 ```json
 {
     "id": "d6a7239f-78c5-413e-b479-f7b6eb3988fd",
@@ -332,12 +375,20 @@ Il pattern Chain of Responsibility è stato adottato per gestire il flusso delle
 **Parametri**
 | Posizione | Nome    | Tipo     | Descrizione  |Obbligatorio  |
 |:---------:|:-------:|:--------:|:------------:|:------------:|
-|Path Param| id| string|Id del parcheggio| ✅ |
-|Path Param| vehicle| string|Tipologia di veicolo| ✅ |
-|Path Param| data| string|Data di arrivo. Formato YYYY-MM-DD| ✅ |
-|Path Param| period| integer |Durata della prenotazione| ✅ |
+|Path Param| `id`| `string`|Id del parcheggio| ✅ |
+|Path Param| `vehicle`| `string`|Tipologia di veicolo| ✅ |
+|Path Param| `data`| `string`|Data di arrivo. Formato YYYY-MM-DD| ✅ |
+|Path Param| `period`| `integer` |Durata della prenotazione| ✅ |
 
-** Esempio di risposta**
+**Esempio di richiesta**
+
+```http
+GET /info/parcheggi/d5ff1727-d01b-4b59-baa3-a800e244cd4f/moto/2025-04-05/5 HTTP/1.1
+Content-Type: application/json
+Authorization: Bearer {{JWT_TOKEN}}
+```
+
+**Esempio di risposta**
 ```json
 {
   "Disponibilità":"14"
@@ -354,7 +405,7 @@ Il pattern Chain of Responsibility è stato adottato per gestire il flusso delle
 | Richiesta nel body | `password` | `string`  | Password dell'utente                                                                               | ✅               |
 | Richiesta nel header | `Authorization` | `string`  | 	JWT di autenticazione: Bearer <token>                                                                              | ✅               |
 
-Esempio di richiesta
+**Esempio di richiesta**
 
 ```http
 POST /api/reservation HTTP/1.1
@@ -373,7 +424,7 @@ Authorization: Bearer {{JWT_TOKEN}}
 
 ```
 
-Esempio di risposta 
+**Esempio di risposta** 
 
 ```json
 {
@@ -400,13 +451,13 @@ Esempio di risposta
 | Richiesta nel header | `Authorization` | `string`  | 	JWT di autenticazione: Bearer <token>                                                                              | ✅               |
 | Richiesta nel payload token | `userId` | `string`  | 	JWT di autenticazione: Bearer <token>                                                                              | ✅               |
 
-Esempio di richiesta
+**Esempio di richiesta**
 
 ```http
 GET /api/reservations HTTP/1.1
 Authorization: Bearer {{JWT_TOKEN}}
 ```
-Esempio di risposta 
+**Esempio di risposta** 
 
 ```json
 {
@@ -473,13 +524,13 @@ Esempio di risposta
 | Richiesta nel path | `id` | `string`  | 	ID della prenotazione da ottenere                                                                         | ✅               |
 | Richiesta nel header | `Authorization` | `string`  | 	JWT di autenticazione: Bearer <token>                                                                              | ✅               |
 
-Esempio di richiesta
+**Esempio di richiesta**
 
 ```http
 GET /api/reservation/95c48683-8d0c-4bee-976b-a1500e7c5656 HTTP/1.1
 Authorization: Bearer {{JWT_TOKEN}}
 ```
-Esempio di risposta 
+**Esempio di risposta** 
 
 ```json
 {
@@ -505,13 +556,13 @@ Esempio di risposta
 | Richiesta nel path | `id` | `string`  | 	ID della prenotazione che si vuole eliminare                                                                    | ✅               |
 | Richiesta nel header | `Authorization` | `string`  | 	JWT di autenticazione: Bearer <token>                                                                              | ✅               |
 
-Esempio di richiesta
+**Esempio di richiesta**
 
 ```http
 DELETE /api/reservation/95c48683-8d0c-4bee-976b-a1500e7c5656 HTTP/1.1
 Authorization: Bearer {{JWT_TOKEN}}
 ```
-Esempio di risposta 
+**Esempio di risposta**
 
 ```json
 {
@@ -528,7 +579,7 @@ Esempio di risposta
 | Richiesta nel body | `param` | `string`  | 	paramaetri che si vogliono aggiornare                                                                    | ✅               |
 | Richiesta nel header | `Authorization` | `string`  | 	JWT di autenticazione: Bearer <token>                                                                              | ✅               |
 
-Esempio di richiesta
+**Esempio di richiesta**
 
 ```http
 POST /api/reservation/update/e40fa6c9-8e16-4305-86a6-14f10bdbb4e1 HTTP/1.1
@@ -540,7 +591,7 @@ Authorization: Bearer {{JWT_TOKEN}}
     "vehicle": "moto"
 }
 ```
-Esempio di risposta 
+**Esempio di risposta** 
 
 ```json
 {
@@ -568,13 +619,13 @@ Esempio di risposta
 | Richiesta nel path | `reservationId` | `string`  | 	ID della prenotazione che si vuole pagare                                                                    | ✅               |
 | Richiesta nel header | `Authorization` | `string`  | 	JWT di autenticazione: Bearer <token>                                                                              | ✅               |
 
-Esempio di richiesta
+**Esempio di richiesta**
 
 ```http
 GET /api/reservation/pay/e40fa6c9-8e16-4305-86a6-14f10bdbb4e1 HTTP/1.1
 Authorization: Bearer {{JWT_TOKEN}}
 ```
-Esempio di risposta 
+**Esempio di risposta** 
 
 ```json
 {
@@ -602,7 +653,7 @@ Esempio di risposta
 |Path Param| id| string|Id della prenotazione| ✅ |
 |Header|	Authorization|	string|	Token JWT per autenticazione	| ✅|
 
-** Esempio di risposta (Formato PDF) **
+**Esempio di risposta (Formato PDF)**
 
 [Scarica il PDF](./pdf/payment-slip-938c89e4-7bbb-4143-b873-d5a56ff1a4fb.pdf)
 
@@ -614,13 +665,13 @@ Esempio di risposta
 | Richiesta nel path | `reservationId` | `string`  | 	ID della prenotazione che si vuole annullare                                                                    | ✅               |
 | Richiesta nel header | `Authorization` | `string`  | 	JWT di autenticazione: Bearer <token>                                                                              | ✅               |
 
-Esempio di richiesta
+**Esempio di richiesta**
 
 ```http
 DELETE /api/reservation/pay/e40fa6c9-8e16-4305-86a6-14f10bdbb4e1 HTTP/1.1
 Authorization: Bearer {{JWT_TOKEN}}
 ```
-Esempio di risposta 
+**Esempio di risposta** 
 
 ```json
 {
@@ -638,13 +689,13 @@ Esempio di risposta
 | Richiesta nel header | `Authorization` | `string`  | 	JWT di autenticazione: Bearer <token>                                                                              | ✅               |
 
 
-
+**Esempio di richiesta**
 ```http
 GET /api/reservationsReport/json?start=01-03-2025&end=12-07-2025&parkingId=a4b69567-1fa7-43ef-b222-90db6a17ab76 HTTP/1.1
 Authorization: Bearer {{JWT_TOKEN}}
 ```
 
-Esempio di risposta
+**Esempio di risposta**
 
 ```json
 {
@@ -676,13 +727,13 @@ oppure in un file [csv](csv/reservations-e603cb6d-97e3-435f-bdc3-38f28823e7cc.cs
 | Richiesta nel body | `format` | `string`  | 	formato in cui si vuole ottenere il report(json,pdf)                                                                    | ✅               |
 | Richiesta nel header | `Authorization` | `string`  | 	JWT di autenticazione: Bearer <token>                                                                              | ✅               |
 
-Esempio di richiesta
+**Esempio di richiesta**
 
 ```http
 POST /operator/reports/reservations HTTP/1.1
 Authorization: Bearer {{JWT_TOKEN}}
 ```
-Esempio di richiesta
+**Esempio di richiesta**
 
 ```json
 {
@@ -698,7 +749,7 @@ Esempio di richiesta
 }
 ```
 
-Esempio di risposta
+**Esempio di risposta**
 
 ```json
 {
@@ -743,14 +794,14 @@ oppure un file [pdf](pdf/report_1749130994650.pdf)
 | Richiesta nella query | `end` | `string`  | 	ID del parcheggio dove si transita                                                                   | ❌               |
 | Richiesta nel header | `Authorization` | `string`  | 	JWT di autenticazione: Bearer <token>                                                                              | ✅               |
 
-Esempio di richiesta
+**Esempio di richiesta**
 
 ```http
 GET /operator/stats/a4b69567-1fa7-43ef-b222-90db6a17ab76?start=31-05-2025 08:00&end=02-08-2025 20:00 HTTP/1.1
 Authorization: Bearer {{JWT_TOKEN}}
 ```
 
-Esempio di risposta
+**Esempio di risposta**
 
 ```json
 {
@@ -960,13 +1011,13 @@ Esempio di risposta
 | Richiesta nel body | `parkingId` | `string`  | 	ID del parcheggio dove si transita                                                                   | ✅               |
 | Richiesta nel header | `Authorization` | `string`  | 	JWT di autenticazione: Bearer <token>                                                                              | ✅               |
 
-Esempio di richiesta
+**Esempio di richiesta**
 
 ```http
 POST /check/transit/ingresso HTTP/1.1
 Authorization: Bearer {{JWT_TOKEN}}
 ```
-Esempio di richiesta
+**Esempio di richiesta**
 
 ```json
 {
@@ -975,7 +1026,7 @@ Esempio di richiesta
 }
 ```
 
-Esempio di risposta
+**Esempio di risposta**
 
 ```json
 {
@@ -1005,6 +1056,39 @@ oppure
         "updatedAt": "2025-06-07T17:08:57.332Z",
         "createdAt": "2025-06-07T17:08:57.332Z"
     }
+}
+```
+# POST operator/updateTokens
+**Parametri**
+| Posizione | Nome    | Tipo     | Descrizione  |Obbligatorio  |
+|:---------:|:-------:|:--------:|:------------:|:------------:|
+|Richiesta nel body | `id` | `string` |Id dell'utente| ✅ |
+|Richiesta nel body| `delta` | `integer` |Incremento dei token dell'utente| ✅ |
+| Richiesta nel header | `Authorization` | `string`  | 	JWT di autenticazione: Bearer <token>  | ✅ |
+
+**Esempio di richiesta**
+
+```http
+GET /operator/updateTokens HTTP/1.1
+Content-Type: application/json
+Authorization: Bearer {{JWT_TOKEN}}
+```
+```json
+{
+ "userId": "10257bb4-f632-40fd-aa3a-44209c65b749f",
+  "delta":"1000"
+```
+**Esempio di risposta**
+```json
+{
+    "id": "10257bb4-f632-40fd-aa3a-44209c65b749",
+    "name": "Paolo Gialli",
+    "email": "paolo.gialli@example.com",
+    "password": "paolo",
+    "role": "automobilista",
+    "tokens": 46000,
+    "createdAt": "2025-06-06T10:06:21.080Z",
+    "updatedAt": "2025-06-06T10:06:21.080Z"
 }
 ```
 
