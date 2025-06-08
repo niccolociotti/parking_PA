@@ -17,7 +17,7 @@ Il progetto è stato interamente realizzato da Niccolò Ciotti e Luca Renzi. Il 
 ## Indice
 
 - [Obiettivi di progetto](#obiettivi-di-progetto)
-- [Struttura del progetto ](#struttura_del_progetto)
+- [Struttura del progetto ](#struttura-del-progetto)
   - [Architettura dei servizi](#architettura-dei-servizi)
   - [Pattern utilizzati](#pattern-utilizzati)
   - [Diagrammi UML](#diagrammi-uml)
@@ -46,6 +46,8 @@ L'obiettivo è realizzare un sistema di back-end per la gestione delle prenotazi
   - Fatturato generato
   - Numero di richieste che sono state rifiutate per mancanza di spazio nel parcheggio.
   - Fascia oraria più richiesta.
+ 
+  
 # Struttura del progetto
 La progettazione di un sistema software ben strutturato richiede una suddivisione ordinata e coerente delle sue componenti principali. Nel nostro progetto, l’architettura è stata pensata per garantire manutenibilità, scalabilità e chiarezza del codice. Ogni componente è stato progettato con una responsabilità ben definita, contribuendo in modo autonomo ma integrato al corretto funzionamento dell’intero sistema.
 L’organizzazione delle directory segue una logica modulare che consente una gestione ordinata di file e moduli, una separazione chiara delle funzionalità ed una facile estensione e manutenzione del progetto. Questa struttura permette di accedere rapidamente alle funzionalità specifiche e rende più semplice lo sviluppo in team.
@@ -121,27 +123,37 @@ Nel progetto il pattern MVC è stato adattato a un contesto esclusivamente back-
 - Service:  è il centro dell’applicazione, dove vengono gestite tutte le operazioni principali. Si occupa di far interagire i diversi componenti, applicare le regole di business. In questo modo i controller restano snelli e concentrati sulla gestione delle richieste HTTP, mentre tutte le logiche complesse rimangono in un unico punto, facilmente testabile ed estendibile.
 
 ## Data Access Object (DAO)
-Il pattern Data Access Object (DAO) è stato adottato e implementato tramite Sequelize, che fornisce un’interfaccia ad alto livello per l’accesso ai dati. Questo pattern permette di astrarre e isolare la logica di accesso al database dal resto dell’applicazione, promuovendo una chiara separazione delle responsabilità. In questo constesto, Sequelize agisce come il DAO, poiché gestisce tutte le operazioni CRUD (Create, Read, Update, Delete) per i modelli. Il vantaggio dell’utilizzo del DAO è la modularità e la facilità di sostituzione o aggiornamento della logica di accesso ai dati senza influenzare la logica di business.
+Il Data Access Object (DAO) è un livello che si occupa esclusivamente di gestire tutte le interazioni con il database. In pratica, ogni interazione CRUD passa attraverso questo livello dedicato, mantenendo la logica di persistenza completamente separata dal resto dell’applicazione. Questo approccio garantisce una maggiore modularità, facilita il testing e permette di sostituire o evolvere la parte di accesso ai dati senza toccare la business logic.
 
-Il pattern DAO è stato scelto per astrarre l’accesso al database, garantendo una separazione netta tra la logica di business e l’interazione diretta con la persistenza dei dati.
-## Factory
-Il pattern Factory è stato impiegato per centralizzare la creazione di errori personalizzati all’interno del progetto, tramite la classe ErrorFactory definita nel file errorFactory.ts. Questo approccio fornisce un’interfaccia unificata per la generazione di differenti tipologie di errori HTTP, in base al contesto in cui si verificano. L’obiettivo principale è ridurre la duplicazione del codice e migliorare la manutenibilità, centralizzando la logica di creazione degli errori.
+Nel progetto ogni DAO è stato realizzato come una classe che si appoggia direttamente ai model di Sequelize per offrire sia operazioni CRUD di base (ad esempio findByPk, findAll, create, destroy) sia query personalizzate, sfruttando opzioni come where per i filtri e include per cercare associazioni.
 
-La classe ErrorFactory sfrutta la libreria http-status-codes per associare in modo semplice e coerente i codici di stato HTTP ai relativi errori. Ciò consente di generare facilmente errori come NOT_FOUND, UNAUTHORIZED, FORBIDDEN e altri, garantendo coerenza semantica e funzionale in tutto il progetto.
-
-Il pattern Factory è stato scelto per centralizzare la creazione degli errori, riducendo la duplicazione del codice e garantendo una gestione uniforme degli errori in tutto il progetto. Inoltre permette di aggiungere nuove tipologie di errori senza modificare il codice nelle sigole parti dell'applicazione.
 ## Singleton
-Il pattern Singleton è stato adottato per gestire la connessione al database in modo centralizzato ed efficiente. In particolare, l’istanza di Sequelize, responsabile di tutte le interazioni con il database PostgreSQL, viene creata una sola volta durante la fase di inizializzazione dell’applicazione. Questo garantisce che esista una unica connessione condivisa tra tutte le componenti del sistema, evitando problemi di concorrenza, conflitti di connessione o sprechi di risorse.
+Il pattern Singleton è stato adottato per garantire che componenti critiche, come la connessione al database, vengano create una sola volta e condivise in tutta l’applicazione. In questo modo si evita l’overhead di istanziare ripetutamente risorse pesanti, assicurando coerenza e un unico punto di controllo per lo stato globale. 
 
-Per implementare il pattern, è stata creata una classe chiamata databaseConnection, che sfrutta una proprietà statica per conservare l’istanza unica di Sequelize. Il metodo getInstance() controlla se questa istanza è già presente: se lo è, la restituisce; altrimenti, ne crea una nuova utilizzando le variabili d’ambiente per configurare la connessione. In questo modo, si assicura che tutte le operazioni di lettura e scrittura sul database passino sempre attraverso la stessa connessione persistente, migliorando la coerenza del sistema e la gestione delle risorse.
+Il Singleton è stato realizzato definendo la classe DatabaseConnection con:
 
-Il pattern Singleton è stato implementato per assicurare che l’applicazione utilizzi una singola istanza di connessione al database, riducendo il rischio di errori legati alla concorrenza nelle operazioni di accesso ai dati.
+- Costruttore privato, per impedire istanziazioni dirette.
+- Proprietà statica instance, che conserva l’unica istanza.
+- Metodo statico getInstance(), che al primo chiamata crea l’oggetto e, alle successive, restituisce sempre la stessa istanza.
+
+## Factory
+Per garantire una gestione centralizzata e coerente degli errori, con messaggi e codici HTTP uniformi, nel progetto è stato adottato il Factory Pattern per la creazione di errori personalizzati.
+
+La classe ErrorFactory offre metodi statici (ad esempio badRequest(), unauthorized(), entityNotFound()) che producono istanze di CustomError già configurate con il messaggio e lo status code corretti.
+
+Nel controller e service si lancia l’errore tramite throw ErrorFactory.entityNotFound("User") o simili, evitando duplicazione di codice e assicurando coerenza nei messaggi e nei codici di risposta.
+
 ## Chain of Responsibility (COR)
-Il pattern Chain of Responsibility (CoR) è stato implementato attraverso l’uso dei middleware di Express.js. Questo approccio consente di suddividere il flusso delle richieste HTTP in una catena di responsabilità, dove ogni middleware si occupa di una fase specifica del processo, come validazione, autenticazione o gestione degli errori. La struttura a catena permette una gestione modulare, ordinata e facilmente estendibile delle richieste in ingresso. Esempi di middleware sono:
-- Middleware di autenticazione: verifica la presenza e la validità di un token JWT nella richiesta. Se il token è assente o non valido, la catena viene interrotta e viene restituito un errore con codice 401 Unauthorized. Questo comportamento è gestito dalla funzione authenticateJWT, che si occupa di decodificare e validare il token, proteggendo le rotte che richiedono un utente autenticato.
-- Middleware di gestione degli errori:gestisce in modo centralizzato tutti gli errori generati lungo la catena. È implementato come middleware globale che cattura eccezioni e restituisce risposte formattate in modo coerente, sfruttando la ErrorFactory per generare messaggi chiari e codici di stato HTTP corretti.
+Per gestire in modo flessibile e modulare la sequenza di controlli e operazioni su una richiesta (ad es. validazione, autorizzazione, elaborazione business), nel progetto è stato introdotto il Chain of Responsibility (CoR), un pattern comportamentale che definisce una catena di oggetti (handler), ciascuno dei quali può gestire la richiesta o passarla al successivo.
 
-Il pattern Chain of Responsibility è stato adottato per gestire il flusso delle richieste HTTP tramite una catena di middleware modulari, consentendo una gestione flessibile e facilmente estendibile di autenticazione, validazione e gestione degli errori.
+L’architettura si basa su una catena di middleware, ciascuno focalizzato su un compito specifico:
+
+- Validazione del JWT: verifica la presenza e la correttezza del token in ogni richiesta.
+- Autenticazione: estrae e conferma l’identità dell’utente dal token validato.
+- Gestione capacità e chiusure: controlla la disponibilità dei posti e rispetta i giorni di chiusura dei parcheggi.
+- Errore globale: un ultimo middleware intercetta tutte le eccezioni, trasformandole in risposte HTTP strutturate grazie all’ErrorFactory.
+Questa suddivisione rende la pipeline chiara e modulare.
+
 # Diagrammi UML
 # Diagramma dei casi d'uso
 # Diagramma E-R
