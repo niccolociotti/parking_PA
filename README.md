@@ -1093,6 +1093,23 @@ Authorization: Bearer {{JWT_TOKEN}}
 ```
 
 # Configurazione e uso
+Per eseguire correttamente l'applicazione, è necessario seguire alcuni passaggi preliminari. Innanzitutto, bisogna installare **Docker** e **Postman**.
+
+Il passo successivo è la clonazione della repository Github tramite il seguente comando:
+```
+git clone https://github.com/
+```
+Una volta clonato il repository, si importa il file `.env` che contiene le variabili necessario per configurare l'applicazione. Successivamente, a parire dalla cartella `parking_PA`(la directory principale del progetto), si può avviare l'applicazione eseguendo il seguente comando:
+
+```
+docker-compose up --build
+```
+L’applicazione sarà in ascolto all’indirizzo `http://localhost:3000` .
+
+Per testare le rotte dell'applicazione si utilizza Postman, attarverso i file che si trovano nella directory `postman`:
+- `env.postman_environment.json`: contine le variabili ambiente utilizzate nelle rotte
+- `ProgettoPA_parking.postman_collection.json`: contiene la collecion di rotte relative all'applicazione.
+
 # Strumenti utilizzati
 - **Node.js**: Runtime utilizzato per eseguire il codice JavaScript sul lato server.
 - **TypeScript**: Linguaggio utilizzato per aggiungere tipizzazione statica a JavaScript, migliorando la manutenibilità del codice.
