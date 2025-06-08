@@ -157,6 +157,7 @@ Questa suddivisione rende la pipeline chiara e modulare.
 # Diagrammi UML
 # Diagramma dei casi d'uso
 # Diagramma E-R
+![Schema E-R](./images/parkingdb .png)
 # Diagrammi delle sequenze
 # API Routes
 | Verbo HTTP | Endpoint | Descrzione | Autenticazione JWT |
