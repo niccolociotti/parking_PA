@@ -3,7 +3,7 @@ import { randomUUID } from "crypto";
 import { ReservationDAO } from "../dao/reservationDAO";
 import { Status } from "../utils/Status";
 import { Reservation } from "../models/reservation";
-import { User } from "../models/User";
+import { User } from "../models/user";
 import { ParkingDao } from "../dao/ParkingDao";
 import { Vehicles } from "../utils/Vehicles";
 import { StatusCodes } from "http-status-codes";

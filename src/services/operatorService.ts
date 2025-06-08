@@ -1,6 +1,6 @@
 import { UserDAO } from "../dao/userDAO";
 import { ErrorFactory } from "../factories/errorFactory";
-import User from "../models/User";
+import User from "../models/user";
 
 /**
  * Service per gestire le operazioni degli operatori.

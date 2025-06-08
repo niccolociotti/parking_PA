@@ -1,4 +1,4 @@
-import { User } from '../models/User';
+import { User } from '../models/user';
 
 /** 
  * Interfaccia per il Data Access Object (DAO) degli utenti.
@@ -64,7 +64,8 @@ export class UserDAO implements UserDAOInterface {
     if (!existingUser) {
       throw new Error(`User with id ${user.id} not found`);
     }
-    return await existingUser.update(user);
+    existingUser.tokens = user.tokens;
+    return await existingUser.save();
   }
 
 }
