@@ -855,7 +855,124 @@ sequenceDiagram
     end
 
 ```
+# GET /api/pay/:paymentId
+```mermaid
+sequenceDiagram
+    actor Client
+    participant App
+    participant Middleware
+    participant Controller
+    participant Service
+    participant DAO
+    participant ORM
+    participant ErrorFactory
 
+    Client->>App: POST /api/pay/:paymentId
+    App->>+Middleware: authenticateJWT
+    Middleware-->>-App: next()
+    App->>+Middleware: isUser
+    Middleware-->>-App: next()
+    App->>+Controller: pay(req)
+    Controller->>+Service: payReservation(paymentId, userId)
+    alt data valid
+        Service->>+DAO: findById(paymentId)
+        DAO->>+ORM: findById(reservationId)
+        ORM-->>-DAO: Payment
+        alt payment exists
+          DAO->>+ORM: findById(payment.reservationId)
+          ORM-->>-DAO: Reservation
+          alt reservation exists
+            DAO->>+ORM: findById(userId)
+            ORM-->>-DAO: User
+            DAO-->>-Service: Payment
+            Service-->>-Controller: Payment
+            Controller-->>App: HTTP Response
+            App-->>Client: HTTP Response
+          else reservation not found
+              Service->>+ErrorFactory: entityNotFound()
+              ErrorFactory-->>-Service: NotFound Error
+              Service-->>Controller: throw NotFound Error
+              Controller-->>Middleware: next(error)
+              Middleware-->>App: HTTP Response
+              App-->>Client: HTTP Response
+              end
+        else payment not found
+            Service->>+ErrorFactory: entityNotFound()
+            ErrorFactory-->>-Service: NotFound Error
+            Service-->>Controller: throw NotFound Error
+            Controller-->>Middleware: next(error)
+            Middleware-->>App: HTTP Response
+            App-->>Client: HTTP Response
+            end
+    else validation failed
+      Service->>+ErrorFactory: badRequest("Nessun campo da aggiornare.")
+      ErrorFactory-->>-Service: ValidationError
+      Service-->>Controller: throw ValidationError
+      Controller-->>Middleware: next(error)
+      Middleware-->>App: HTTP Response
+      App-->>Client: HTTP Response
+  end
+
+```
+# DELETE	/api/paymentslip/:id
+```mermaid
+sequenceDiagram
+    actor Client
+    participant App
+    participant Middleware
+    participant Controller
+    participant Service
+    participant DAO
+    participant ORM
+    participant ErrorFactory
+
+    Client->>App: GET /api/paymentslip/:id
+    App->>+Middleware: authenticateJWT
+    Middleware-->>-App: next()
+    App->>+Middleware: isUser
+    Middleware-->>-App: next()
+    App->>+Controller: deletePayment(req)
+    Controller->>+Service: deletePayment(paymentId)
+    alt payment valid
+        Service->>+DAO: findById(paymentId)
+        DAO->>+ORM: findByPk(paymentId)
+        ORM-->>-DAO: Payment
+        alt reservation exists
+          DAO->>+ORM: findById(payment.reservationId)
+          ORM-->>-DAO: Reservation
+          alt payment exists
+            DAO->>+ORM: destroy(paymentId)
+            ORM-->>-DAO: Payment deleted
+            DAO-->>-Service: Payment deleted
+            Service-->>-Controller: Payment deleted
+            Controller-->>App: HTTP Response
+            App-->>Client: HTTP Response
+          else payment not found
+              Service->>+ErrorFactory: entityNotFound()
+              ErrorFactory-->>-Service: NotFound Error
+              Service-->>Controller: throw NotFound Error
+              Controller-->>Middleware: next(error)
+              Middleware-->>App: HTTP Response
+              App-->>Client: HTTP Response
+              end
+        else reservation not found
+            Service->>+ErrorFactory: entityNotFound()
+            ErrorFactory-->>-Service: NotFound Error
+            Service-->>Controller: throw NotFound Error
+            Controller-->>Middleware: next(error)
+            Middleware-->>App: HTTP Response
+            App-->>Client: HTTP Response
+            end
+    else payment failed
+      Service->>+ErrorFactory: badRequest("Nessun campo da aggiornare.")
+      ErrorFactory-->>-Service: ValidationError
+      Service-->>Controller: throw ValidationError
+      Controller-->>Middleware: next(error)
+      Middleware-->>App: HTTP Response
+      App-->>Client: HTTP Response
+  end
+
+```
 
 # API Routes
 | Verbo HTTP | Endpoint | Descrzione | Autenticazione JWT |
