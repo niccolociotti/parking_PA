@@ -44,22 +44,22 @@ export class PaymentController {
     }
 
   /**
-   * Elimina il pagamento associato a una prenotazione.
-   * Recupera l'ID della prenotazione dai parametri e chiama il ReservationService per eliminare il pagamento.
-   * Usata nella rotta DELETE /pay/:reservationId.
-   * @param req - Richiesta HTTP con reservationId nei parametri
+   * Elimina il pagamento associato a una prenotazione e cambia stato in REJECTED.
+   * Recupera l'ID dai parametri e chiama il ReservationService per eliminare il pagamento.
+   * Usata nella rotta DELETE /pay/:paymentId.
+   * @param req - Richiesta HTTP con paymentId nei parametri
    * @param res - Risposta HTTP di conferma eliminazione
    * @param next - Funzione per la gestione degli errori
    * @returns Restituisce una risposta HTTP di conferma eliminazione o errore se non trovata
    */
   deletePayment = async (req: Request, res: Response, next: NextFunction) => {   
-    const deleted = await this.reservationService.deletePayment(req.params.reservationId);
+    const deleted = await this.paymentService.deletePayment(req.params.paymentId);
 
     try{
     if (deleted > 0) {
-    res.status(StatusCodes.OK).json({ message: `Reservation with ID ${req.params.reservationId} deleted.` });
+    res.status(StatusCodes.OK).json({ message: `Paymnet with ID ${req.params.paymentId} deleted.` });
   } else {
-    throw ErrorFactory.entityNotFound("Reservation");
+    throw ErrorFactory.entityNotFound("Payment");
     }
 }catch (err) {
     next(err);

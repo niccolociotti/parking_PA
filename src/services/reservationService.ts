@@ -126,22 +126,6 @@ export class ReservationService {
   }
 
   /**
-   * Elimina il pagamento associato a una prenotazione, solo se il pagamento non è stato confermato.
-   * Questa funzione viene usata dal PaymentController nella rotta DELETE /pay/:reservationId
-   * per consentire all'utente di annullare un pagamento non ancora confermato.
-   * @param id - ID della prenotazione
-   * @returns Numero di pagamenti eliminati (0 o 1)
-   * @throws Errore se il pagamento è già confermato o già eliminato
-   */
-  async deletePayment(id: string): Promise<number> {
-    const deleted = await this.reservationDAO.deleteByIdStatus(id);
-    if (deleted === 0) {
-      throw ErrorFactory.customMessage('Pagamento non confermato o già eliminato',StatusCodes.NOT_FOUND);
-    }
-    return deleted;
-  }
-
-  /**
    * Restituisce tutte le prenotazioni presenti nel sistema.
    * Recupera tutte le prenotazioni tramite il DAO, senza filtri.
    * È usata dal ReservationController nella rotta GET /reservations per mostrare

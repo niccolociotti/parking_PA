@@ -95,12 +95,12 @@ router.get('/paymentslip/:id', paymentController.downloadPaymentSlip);
 
 /**
  * Rotta per eliminare un pagamento di una prenotazione
- * @route DELETE /pay/:reservationId - Elimina il pagamento di una prenotazione
- * @param req - Richiesta contenente l'ID della prenotazione da eliminare
+ * @route DELETE /pay/:paymentId - Elimina il pagamento di una prenotazione
+ * @param req - Richiesta contenente l'ID del pagamento da eliminare
  * @param res - Risposta da inviare al client
  * @param next - Funzione per passare al middleware successivo
  */
-router.delete('/pay/:reservationId', paymentController.deletePayment);
+router.delete('/pay/:paymentId', paymentController.deletePayment);
 
 /**
  * Rotta per generare un report delle prenotazioni

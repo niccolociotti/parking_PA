@@ -194,4 +194,31 @@ export class PaymentService {
     return QRCode.toBuffer(qrString);
   }
 
+    /**
+     * Elimina il pagamento associato a una prenotazione, solo se il pagamento non è stato confermato.
+     * Questa funzione viene usata dal PaymentController nella rotta DELETE /pay/:reservationId
+     * per consentire all'utente di annullare un pagamento non ancora confermato.
+     * @param id - ID della prenotazione
+     * @returns Numero di pagamenti eliminati (0 o 1)
+     * @throws Errore se il pagamento è già confermato o già eliminato
+     */
+    async deletePayment(id: string): Promise<number> {
+      const deletedPayment = await this.paymentDAO.delete(id);
+      if (deletedPayment === 0) {
+        throw ErrorFactory.entityNotFound('Payment');
+      }
+      const payment = await this.paymentDAO.findById(id);
+      if (!payment?.reservationId) {
+        throw ErrorFactory.entityNotFound('Payment');
+      }
+      const reservation = await this.reservationDAO.findById(payment.reservationId);
+      if (!reservation) {
+        throw ErrorFactory.entityNotFound('Reservation');
+      }
+      reservation.status= Status.REJECTED;
+      await reservation.save();
+      return deletedPayment;
+    }
+
+
 }

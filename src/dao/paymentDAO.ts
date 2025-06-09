@@ -10,6 +10,7 @@ import { PaymentCreationAttributes } from '../models/payment';
 interface PaymentDAOInterface {
   create(data: Payment): Promise<Payment>;
   findById(id: string): Promise<Payment | null>;
+  delete(id: string): Promise<number>;
 }
 
 /**
@@ -28,11 +29,20 @@ export class PaymentDAO implements PaymentDAOInterface {
   }
 
   /**
-   * Trova un pagamento tramite ID.
+   * Trova un pagamento tramite ID
    * @param id 
-   * @returns 
+   * @returns Il pagamento trovato o null se non esiste
    */
   async findById(id: string): Promise<Payment | null> {
     return await Payment.findByPk(id);
+  }
+
+  /**
+   * Elimina un pagamento tramite ID.
+   * @param id - ID del pagamento da eliminare
+   * @returns Numero di righe eliminate o null se non trovato
+   */
+  async delete(id: string): Promise<number> {
+     return await Payment.destroy({ where: { id } });
   }
 }
