@@ -44,7 +44,11 @@ constructor(private parkingService: ParkingService) {}
   listParking = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const parkings = await this.parkingService.findAll();
-      res.status(StatusCodes.OK).json(parkings);
+      if (parkings.length > 0) {
+        res.status(StatusCodes.OK).json(parkings);
+      } else {
+        throw ErrorFactory.entityNotFound("Parking");
+      }
     } catch (error) {
       next(error); 
       }
@@ -98,6 +102,10 @@ constructor(private parkingService: ParkingService) {}
 
     const status = req.body; 
     const parkingid = req.params.id;
+
+    if (!parkingid || !status) {
+      throw ErrorFactory.badRequest("ID del parcheggio o dati di aggiornamento mancanti");
+    }
     try {
       const updatedParking = await this.parkingService.update(parkingid, status);
       if (updatedParking) {
