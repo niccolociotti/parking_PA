@@ -4,14 +4,14 @@ import { ParkingCapacityDao } from "../dao/parkingCapacityDAO";
 import { ErrorFactory } from "../factories/errorFactory";
 import { Status } from "../utils/Status";
 import { StatusCodes } from "http-status-codes";
-import Reservation from "../models/reservation";
+import { Payment } from "../models/payment";
 import { Vehicles } from "../utils/Vehicles";
 import { v4 as uuidv4 } from 'uuid';
 import PDFDocument from 'pdfkit';
 import { PassThrough } from "stream";
 import { buffer } from "stream/consumers";
 import QRCode from 'qrcode';
-
+import {PaymentDAO} from "../dao/paymentDAO";
 /**
  * Questa classe fornisce metodi per effettuare il pagamento di una prenotazione,
  * calcolare il prezzo in base a regole tariffarie, generare e scaricare la ricevuta PDF
@@ -21,58 +21,65 @@ import QRCode from 'qrcode';
  */
 export class PaymentService {
   constructor(
-    private reservationDAO: ReservationDAO,
     private userDAO: UserDAO,
     private parkingCapacityDAO: ParkingCapacityDao,
+    private paymentDAO: PaymentDAO = new PaymentDAO(),
+    private reservationDAO: ReservationDAO = new ReservationDAO()
   ) {}
 
   /**
    * Esegue il pagamento di una prenotazione.
-   * Verifica che la prenotazione esista, appartenga all'utente e sia in stato PENDING.
+   * Verifica che la prenotazione esista e appartenga all'utente.
    * Scala i token all'utente se sufficienti, aggiorna lo stato della prenotazione e azzera i tentativi.
    * Dopo 3 tentativi falliti per credito insufficiente, elimina la prenotazione.
-   * Usata dal PaymentController nella rotta GET /pay/:reservationId.
-   * @param reservationId - ID della prenotazione da pagare
+   * Usata dal PaymentController nella rotta GET /pay/:paymentId.
+   * @param paymentId - ID della pagamanto da effettuare
    * @param userId - ID dell'utente che effettua il pagamento
-   * @returns La prenotazione aggiornata e confermata
+   * @returns Il pagamento e aggiorna la prenotazione
    * @throws Errore se la prenotazione non esiste, non appartiene all'utente, non è pagabile o per credito insufficiente
    */
-  async payReservation(reservationId: string, userId: string): Promise<Reservation> {
-    const reservation = await this.reservationDAO.findById(reservationId);
+  async payReservation(paymentId: string, userId: string): Promise<Payment> {
+    const payment = await this.paymentDAO.findById(paymentId);
 
+    if (!payment) 
+      throw ErrorFactory.entityNotFound('Reservation');
+
+    if (!payment.reservationId) {
+      throw ErrorFactory.customMessage('Pagamento non associato a una prenotazione valida', StatusCodes.BAD_REQUEST);
+    }
+    const reservation = await this.reservationDAO.findById(payment.reservationId);
     if (!reservation) 
       throw ErrorFactory.entityNotFound('Reservation');
 
-    if(reservation.userId !== userId)
-      throw ErrorFactory.customMessage('Nessuna prenotazione trovata per questo utente', StatusCodes.FORBIDDEN);
-
-    if (reservation.status !== Status.PENDING)
-      throw ErrorFactory.badRequest('Reservation is not in pending state');
+    if(payment.userId !== userId)
+      throw ErrorFactory.customMessage('Nessun bollettino trovato per questo utente', StatusCodes.FORBIDDEN);
     
     const user = await this.userDAO.findById(userId);
     if (!user) throw ErrorFactory.entityNotFound('User');
-   
-    const parkingCapacity = await this.parkingCapacityDAO.findByParkingAndType(reservation.parkingId, reservation.vehicle.trim().toLowerCase() as Vehicles);
-    if (!parkingCapacity) throw ErrorFactory.entityNotFound('Parking for the vehicle '+ reservation.vehicle+' ');
-    
-    const rawPrice = PaymentService.calculatePrice(parkingCapacity.price, reservation.startTime, reservation.endTime);
-    const price = Math.floor(rawPrice);
+
+    const price = Math.floor(payment.price);
+
+    if (reservation.status == Status.CONFIRMED) {
+      throw ErrorFactory.customMessage('Prenotazione già confermata', StatusCodes.BAD_REQUEST);
+    }
 
     if (user.tokens >= price) {
-      user.tokens -= price;
+      const newTokens = user.tokens - price;
       reservation.status = Status.CONFIRMED;
-      reservation.paymentAttemps = 0;
-      await user.save();
+      payment.paymentAttemps = 0;
+      await user.update({ tokens: newTokens });
       await reservation.save();
-      return reservation;
+      payment.setDataValue('remainingTokens',newTokens);
+      await payment.save();
+      return payment;
     } else {
-      reservation.paymentAttemps = (reservation.paymentAttemps ?? 0) + 1;
-      if (reservation.paymentAttemps >= 3) {
-        await this.reservationDAO.delete(reservationId);
+      payment.paymentAttemps = (payment.paymentAttemps ?? 0) + 1;
+      if (payment.paymentAttemps >= 3) {
+        await this.reservationDAO.delete(payment.reservationId);
         throw ErrorFactory.customMessage("Credito insufficiente. Prenotazione cancellata dopo 3 tentativi.",StatusCodes.BAD_REQUEST);
       }
-      await reservation.save();
-      throw ErrorFactory.customMessage('Credito insufficiente. Tentativo ' + reservation.paymentAttemps + ' di 3.' ,StatusCodes.BAD_REQUEST);
+      await payment.save();
+      throw ErrorFactory.customMessage('Credito insufficiente. Tentativo ' + payment.paymentAttemps + ' di 3.' ,StatusCodes.BAD_REQUEST);
     }
   }
 
@@ -117,23 +124,41 @@ export class PaymentService {
    * @returns Buffer del file PDF generato
    * @throws Errore se la prenotazione non esiste o non è confermata
    */
-  async downloadPaymentSlip(reservationId: string): Promise<Buffer> {
+  async downloadPaymentSlip(reservationId: string,userId:string): Promise<Buffer> {
 
     const reservation = await this.reservationDAO.findById(reservationId);
     if (!reservation) throw ErrorFactory.entityNotFound('Reservation');
 
-    if (reservation.status !== Status.CONFIRMED) {
-      throw ErrorFactory.customMessage('Reservation is not confirmed', StatusCodes.BAD_REQUEST);
+    console.log(reservation.status);
+    if (reservation.status == Status.CONFIRMED) {
+      throw ErrorFactory.customMessage('Reservation is already confirmed', StatusCodes.BAD_REQUEST);
     }
 
+    if(reservation.userId !== userId)
+      throw ErrorFactory.customMessage('Nessun bollettino trovato per questo utente', StatusCodes.FORBIDDEN);
+
     const parking = await this.parkingCapacityDAO.findByParkingAndType(reservation.parkingId, reservation.vehicle.trim().toLowerCase() as Vehicles);
-    if (!parking) throw ErrorFactory.entityNotFound('Parking');
+    if (!parking) throw ErrorFactory.entityNotFound('Parking or veichle');
 
     const amount = PaymentService.calculatePrice(parking.price, reservation.startTime, reservation.endTime);
     const licensePlate = reservation.licensePlate;
 
+    const user = await this.userDAO.findById(reservation.userId);
+    if (!user) throw ErrorFactory.entityNotFound('User');
+
     //Genera UUID pagamento
     const paymentId = uuidv4();
+
+    const paymentData = {
+      id: paymentId,
+      price: amount,
+      userId : reservation.userId,
+      reservationId: reservation.id, 
+      remainingTokens: user.tokens,
+      paymentAttemps: 0,
+    };
+
+    const payment = await this.paymentDAO.create(paymentData);
     
     // Genera QR code
     const qrBuffer = await this.generateQrBuffer(paymentId, licensePlate, amount);

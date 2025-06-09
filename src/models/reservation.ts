@@ -36,7 +36,6 @@ export class Reservation extends Model<InferAttributes<Reservation>, InferCreati
   declare parkingId: string;
   declare licensePlate: string;
   declare vehicle: Vehicles;
-  declare paymentAttemps: number
   declare startTime: Date;
   declare endTime: Date;
 }
@@ -60,11 +59,6 @@ Reservation.init(
       type: DataTypes.ENUM,
       values: Object.values(Vehicles),
       allowNull: false,
-    },
-    paymentAttemps: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-      defaultValue: 0,
     },
     userId: {
       type: DataTypes.UUID,

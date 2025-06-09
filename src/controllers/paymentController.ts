@@ -16,26 +16,25 @@ export class PaymentController {
 
   /**
    * Esegue il pagamento di una prenotazione.
-   * Recupera l'ID della prenotazione dai parametri e l'utente autenticato dalla request.
-   * Chiama il PaymentService per effettuare il pagamento e restituisce la prenotazione aggiornata.
-   * Usata nella rotta GET /pay/:reservationId.
-   * @param req - Richiesta HTTP con reservationId nei parametri e utente autenticato
-   * @param res - Risposta HTTP con conferma pagamento e dettagli prenotazione
+   * Recupera l'ID del pagamento dai parametri e l'utente autenticato dalla request.
+   * Chiama il PaymentService per effettuare il pagamento e restituisce il pagamento e aggiorna la prenotazione.
+   * Usata nella rotta GET /pay/:paymentId.
+   * @param req - Richiesta HTTP con paymentId nei parametri e utente autenticato
+   * @param res - Risposta HTTP con conferma pagamento e dettagli del pagamento
    * @param next - Funzione per la gestione degli errori
-   * @returns Restituisce una risposta HTTP con la prenotazione pagata o errore
+   * @returns Restituisce una risposta HTTP con il pagamento pagato o errore
    */
   pay = async (req: Request, res: Response, next: NextFunction) => {
-         const reservationId  = req.params.reservationId;
+         const paymentId  = req.params.paymentId;
         try {
         const user = (req as any).user; 
         if (!user || !user.id) {
         throw ErrorFactory.unauthorized();
         }
         const userId: string = user.id;
-        const reservation = await this.paymentService.payReservation(reservationId, userId);
-
-        if (reservation) {
-            res.status(StatusCodes.OK).json({message: "Pagamento effettuato.",reservation });
+        const payment = await this.paymentService.payReservation(paymentId, userId);
+        if (payment) {
+            res.status(StatusCodes.OK).json({message: "Pagamento effettuato.",payment});
         } else {
             throw ErrorFactory.badRequest();
         }
@@ -79,13 +78,16 @@ export class PaymentController {
    */
   downloadPaymentSlip = async (req: Request, res: Response, next: NextFunction) => {
         try {
+            const user = (req as any).user; 
+            if (!user || !user.id) {
+            throw ErrorFactory.unauthorized();
+            }
             const reservationId = req.params.id;
             if (!reservationId) {
                 throw ErrorFactory.badRequest('ReservationId not valid.');
             }
-            
 
-            const pdfBuffer  = await this.paymentService.downloadPaymentSlip(reservationId);
+            const pdfBuffer  = await this.paymentService.downloadPaymentSlip(reservationId,user.id);
 
             const pdfDir = path.resolve(__dirname, '../../pdf');
             const filename = `payment-slip-${reservationId}.pdf`;

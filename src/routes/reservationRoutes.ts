@@ -10,18 +10,19 @@ import { ParkingCapacityDao } from "../dao/parkingCapacityDAO";
 import { PaymentController } from "../controllers/paymentController";
 import { ParkingDao} from "../dao/ParkingDao";
 import { ParkingMiddleware } from "../middleware/parkingMiddleware";
-
+import { PaymentDAO } from "../dao/paymentDAO";
 
 const router = Router();
 
 const parkingCapacityDAO = new ParkingCapacityDao();
 const parkingDAO = new ParkingDao(); 
+const paymentDAO = new PaymentDAO();
 const reservationDAO = new ReservationDAO();
 const reservationService = new ReservationService(reservationDAO,parkingDAO);
 const reservationController = new ReservationController(reservationService);
 const userDAO = new UserDAO();
 const authService = new AuthService(userDAO);
-const paymentService = new PaymentService(reservationDAO,userDAO,parkingCapacityDAO);
+const paymentService = new PaymentService(userDAO,parkingCapacityDAO,paymentDAO,reservationDAO);
 const paymentController = new PaymentController(paymentService,reservationService);
 const authMiddleware = new AuthMiddleware(authService);
 const parkingMiddleware = new ParkingMiddleware(parkingCapacityDAO,reservationDAO,parkingDAO);
@@ -76,12 +77,12 @@ router.post("/reservation/update/:id", reservationController.update);
 
 /**
  * Rotta per effettuare il pagamento di una prenotazione
- * @route GET /pay/:reservationId - Effettua il pagamento di una prenotazione
- * @param req - Richiesta contenente l'ID della prenotazione da pagare
+ * @route GET /pay/:paymentId - Effettua il pagamento di una prenotazione
+ * @param req - Richiesta contenente l'ID del pagamento
  * @param res - Risposta da inviare al client
  * @param next - Funzione per passare al middleware successivo
  */
-router.get('/pay/:reservationId',paymentController.pay);
+router.get('/pay/:paymentId',paymentController.pay);
 
 /**
  * Rotta per scaricare la ricevuta di pagamento di una prenotazione

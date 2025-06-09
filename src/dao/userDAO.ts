@@ -48,7 +48,7 @@ export class UserDAO implements UserDAOInterface {
    * @throws {Error} Se si verifica un errore durante l'interrogazione del database.
    */
   async findById(id: string): Promise<User | null> {
-    return await User.findOne({where: {id}});
+    return await User.findByPk(id);
   }
   
   /**

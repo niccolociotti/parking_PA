@@ -66,11 +66,6 @@ module.exports = {
       endTime: { type: Sequelize.DATE, allowNull: false },
       createdAt: { type: Sequelize.DATE, allowNull: false },
       updatedAt: { type: Sequelize.DATE, allowNull: false },
-      paymentAttemps : {
-        type: Sequelize.INTEGER, 
-        allowNull: false,
-        defaultValue: 0
-      }
     });
 
     //TRANSIT
@@ -168,9 +163,58 @@ module.exports = {
       }
     });
 
+    // PAYMENTS
+    await queryInterface.createTable('Payments', {
+      id: {
+        type: Sequelize.UUID,
+        primaryKey: true,
+        defaultValue: Sequelize.UUIDV4,
+        allowNull: false,
+      },
+      price: {
+        type: Sequelize.FLOAT,
+        allowNull: false,
+      },
+      reservationId: {
+        type: Sequelize.UUID,
+        allowNull: true,
+        references: { model: 'Reservations', key: 'id' },
+        onUpdate: 'CASCADE',
+        onDelete: 'SET NULL',
+      },
+      userId: {
+        type: Sequelize.UUID,
+        allowNull: false,
+        references: { model: 'Users', key: 'id' },
+        onUpdate: 'CASCADE',
+        onDelete: 'CASCADE',
+      },
+       paymentAttemps : {
+        type: Sequelize.INTEGER, 
+        allowNull: false,
+        defaultValue: 0
+      },
+      remainingTokens: {
+        type: Sequelize.INTEGER,
+        allowNull: false,
+        defaultValue: 0
+      },
+      createdAt: {
+        allowNull: false,
+        type: Sequelize.DATE,
+        defaultValue: Sequelize.literal('CURRENT_TIMESTAMP'),
+      },
+      updatedAt: {
+        allowNull: false,
+        type: Sequelize.DATE,
+        defaultValue: Sequelize.literal('CURRENT_TIMESTAMP'),
+      }
+    });
+
   },
 
   down: async (queryInterface, Sequelize) => {
+    await queryInterface.dropTable('Payments');
     await queryInterface.dropTable('Transits');
     await queryInterface.dropTable('Fines');
     await queryInterface.dropTable('Reservations');

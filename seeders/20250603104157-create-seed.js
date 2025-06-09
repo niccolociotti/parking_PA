@@ -144,7 +144,7 @@ module.exports = {
         {
           id: uuidv4(),
           parkingId: parking2Id,
-          vehicle: 'camion',
+          vehicle: 'moto',
           capacity: 10,
           price: 2.7,
           createdAt: new Date(),
