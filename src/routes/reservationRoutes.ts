@@ -11,7 +11,7 @@ import { PaymentController } from "../controllers/paymentController";
 import { ParkingDao} from "../dao/ParkingDao";
 import { ParkingMiddleware } from "../middleware/parkingMiddleware";
 import { PaymentDAO } from "../dao/paymentDAO";
-
+import { UUIDMiddleware } from "../middleware/UUIDMiddleware";
 
 const router = Router();
 
@@ -27,9 +27,11 @@ const paymentService = new PaymentService(userDAO,parkingCapacityDAO,paymentDAO,
 const paymentController = new PaymentController(paymentService,reservationService);
 const authMiddleware = new AuthMiddleware(authService);
 const parkingMiddleware = new ParkingMiddleware(parkingCapacityDAO,reservationDAO,parkingDAO);
+const uuidMiddleware = new UUIDMiddleware();
 
 router.use(authMiddleware.authenticateToken);
 router.use(authMiddleware.isUser);
+
 
 /**
  * Rotta per creare una prenotazione
@@ -47,7 +49,7 @@ router.post("/reservation", parkingMiddleware.checkCapacity, parkingMiddleware.c
  * @param res - Risposta contenente i dettagli della prenotazione
  * @param next - Funzione per passare al middleware successivo
  */
-router.get("/reservation/:id", reservationController.listById);
+router.get("/reservation/:id",uuidMiddleware.validateUUID ,reservationController.listById);
 
 /**
  * Rotta per ottenere le prenotazioni di un utente specifico
@@ -65,7 +67,7 @@ router.get("/reservations", reservationController.listByUser);
  * @param res - Risposta da inviare al client
  * @param next - Funzione per passare al middleware successivo
  */
-router.delete("/reservation/:id", reservationController.delete);
+router.delete("/reservation/:id",uuidMiddleware.validateUUID, reservationController.delete);
 
 /**
  * Rotta per aggiornare una prenotazione
@@ -74,7 +76,7 @@ router.delete("/reservation/:id", reservationController.delete);
  * @param res - Risposta da inviare al client
  * @param next - Funzione per passare al middleware successivo
  */
-router.post("/reservation/update/:id", reservationController.update);
+router.post("/reservation/update/:id",uuidMiddleware.validateUUID,reservationController.update);
 
 /**
  * Rotta per effettuare il pagamento di una prenotazione
@@ -83,7 +85,7 @@ router.post("/reservation/update/:id", reservationController.update);
  * @param res - Risposta da inviare al client
  * @param next - Funzione per passare al middleware successivo
  */
-router.get('/pay/:paymentId',paymentController.pay);
+router.get('/pay/:paymentId',uuidMiddleware.validateUUID,paymentController.pay);
 
 /**
  * Rotta per scaricare la ricevuta di pagamento di una prenotazione
@@ -92,7 +94,7 @@ router.get('/pay/:paymentId',paymentController.pay);
  * @param res - Risposta da inviare al client
  * @param next - Funzione per passare al middleware successivo
  */
-router.get('/paymentslip/:id', paymentController.downloadPaymentSlip);
+router.get('/paymentslip/:id',uuidMiddleware.validateUUID, paymentController.downloadPaymentSlip);
 
 /**
  * Rotta per eliminare un pagamento di una prenotazione
@@ -101,7 +103,7 @@ router.get('/paymentslip/:id', paymentController.downloadPaymentSlip);
  * @param res - Risposta da inviare al client
  * @param next - Funzione per passare al middleware successivo
  */
-router.delete('/pay/:paymentId', paymentController.deletePayment);
+router.delete('/pay/:paymentId',uuidMiddleware.validateUUID, paymentController.deletePayment);
 
 /**
  * Rotta per generare un report delle prenotazioni

@@ -7,6 +7,7 @@ import { UserDAO } from "../dao/userDAO";
 import { AuthService } from "../services/authService";
 import { ReservationDAO } from '../dao/reservationDAO';
 import { ParkingCapacityDao } from '../dao/parkingCapacityDAO';
+import { UUIDMiddleware } from '../middleware/UUIDMiddleware';
 
 const router = Router(); //nuova istanza di Router
 
@@ -18,6 +19,7 @@ const parkingController = new ParkingController(parkingService)
 const userDAO = new UserDAO();
 const authService = new AuthService(userDAO);
 const authMiddleware = new AuthMiddleware(authService);
+const uuidMiddleware = new UUIDMiddleware();
 
 /** Middleware per autenticazione e autorizzazione degli operatori
  * @middleware authenticateToken
@@ -51,7 +53,7 @@ router.get('/parkings', parkingController.listParking);
 * @param res - Response con messaggio di conferma
 * @param next - Funzione di middleware per gestire errori
 * */
-router.delete('/parking/:id', parkingController.DeleteParking);
+router.delete('/parking/:id',uuidMiddleware.validateUUID, parkingController.DeleteParking);
 
 /** Rotte per ottenere le statistiche di un parcheggio
  * @route GET /stats/:parkingId - Ottenere le statistiche di un parcheggio
@@ -59,7 +61,7 @@ router.delete('/parking/:id', parkingController.DeleteParking);
  * @param res - Response con le statistiche del parcheggio
  * @param next - Funzione di middleware per gestire errori
  */
-router.get('/parking/:id', parkingController.getParking);
+router.get('/parking/:id',uuidMiddleware.validateUUID, parkingController.getParking);
 
 /** Rotte per aggiornare un parcheggio
  * @route POST /parking/update/:id - Aggiornamento di un parcheggio
@@ -67,6 +69,6 @@ router.get('/parking/:id', parkingController.getParking);
  * @param res - Response con il parcheggio aggiornato
  * @param next - Funzione di middleware per gestire errori
  */
-router.post('/parking/update/:id', parkingController.UpdateParking);
+router.post('/parking/update/:id',uuidMiddleware.validateUUID ,parkingController.UpdateParking);
 
 export default router;

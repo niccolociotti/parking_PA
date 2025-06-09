@@ -11,6 +11,7 @@ import { ParkingService } from "../services/ParkingService";
 import { ParkingCapacityDao } from "../dao/parkingCapacityDAO";
 import { OperatorController } from "../controllers/operatorController";
 import { OperatorService } from "../services/operatorService";
+import { UUIDMiddleware } from "../middleware/UUIDMiddleware";
 
 const router = Router();  // nuova istanza di Express Router
 
@@ -40,6 +41,7 @@ const authService = new AuthService(userDAO);
 const authMiddleware = new AuthMiddleware(authService);
 const operatoService = new OperatorService(userDAO);
 const operatorController = new OperatorController(operatoService);
+const uuidMiddleware = new UUIDMiddleware();
 
 /**
  * Middleware per autenticare l'utente.
@@ -78,7 +80,7 @@ router.post('/reports/reservations',reservationController.postReservationsReport
  * @returns Un oggetto contenente le statistiche del parcheggio richiesto.
  * @throws Se si verifica un errore durante il recupero delle statistiche del parcheggio.
  */
-router.get('/stats/:parkingId',parkingController.getStats);
+router.get('/stats/:parkingId',uuidMiddleware.validateUUID,parkingController.getStats);
 
 /**
  * @route POST /updateTokens

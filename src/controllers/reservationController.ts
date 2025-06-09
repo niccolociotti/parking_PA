@@ -87,7 +87,7 @@ export class ReservationController {
       if (reservation) {
         res.status(StatusCodes.OK).json(reservation);
       } else {
-        throw ErrorFactory.entityNotFound("Reservations");
+        throw ErrorFactory.entityNotFound("Reservation");
       }
     } catch (error) {
       next(error);
