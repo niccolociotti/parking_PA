@@ -569,8 +569,52 @@ sequenceDiagram
     end
 
 ```
+## GET /info/parcheggi/:id/:vehicle/:data/:period
 
+```mermaid
+sequenceDiagram
+    actor Client
+    participant App
+    participant Middleware
+    participant Controller
+    participant Service
+    participant DAO
+    participant ORM
+    participant ErrorFactory
 
+    Client->>App: GET /info/parcheggi/:id/:vehicle/:data/:period
+    App->>+Controller: getParkingCapacityByIdAndVehicleAndDayAndPeriod(req)
+    Controller->>+Service: findByVehicleTypeAndDayAndPeriod(id, vehicle, startTime, period)
+    alt data valid     
+      Service->>+DAO: findOne(id, vehicle)
+      DAO->+ORM: findOne(id, vehicle)
+      ORM-->-DAO: Parking
+      alt parking exist
+        DAO->+ORM: count(id, status,startTime,endTime)
+        ORM-->-DAO: Reservation
+        DAO-->>-Service: capacity
+        Service-->>Controller: capacity
+        Controller-->>Middleware: capacity
+        Middleware-->>App: HTTP Response
+        App-->>Client: HTTP Response
+      else parking not found
+        Service->>+ErrorFactory: entityNotFound()
+        ErrorFactory-->>-Service: NotFound Error
+        Service-->>Controller: throw NotFound Error
+        Controller-->>Middleware: next(error)
+        Middleware-->>App: HTTP Response
+        App-->>Client: HTTP Response
+      end
+    else validation failed
+        Service->>+ErrorFactory: customMessage("Parametri non corretti")
+        ErrorFactory-->>-Service: ValidationError
+        Service-->>Controller: throw ValidationError
+        Controller-->>Middleware: next(error)
+        Middleware-->>App: HTTP Response
+        App-->>Client: HTTP Response
+    end
+
+```
 ## POST /api/reservation
 
 ```mermaid
