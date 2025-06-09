@@ -189,27 +189,24 @@ export class PaymentService {
    * @param amount - Importo pagato
    * @returns Buffer contenente il QR code
    */
-  generateQrBuffer(paymentId: string, licensePlate: string, amount: number): Promise<Buffer> {
+  async generateQrBuffer(paymentId: string, licensePlate: string, amount: number): Promise<Buffer> {
     const qrString = `${paymentId}|${licensePlate}|${amount.toFixed(2)}`;
     return QRCode.toBuffer(qrString);
   }
 
     /**
      * Elimina il pagamento associato a una prenotazione, solo se il pagamento non è stato confermato.
-     * Questa funzione viene usata dal PaymentController nella rotta DELETE /pay/:reservationId
+     * Questa funzione viene usata dal PaymentController nella rotta DELETE /pay/:paymentId
      * per consentire all'utente di annullare un pagamento non ancora confermato.
-     * @param id - ID della prenotazione
+     * @param id - ID del pagamento da eliminare
      * @returns Numero di pagamenti eliminati (0 o 1)
      * @throws Errore se il pagamento è già confermato o già eliminato
      */
     async deletePayment(id: string): Promise<number> {
-      const deletedPayment = await this.paymentDAO.delete(id);
-      if (deletedPayment === 0) {
-        throw ErrorFactory.entityNotFound('Payment');
-      }
+
       const payment = await this.paymentDAO.findById(id);
       if (!payment?.reservationId) {
-        throw ErrorFactory.entityNotFound('Payment');
+        throw ErrorFactory.entityNotFound('Payment not associated with a reservation');
       }
       const reservation = await this.reservationDAO.findById(payment.reservationId);
       if (!reservation) {
@@ -217,8 +214,11 @@ export class PaymentService {
       }
       reservation.status= Status.REJECTED;
       await reservation.save();
+
+      const deletedPayment = await this.paymentDAO.delete(id);
+      if (deletedPayment === 0) {
+        throw ErrorFactory.entityNotFound('Payment');
+      }
       return deletedPayment;
     }
-
-
 }

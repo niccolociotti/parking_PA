@@ -12,6 +12,7 @@ import { ParkingDao} from "../dao/ParkingDao";
 import { ParkingMiddleware } from "../middleware/parkingMiddleware";
 import { PaymentDAO } from "../dao/paymentDAO";
 
+
 const router = Router();
 
 const parkingCapacityDAO = new ParkingCapacityDao();
