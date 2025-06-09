@@ -172,7 +172,6 @@ Questa suddivisione rende la pipeline chiara e modulare.
 # Diagrammi UML
 # Diagramma dei casi d'uso
 Un diagramma dei casi d’uso è una rappresentazione grafica che serve a descrivere chi (gli attori) interagisce con il sistema e cosa il sistema fornisce loro (i casi d’uso).
-
 ```mermaid
 graph TD
     %% Attori
@@ -336,6 +335,242 @@ erDiagram
 # Diagrammi delle sequenze
 
 I diagrammi delle sequenze sono dei diagrammi comportamentali utilizzati per descrivere come e in che ordine gli oggetti (o componenti) di un sistema collaborano per realizzare uno specifico flusso di esecuzione.
+## POST /login
+```mermaid
+sequenceDiagram
+    actor Client
+    participant App
+    participant Middleware
+    participant Controller
+    participant Service
+    participant DAO
+    participant ORM
+    participant ErrorFactory
+
+    Client->>App: POST /login
+    App->>+Controller: login(req.Request, res:Response)
+    Controller->>+Service: login
+    alt data valid
+        Service->>+DAO: findByPk(userId)
+        DAO->>+ORM: findByPk(userId)
+        ORM-->>-DAO: User
+        DAO-->>-Service: genrateToken
+        Service-->-Controller: token
+        else user not found
+          Service->>+ErrorFactory: entityNotFound()
+          ErrorFactory-->>-Service: NotFound Error
+          Service-->>Controller: throw NotFound Error
+          Controller-->>Middleware: next(error)
+          Middleware-->>App: HTTP Response
+          App-->>Client: HTTP Response
+          else password not valid
+            Service->>+ErrorFactory: unauthorized()
+            ErrorFactory-->>-Service: Unauthorized Error
+            Service-->>Controller: throw Unauthorized Error
+            Controller-->>Middleware: next(error)
+            Middleware-->>App: HTTP Response
+            App-->>Client: HTTP Response
+      end   
+```
+## POST	/park/parking
+
+```mermaid
+sequenceDiagram
+    actor Client
+    participant App
+    participant Middleware
+    participant Controller
+    participant Service
+    participant DAO
+    participant ORM
+    participant ErrorFactory
+
+    Client->>App: POST /park/parking ( parkingData )
+    App->>+Middleware: authenticateJWT
+    Middleware-->>-App: next()
+    App->>+Middleware: isOperator
+    Middleware-->>-App: next()
+    App->>+Controller: createParking(req)
+    Controller->>+Service: create(name, address,capacity,closedData)
+    alt data valid
+        Service->>+DAO: create(data)
+        DAO->>+ORM: Parking
+        ORM-->>-DAO: Parking
+        DAO-->>-Service: Parking
+        Service-->>-Controller: Parking
+        Controller-->>App: HTTP Parking ( Parking )
+        App-->>Client: HTTP Response new Parking
+        else data not valid
+          Service->>+ErrorFactory: entityNotFound()
+          ErrorFactory-->>-Service: NotFound
+          Service-->>Controller: throw NotFound
+          Controller-->>Middleware: next(error)
+          Middleware-->>App: HTTP Response
+          App-->>Client: HTTP Response
+    end
+```
+## GET /park/parkings
+
+```mermaid
+sequenceDiagram
+    actor Client
+    participant App
+    participant Middleware
+    participant Controller
+    participant Service
+    participant DAO
+    participant ORM
+    participant ErrorFactory
+
+    Client->>App: GET /park/parkings ( parkingData )
+    App->>+Middleware: authenticateJWT
+    Middleware-->>-App: next()
+    App->>+Middleware: isOperator
+    Middleware-->>-App: next()
+    App->>+Controller: listParking(req)
+    Controller->>+Service: findAll()
+    alt parking exists
+        Service->>+DAO: findAll()
+        DAO->>+ORM: Parking
+        ORM-->>-DAO: Parking
+        DAO-->>-Service: Parking
+        Service-->>-Controller: Parking
+        Controller-->>App: HTTP Parking
+        App-->>Client: HTTP Response
+        else reservation not found
+            Service->>+ErrorFactory: entityNotFound()
+            ErrorFactory-->>-Service: NotFound Error
+            Service-->>Controller: throw NotFound Error
+            Controller-->>Middleware: next(error)
+            Middleware-->>App: HTTP Response
+            App-->>Client: HTTP Response
+    end
+```
+## DELETE /park/parking/:id
+
+```mermaid
+sequenceDiagram
+    actor Client
+    participant App
+    participant Middleware
+    participant Controller
+    participant Service
+    participant DAO
+    participant ORM
+    participant ErrorFactory
+
+    Client->>App: DELETE /park/parking/:id
+    App->>+Middleware: authenticateJWT
+    Middleware-->>-App: next()
+    App->>+Middleware: isOperator
+    Middleware-->>-App: next()
+    App->>+Controller: DeleteParking(req)
+    Controller->>+Service: delete(parkingId)
+        Service->>+DAO: delete(parkingId)
+        DAO->>+ORM: destroy()
+        ORM-->>-DAO: Parking deleted
+        alt parking exists
+            DAO-->>-Service: Parking deleted
+            Service-->>-Controller: Parking
+            Controller-->>App: HTTP Response ( Parking )
+            App-->>Client: HTTP Response
+            else parking not found
+                Service->>+ErrorFactory: entityNotFound()
+                ErrorFactory-->>-Service: NotFound Error
+                Service-->>Controller: throw NotFound Error
+                Controller-->>Middleware: next(error)
+                Middleware-->>App: HTTP Response
+                App-->>Client: HTTP Response
+    end
+```
+## GET /park/parking/:id
+
+```mermaid
+sequenceDiagram
+    actor Client
+    participant App
+    participant Middleware
+    participant Controller
+    participant Service
+    participant DAO
+    participant ORM
+    participant ErrorFactory
+
+    Client->>App: GET /park/parking/:id
+    App->>+Middleware: authenticateJWT
+    Middleware-->>-App: next()
+    App->>+Middleware: isOperator
+    Middleware-->>-App: next()
+    App->>+Controller: getParking(req)
+    Controller->>+Service: findById(parkingId)
+        Service->>+DAO: findById(parkingId)
+        DAO->>+ORM: findByPk(reservationId)
+        ORM-->>-DAO: Reservation
+        alt parking exists
+            DAO-->>-Service: Parking
+            Service-->>-Controller: Parking
+            Controller-->>App: HTTP Response ( Parking )
+            App-->>Client: HTTP Response
+            else parking not found
+                Service->>+ErrorFactory: entityNotFound()
+                ErrorFactory-->>-Service: NotFound Error
+                Service-->>Controller: throw NotFound Error
+                Controller-->>Middleware: next(error)
+                Middleware-->>App: HTTP Response
+                App-->>Client: HTTP Response
+    end
+```
+## POST /park/parking/update/:id
+
+```mermaid
+sequenceDiagram
+    actor Client
+    participant App
+    participant Middleware
+    participant Controller
+    participant Service
+    participant DAO
+    participant ORM
+    participant ErrorFactory
+
+    Client->>App: POST /park/parking/update/:id
+    App->>+Middleware: authenticateJWT
+    Middleware-->>-App: next()
+    App->>+Middleware: isOperator
+    Middleware-->>-App: next()
+    App->>+Controller: UpdateParking(req)
+    alt data valid
+    Controller->>+Service: update(parkingId,updates)
+        Service->>+DAO: update(parkingId,updates)
+        DAO->>+ORM: findByPk(parkingId)
+        ORM-->>-DAO: Parking
+        alt parking exists
+        DAO->>+ORM: update(updates)
+        ORM-->>-DAO: Parking updated
+            DAO-->>-Service: Parking updated
+            Service-->>-Controller: Parking
+            Controller-->>App: HTTP Response ( Parking )
+            App-->>Client: HTTP Response
+            else parking not found
+                Service->>+ErrorFactory: entityNotFound()
+                ErrorFactory-->>-Service: NotFound Error
+                Service-->>Controller: throw NotFound Error
+                Controller-->>Middleware: next(error)
+                Middleware-->>App: HTTP Response
+                App-->>Client: HTTP Response
+                end
+    else validation failed
+    Service->>+ErrorFactory: badRequest("ID del parcheggio o dati di aggiornamento mancanti.")
+        ErrorFactory-->>-Service: ValidationError
+        Service-->>Controller: throw ValidationError
+        Controller-->>Middleware: next(error)
+        Middleware-->>Controller: HTTP Response
+        App-->>Client: HTTP Response
+    end
+
+```
+
+
 ## POST /api/reservation
 
 ```mermaid
@@ -397,7 +632,7 @@ sequenceDiagram
         ErrorFactory-->>-Service: ValidationError
         Service-->>Controller: throw ValidationError
         Controller-->>Middleware: next(error)
-        Middleware-->>Controller: HTTP Response
+        Middleware-->>App: HTTP Response
         App-->>Client: HTTP Response
     end
 ```
