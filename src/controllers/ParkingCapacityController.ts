@@ -23,6 +23,10 @@ export class ParkingCapacityController {
        const vehicle = req.params.vehicle;
        const startTime = new Date(req.params.data);
        const period = parseFloat(req.params.period as string);
+
+        if (!parkingId || !vehicle || !startTime || isNaN(period)) {
+          throw ErrorFactory.customMessage("Parametri non corretti", StatusCodes.BAD_REQUEST);
+        }
        
        const endTime = new Date(startTime.getTime() + period * 60 * 60 * 1000);
 
