@@ -874,7 +874,7 @@ sequenceDiagram
 | POST| `/api/reservation/update/:id`| Aggiornamenot della prenotazione | ✅ |
 | GET| `/api/pay/:paymentId`| Esecuzione del pagamento della prenotazione | ✅ |
 | GET| `/api/paymentslip/:id`| Generazione del bollettino di una prenotazione | ✅ |
-| DELETE| `/api/pay/:reservationId`| Annullamento del pagamento di una prenotazione esclusivamente se il suo stato è in attesa.| ✅ |
+| DELETE| `/api/pay/:paymentId`| Annullamento del pagamento di una prenotazione esclusivamente se il suo stato è in attesa.| ✅ |
 | GET| `/api/reservationsReport/:format`| Generazione di una report sulle prenotazioni | ✅ |
 | POST| `/operator/reports/reservations`| Generazione di una report sulle prenotazioni degli utenti| ✅ |
 | GET| `/operator/stats/:parkingId`|Generazione di una report sulle prenotazioni di un parcheggio | ✅ |
@@ -1365,25 +1365,25 @@ Authorization: Bearer {{JWT_TOKEN}}
 
 [Scarica il PDF](./pdf/payment-slip-938c89e4-7bbb-4143-b873-d5a56ff1a4fb.pdf)
 
-# DELETE /api/pay/:reservationId
+# DELETE /api/pay/:paymentId
 ### Parametri
 
 | **Posizione**      | **Nome**   | **Tipo**  | **Descrizione**                                                                                    | **Obbligatorio** |
 |--------------------|------------|-----------|----------------------------------------------------------------------------------------------------|------------------|
-| Richiesta nel path | `reservationId` | `string`  | 	ID della prenotazione che si vuole annullare                                                                    | ✅               |
+| Richiesta nel path | `paymentId` | `string`  | 	ID del pagamneto che si vuole annullare                                                                    | ✅               |
 | Richiesta nel header | `Authorization` | `string`  | 	JWT di autenticazione: Bearer <token>                                                                              | ✅               |
 
 **Esempio di richiesta**
 
 ```http
-DELETE /api/reservation/pay/e40fa6c9-8e16-4305-86a6-14f10bdbb4e1 HTTP/1.1
+DELETE /api/pay/e40fa6c9-8e16-4305-86a6-14f10bdbb4e1 HTTP/1.1
 Authorization: Bearer {{JWT_TOKEN}}
 ```
 **Esempio di risposta** 
 
 ```json
 {
-   "message": "Reservation with ID e40fa6c9-8e16-4305-86a6-14f10bdbb4e1 deleted."
+   "message": "Payment with ID e40fa6c9-8e16-4305-86a6-14f10bdbb4e1 deleted."
 }
 ```
 # GET /api/reservationsReport/:format
