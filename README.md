@@ -1070,6 +1070,115 @@ sequenceDiagram
 ## POST /operator/reports/reservations
 
 ```mermaid
+sequenceDiagram
+    actor Client
+    participant App
+    participant Middleware
+    participant Controller
+    participant Service
+    participant DAO
+    participant ORM
+    participant ErrorFactory
+
+    Client->>App: DELETE /api/pay/:paymentId
+    App->>+Middleware: authenticateJWT
+    Middleware-->>-App: next()
+    App->>+Middleware: isUser
+    Middleware-->>-App: next()
+    App->>+Controller: postReservationsReport(req)
+    alt data valid
+    Controller->>+Service: getReservationsByPlatesPeriod(licensePlate, startTime, endTime)
+        Service->>+DAO: findByPlatesAndPeriod(licensePlate, startTime, endTime)
+        DAO->>+ORM: findAll(licensePlate, startTime, endTime)
+        ORM-->>-DAO: Reservation
+        alt reservation exists
+            DAO-->>-Service: Reservation
+            Service-->>Controller: Reservation
+            Controller->>Controller: create PDF or JSON
+            Controller-->>App: HTTP Response 
+            App-->>Client: HTTP Response
+            else reservation not found
+            Service->>+ErrorFactory: entityNotFound()
+                ErrorFactory-->>-Service: NotFound Error
+                Service-->>Controller: throw NotFound Error
+                Controller-->>Middleware: next(error)
+                Middleware-->>App: HTTP Response
+                App-->>Client: HTTP Response
+                end
+    else validation failed
+    Service->>+ErrorFactory: badRequest()
+        ErrorFactory-->>-Service: ValidationError
+        Service-->>Controller: throw ValidationError
+        Controller-->>Middleware: next(error)
+        Middleware-->>Controller: HTTP Response
+        App-->>Client: HTTP Response
+    end
+
+```
+
+## POST /check/transit/:type
+
+```mermaid
+sequenceDiagram
+    actor Client
+    participant App
+    participant Middleware
+    participant Controller
+    participant Service
+    participant DAO
+    participant ORM
+    participant ErrorFactory
+
+    Client->>App: DELETE /api/pay/:paymentId
+    App->>+Middleware: authenticateJWT
+    Middleware-->>-App: next()
+    App->>+Middleware: isUser
+    Middleware-->>-App: next()
+    App->>+Controller: createFineOrTransit(req)
+    alt data valid
+    Controller->>+Service: createFineOrTransit(licensePlate, parkingId, type)
+        Service->>+DAO: findActiveReservation(licensePlate, time, parkingId)
+        DAO->>+ORM: findOne(licensePlate, parkingId, startTime, endTime)
+        ORM-->>-DAO: Reservation
+        alt reservation exists
+            DAO-->>-Service: Reservation
+            Service->>DAO: createTransit(transitData)
+            DAO->>+ORM: create()
+            ORM-->>-DAO: Transit
+            DAO-->>Service: Transit
+            Service-->>Controller: Transit
+            Controller-->>App: HTTP Response 
+            App-->>Client: HTTP Response
+            else transit not found
+                Service->>+ErrorFactory: entityNotFound()
+                ErrorFactory-->>-Service: NotFound Error
+                Service-->>Controller: throw NotFound Error
+                Controller-->>Middleware: next(error)
+                Middleware-->>App: HTTP Response
+                App-->>Client: HTTP Response
+            else reservation not found
+            Service->>DAO: createFine(licensePlate, parkingId, reason)
+            DAO->>+ORM: create(id, licensePlate, parkingId, price, reason)
+            ORM-->>-DAO: Fine
+            DAO-->>Service: Fine
+            Service-->>Controller: Fine
+            else fine not found
+            Service->>+ErrorFactory: entityNotFound()
+                ErrorFactory-->>-Service: NotFound Error
+                Service-->>Controller: throw NotFound Error
+                Controller-->>Middleware: next(error)
+                Middleware-->>App: HTTP Response
+                App-->>Client: HTTP Response
+                end
+    else validation failed
+    Service->>+ErrorFactory: badRequest()
+        ErrorFactory-->>-Service: ValidationError
+        Service-->>Controller: throw ValidationError
+        Controller-->>Middleware: next(error)
+        Middleware-->>Controller: HTTP Response
+        App-->>Client: HTTP Response
+    end
+
 
 ```
 
