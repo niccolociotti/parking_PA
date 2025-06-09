@@ -234,6 +234,9 @@ graph TD
     System --> GenerateJSON
     System --> GeneratePDF
     System --> GenerateCSV
+    System --> checkCapacity
+    System --> checkClosedData
+    System --> validateUUID
 
     createReservation -->authenticateJWT
     getReservation -->authenticateJWT
@@ -855,7 +858,7 @@ sequenceDiagram
     end
 
 ```
-# GET /api/pay/:paymentId
+## GET /api/pay/:paymentId
 ```mermaid
 sequenceDiagram
     actor Client
@@ -884,6 +887,8 @@ sequenceDiagram
           alt reservation exists
             DAO->>+ORM: findById(userId)
             ORM-->>-DAO: User
+            Service->>Service:calculatePrice(pricePerMinute, startTime, endTime)
+            Service-->>Controller: Reservation
             DAO-->>-Service: Payment
             Service-->>-Controller: Payment
             Controller-->>App: HTTP Response
@@ -914,7 +919,7 @@ sequenceDiagram
   end
 
 ```
-# DELETE	/api/paymentslip/:id
+## DELETE	/api/paymentslip/:id
 ```mermaid
 sequenceDiagram
     actor Client
@@ -971,6 +976,76 @@ sequenceDiagram
       Middleware-->>App: HTTP Response
       App-->>Client: HTTP Response
   end
+
+```
+
+##DELETE /api/pay/:paymentId
+
+```mermaid
+sequenceDiagram
+    actor Client
+    participant App
+    participant Middleware
+    participant Controller
+    participant Service
+    participant DAO
+    participant ORM
+    participant ErrorFactory
+
+    Client->>App: DELETE /api/pay/:paymentId
+    App->>+Middleware: authenticateJWT
+    Middleware-->>-App: next()
+    App->>+Middleware: isUser
+    Middleware-->>-App: next()
+    App->>+Middleware: validataeUUID
+    Middleware-->>-App: next()
+    App->>+Controller: deletePayment(req)
+    alt data valid
+    Controller->>+Service: deletePayment(paymentId)
+        Service->>+DAO: findById(paymentId)
+        DAO->>+ORM: findByPk(paymentId)
+        ORM-->>-DAO: Payment
+        alt payment exists
+        Service->>DAO:findById(reservationId)
+        DAO->>+ORM: findByPk(reservationId)
+        ORM-->>-DAO: Reservation
+        alt reservation exists
+        Service->>+DAO: update status
+        DAO->>+ORM: save()
+        ORM-->>-DAO: Reservation
+        Service->>Service:calculatePrice(pricePerMinute, startTime, endTime)
+        Service-->>Controller: Reservation
+        DAO->>+ORM:delete(paymentId)
+        ORM-->>-DAO:deletedPayment
+        end
+            DAO-->>-Service:  Payment deleted
+            Service-->>-Controller: Payment deleted
+            Controller-->>App: HTTP Response 
+            App-->>Client: HTTP Response
+            else payment not found
+            Service->>+ErrorFactory: entityNotFound()
+                ErrorFactory-->>-Service: NotFound Error
+                Service-->>Controller: throw NotFound Error
+                Controller-->>Middleware: next(error)
+                Middleware-->>App: HTTP Response
+                App-->>Client: HTTP Response
+            else reservation not found
+                Service->>+ErrorFactory: entityNotFound()
+                ErrorFactory-->>-Service: NotFound Error
+                Service-->>Controller: throw NotFound Error
+                Controller-->>Middleware: next(error)
+                Middleware-->>App: HTTP Response
+                App-->>Client: HTTP Response
+                end
+    else validation failed
+    Service->>+ErrorFactory: badRequest("Nessun campo da aggiornare.")
+        ErrorFactory-->>-Service: ValidationError
+        Service-->>Controller: throw ValidationError
+        Controller-->>Middleware: next(error)
+        Middleware-->>Controller: HTTP Response
+        App-->>Client: HTTP Response
+    end
+
 
 ```
 
