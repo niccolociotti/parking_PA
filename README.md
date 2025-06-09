@@ -322,6 +322,15 @@ erDiagram
         DATETIME createdAt
         DATETIME updatedAt
     }
+PAYMENTS{
+        STRING id PK
+        FLOAT price
+        STRING userId FK
+        STRING reservationId FK
+        FLOAT paymentAttemps
+        FLOAT remainTokens
+
+    }
 
     USERS ||--o{ RESERVATIONS : ha
     PARKINGS ||--o{ RESERVATIONS : ha
@@ -329,6 +338,8 @@ erDiagram
     PARKINGS ||--o{ TRANSITS : registra
     PARKINGS ||--o{ FINES : emette
     PARKINGS ||--o{ PARKINGCAPACITIES : ha
+    RESERVATIONS ||--||  PAYMENTS :ha
+    PAYMENTS ||--o{USERS : ha
 
 ```
 
@@ -588,12 +599,12 @@ sequenceDiagram
     App->>+Controller: getParkingCapacityByIdAndVehicleAndDayAndPeriod(req)
     Controller->>+Service: findByVehicleTypeAndDayAndPeriod(id, vehicle, startTime, period)
     alt data valid     
-      Service->>+DAO: findOne(id, vehicle)
+      Service->>+DAO: findByVehicleTypeAndDayAndPeriod(id, vehicle, startTime, endTime)
       DAO->+ORM: findOne(id, vehicle)
       ORM-->-DAO: Parking
       alt parking exist
         DAO->+ORM: count(id, status,startTime,endTime)
-        ORM-->-DAO: Reservation
+        ORM-->-DAO:  count Reservation
         DAO-->>-Service: capacity
         Service-->>Controller: capacity
         Controller-->>App: HTTP Response
@@ -861,7 +872,7 @@ sequenceDiagram
 | GET| `/api/reservations`| Recupero prenotazioni di un utente| ✅ |
 | DELETE| `/api/reservation/:id`| Cancellazione di una prenotazione| ✅ |
 | POST| `/api/reservation/update/:id`| Aggiornamenot della prenotazione | ✅ |
-| GET| `/api/pay/:reservationId`| Esecuzione del pagamento della prenotazione | ✅ |
+| GET| `/api/pay/:paymentId`| Esecuzione del pagamento della prenotazione | ✅ |
 | GET| `/api/paymentslip/:id`| Generazione del bollettino di una prenotazione | ✅ |
 | DELETE| `/api/pay/:reservationId`| Annullamento del pagamento di una prenotazione esclusivamente se il suo stato è in attesa.| ✅ |
 | GET| `/api/reservationsReport/:format`| Generazione di una report sulle prenotazioni | ✅ |
@@ -1311,37 +1322,34 @@ Authorization: Bearer {{JWT_TOKEN}}
 }
 ```
 
-# GET /api/pay/:reservationId
+# GET /api/pay/:paymentId
 ### Parametri
 
 | **Posizione**      | **Nome**   | **Tipo**  | **Descrizione**                                                                                    | **Obbligatorio** |
 |--------------------|------------|-----------|----------------------------------------------------------------------------------------------------|------------------|
-| Richiesta nel path | `reservationId` | `string`  | 	ID della prenotazione che si vuole pagare                                                                    | ✅               |
+| Richiesta nel path | `paymentId` | `string`  | 	ID del bollettino da pagare                                                              | ✅               |
 | Richiesta nel header | `Authorization` | `string`  | 	JWT di autenticazione: Bearer <token>                                                                              | ✅               |
 
 **Esempio di richiesta**
 
 ```http
-GET /api/reservation/pay/e40fa6c9-8e16-4305-86a6-14f10bdbb4e1 HTTP/1.1
+GET /api/reservation/pay/c9c9e9a1-c173-4788-ab1e-e4872e7a784c HTTP/1.1
 Authorization: Bearer {{JWT_TOKEN}}
 ```
 **Esempio di risposta** 
 
 ```json
 {
-   "message": "Pagamento effettuato.",
-    "reservation": {
-        "id": "e40fa6c9-8e16-4305-86a6-14f10bdbb4e1",
-        "status": "Prenotazione confermata",
-        "licensePlate": "CC123FF",
-        "vehicle": "moto",
+"message": "Pagamento effettuato.",
+    "payment": {
+        "id": "c9c9e9a1-c173-4788-ab1e-e4872e7a784c",
+        "price": 2430,
+        "reservationId": "1256d8af-2c40-4de2-8f38-0c113c883058",
+        "userId": "a2ed44b1-4694-4fe5-88e7-d670c0c31bd9",
         "paymentAttemps": 0,
-        "userId": "e603cb6d-97e3-435f-bdc3-38f28823e7cc",
-        "parkingId": "a4b69567-1fa7-43ef-b222-90db6a17ab76",
-        "startTime": "2025-06-07T15:49:41.865Z",
-        "endTime": "2025-06-12T15:49:41.865Z",
-        "createdAt": "2025-06-07T15:49:41.866Z",
-        "updatedAt": "2025-06-07T16:30:48.536Z"
+        "remainingTokens": 5140,
+        "createdAt": "2025-06-09T14:35:20.863Z",
+        "updatedAt": "2025-06-09T15:05:09.727Z"
     }
 }
 ```
