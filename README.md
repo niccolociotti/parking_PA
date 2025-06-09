@@ -356,6 +356,8 @@ sequenceDiagram
         ORM-->>-DAO: User
         DAO-->>-Service: genrateToken
         Service-->-Controller: token
+        Controller-->>App: HTTP Response
+        App-->>Client: HTTP Response
         else user not found
           Service->>+ErrorFactory: entityNotFound()
           ErrorFactory-->>-Service: NotFound Error
@@ -435,7 +437,7 @@ sequenceDiagram
         ORM-->>-DAO: Parking
         DAO-->>-Service: Parking
         Service-->>-Controller: Parking
-        Controller-->>App: HTTP Parking
+        Controller-->>App: HTTP Response Parking
         App-->>Client: HTTP Response
         else reservation not found
             Service->>+ErrorFactory: entityNotFound()
@@ -594,8 +596,7 @@ sequenceDiagram
         ORM-->-DAO: Reservation
         DAO-->>-Service: capacity
         Service-->>Controller: capacity
-        Controller-->>Middleware: capacity
-        Middleware-->>App: HTTP Response
+        Controller-->>App: HTTP Response
         App-->>Client: HTTP Response
       else parking not found
         Service->>+ErrorFactory: entityNotFound()
