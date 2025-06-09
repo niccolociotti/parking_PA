@@ -165,6 +165,7 @@ L’architettura si basa su una catena di middleware, ciascuno focalizzato su un
 
 - Validazione del JWT: verifica la presenza e la correttezza del token in ogni richiesta.
 - Autenticazione: estrae e conferma l’identità dell’utente dal token validato.
+- Validazione degli ID: controlla che tutti gli identificativi utilizzati nelle rotte siano UUID validi.
 - Gestione capacità e chiusure: controlla la disponibilità dei posti e rispetta i giorni di chiusura dei parcheggi.
 - Errore globale: un ultimo middleware intercetta tutte le eccezioni, trasformandole in risposte HTTP strutturate grazie all’ErrorFactory.
 Questa suddivisione rende la pipeline chiara e modulare.
@@ -480,6 +481,8 @@ sequenceDiagram
     Middleware-->>-App: next()
     App->>+Middleware: isOperator
     Middleware-->>-App: next()
+    App->>+Middleware: validataeUUID
+    Middleware-->>-App: next()
     App->>+Controller: DeleteParking(req)
     Controller->>+Service: delete(parkingId)
         Service->>+DAO: delete(parkingId)
@@ -517,6 +520,8 @@ sequenceDiagram
     Middleware-->>-App: next()
     App->>+Middleware: isOperator
     Middleware-->>-App: next()
+    App->>+Middleware: validataeUUID
+    Middleware-->>-App: next()
     App->>+Controller: getParking(req)
     Controller->>+Service: findById(parkingId)
         Service->>+DAO: findById(parkingId)
@@ -553,6 +558,8 @@ sequenceDiagram
     App->>+Middleware: authenticateJWT
     Middleware-->>-App: next()
     App->>+Middleware: isOperator
+    Middleware-->>-App: next()
+    App->>+Middleware: validataeUUID
     Middleware-->>-App: next()
     App->>+Controller: UpdateParking(req)
     alt data valid
@@ -599,6 +606,8 @@ sequenceDiagram
     participant ErrorFactory
 
     Client->>App: GET /info/parcheggi/:id/:vehicle/:data/:period
+    App->>+Middleware: validataeUUID
+    Middleware-->>-App: next()
     App->>+Controller: getParkingCapacityByIdAndVehicleAndDayAndPeriod(req)
     Controller->>+Service: findByVehicleTypeAndDayAndPeriod(id, vehicle, startTime, period)
     alt data valid     
@@ -714,6 +723,8 @@ sequenceDiagram
     Middleware-->>-App: next()
     App->>+Middleware: isUser
     Middleware-->>-App: next()
+    App->>+Middleware: validataeUUID
+    Middleware-->>-App: next()
     App->>+Controller: listById(req)
     Controller->>+Service: findReservationById(reservationId)
         Service->>+DAO: findById(reservationId)
@@ -788,6 +799,8 @@ sequenceDiagram
     App->>+Middleware: authenticateJWT
     Middleware-->>-App: next()
     App->>+Middleware: isUser
+    App->>+Middleware: validataeUUID
+    Middleware-->>-App: next()
     Middleware-->>-App: next()
     App->>+Controller: delete(req)
     Controller->>+Service: deleteReservation(reservationId)
@@ -826,6 +839,8 @@ sequenceDiagram
     App->>+Middleware: authenticateJWT
     Middleware-->>-App: next()
     App->>+Middleware: isUser
+    Middleware-->>-App: next()
+    App->>+Middleware: validataeUUID
     Middleware-->>-App: next()
     App->>+Controller: update(req)
     alt data valid
@@ -874,6 +889,8 @@ sequenceDiagram
     App->>+Middleware: authenticateJWT
     Middleware-->>-App: next()
     App->>+Middleware: isUser
+    Middleware-->>-App: next()
+    App->>+Middleware: validataeUUID
     Middleware-->>-App: next()
     App->>+Controller: pay(req)
     Controller->>+Service: payReservation(paymentId, userId)
@@ -935,6 +952,8 @@ sequenceDiagram
     App->>+Middleware: authenticateJWT
     Middleware-->>-App: next()
     App->>+Middleware: isUser
+    App->>+Middleware: validataeUUID
+    Middleware-->>-App: next()
     Middleware-->>-App: next()
     App->>+Controller: deletePayment(req)
     Controller->>+Service: deletePayment(paymentId)
@@ -979,7 +998,7 @@ sequenceDiagram
 
 ```
 
-##DELETE /api/pay/:paymentId
+## DELETE /api/pay/:paymentId
 
 ```mermaid
 sequenceDiagram
@@ -1046,6 +1065,11 @@ sequenceDiagram
         App-->>Client: HTTP Response
     end
 
+```
+
+## POST /operator/reports/reservations
+
+```mermaid
 
 ```
 
