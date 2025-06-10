@@ -366,8 +366,8 @@ sequenceDiagram
     App->>+Controller: login(req.Request, res:Response)
     Controller->>+Service: login
     alt data valid
-        Service->>+DAO: findByPk(userId)
-        DAO->>+ORM: findByPk(userId)
+        Service->>+DAO: findByEmail(email)
+        DAO->>+ORM: findOne(email)
         ORM-->>-DAO: User
         DAO-->>-Service: genrateToken
         Service-->-Controller: token
@@ -411,7 +411,7 @@ sequenceDiagram
     Controller->>+Service: create(name, address,capacity,closedData)
     alt data valid
         Service->>+DAO: create(data)
-        DAO->>+ORM: Parking
+        DAO->>+ORM: create(parking)
         ORM-->>-DAO: Parking
         DAO-->>-Service: Parking
         Service-->>-Controller: Parking
@@ -448,13 +448,13 @@ sequenceDiagram
     Controller->>+Service: findAll()
     alt parking exists
         Service->>+DAO: findAll()
-        DAO->>+ORM: Parking
+        DAO->>+ORM: findAll()
         ORM-->>-DAO: Parking
         DAO-->>-Service: Parking
         Service-->>-Controller: Parking
         Controller-->>App: HTTP Response Parking
         App-->>Client: HTTP Response
-        else reservation not found
+        else parking not found
             Service->>+ErrorFactory: entityNotFound()
             ErrorFactory-->>-Service: NotFound Error
             Service-->>Controller: throw NotFound Error
@@ -486,11 +486,11 @@ sequenceDiagram
     App->>+Controller: DeleteParking(req)
     Controller->>+Service: delete(parkingId)
         Service->>+DAO: delete(parkingId)
-        DAO->>+ORM: destroy()
+        DAO->>+ORM: destroyparkingId
         ORM-->>-DAO: Parking deleted
         alt parking exists
             DAO-->>-Service: Parking deleted
-            Service-->>-Controller: Parking
+            Service-->>-Controller: Parking deleted
             Controller-->>App: HTTP Response ( Parking )
             App-->>Client: HTTP Response
             else parking not found
@@ -525,8 +525,8 @@ sequenceDiagram
     App->>+Controller: getParking(req)
     Controller->>+Service: findById(parkingId)
         Service->>+DAO: findById(parkingId)
-        DAO->>+ORM: findByPk(reservationId)
-        ORM-->>-DAO: Reservation
+        DAO->>+ORM: findByPk(parkingId)
+        ORM-->>-DAO: Parking
         alt parking exists
             DAO-->>-Service: Parking
             Service-->>-Controller: Parking
@@ -2292,6 +2292,12 @@ Chiave pubblica
 openssl rsa -in jwtRS256.key -pubout -outform PEM -out
 jwtRS256.key.pub
 ```
+
+Una volta create, le chiavi devono essere copiate in un volume docker con il comando
+```bash
+docker run --rm -v keys-volume:/keys -v $(pwd):/rootdir busybox sh -c "cp /rootdir/jwtRS256.key /keys/ && cp /rootdir/jwtRS256.key.pub /keys/"
+```
+
 ### Passo 4
 
 Successivamente, a partire dalla cartella `parking_PA`(la directory principale del progetto), si può avviare l'applicazione eseguendo il seguente comando:
