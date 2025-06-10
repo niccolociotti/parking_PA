@@ -936,7 +936,7 @@ sequenceDiagram
   end
 
 ```
-## DELETE	/api/paymentslip/:id
+## GET	/api/paymentslip/:id
 ```mermaid
 sequenceDiagram
     actor Client
@@ -952,49 +952,51 @@ sequenceDiagram
     App->>+Middleware: authenticateJWT
     Middleware-->>-App: next()
     App->>+Middleware: isUser
-    App->>+Middleware: validataeUUID
+    App->>+Middleware: validateUUID
     Middleware-->>-App: next()
     Middleware-->>-App: next()
-    App->>+Controller: deletePayment(req)
-    Controller->>+Service: deletePayment(paymentId)
-    alt payment valid
-        Service->>+DAO: findById(paymentId)
-        DAO->>+ORM: findByPk(paymentId)
-        ORM-->>-DAO: Payment
-        alt reservation exists
-          DAO->>+ORM: findById(payment.reservationId)
-          ORM-->>-DAO: Reservation
-          alt payment exists
-            DAO->>+ORM: destroy(paymentId)
-            ORM-->>-DAO: Payment deleted
-            DAO-->>-Service: Payment deleted
-            Service-->>-Controller: Payment deleted
-            Controller-->>App: HTTP Response
+    App->>+Controller: downloadPaymentSlip(req)
+    Controller->>+Service: downloadPaymentSlip(reservationId,user.id)
+    alt reservation exists
+      Service->>+DAO: findById(reservationId)
+      DAO->>+ORM: findByParkingAndType(reservation.parkingId, reservation.vehicle)
+      ORM-->>-DAO: Parking
+      alt parking exists
+        DAO->>+ORM: findById(reservation.userId)
+        ORM-->>-DAO: User
+        alt user exists
+            DAO->>+ORM: create(paymentData)
+            ORM-->>-DAO: Payment
+            DAO-->>-Service:  generateQrBuffer(paymentId, licensePlate, amount)
+            Service-->>-Controller: pdfBuffer
+            Controller-->>App: HTTP Response 
             App-->>Client: HTTP Response
-          else payment not found
-              Service->>+ErrorFactory: entityNotFound()
-              ErrorFactory-->>-Service: NotFound Error
-              Service-->>Controller: throw NotFound Error
-              Controller-->>Middleware: next(error)
-              Middleware-->>App: HTTP Response
-              App-->>Client: HTTP Response
-              end
-        else reservation not found
+
+        else user not found
             Service->>+ErrorFactory: entityNotFound()
             ErrorFactory-->>-Service: NotFound Error
             Service-->>Controller: throw NotFound Error
             Controller-->>Middleware: next(error)
             Middleware-->>App: HTTP Response
             App-->>Client: HTTP Response
-            end
-    else payment failed
-      Service->>+ErrorFactory: badRequest("Nessun campo da aggiornare.")
-      ErrorFactory-->>-Service: ValidationError
-      Service-->>Controller: throw ValidationError
+        end
+
+      else parking non found
+        Service->>+ErrorFactory: entityNotFound()
+        ErrorFactory-->>-Service: NotFound Error
+        Service-->>Controller: throw NotFound Error
+        Controller-->>Middleware: next(error)
+        Middleware-->>App: HTTP Response
+        App-->>Client: HTTP Response
+      end
+    else reservation non valid
+      Service->>+ErrorFactory: entityNotFound()
+      ErrorFactory-->>-Service: NotFound Error
+      Service-->>Controller: throw NotFound Error
       Controller-->>Middleware: next(error)
       Middleware-->>App: HTTP Response
       App-->>Client: HTTP Response
-  end
+    end
 
 ```
 
