@@ -486,7 +486,7 @@ sequenceDiagram
     App->>+Controller: DeleteParking(req)
     Controller->>+Service: delete(parkingId)
         Service->>+DAO: delete(parkingId)
-        DAO->>+ORM: destroyparkingId
+        DAO->>+ORM: destroy(parkingId)
         ORM-->>-DAO: Parking deleted
         alt parking exists
             DAO-->>-Service: Parking deleted
@@ -587,7 +587,7 @@ sequenceDiagram
         ErrorFactory-->>-Service: ValidationError
         Service-->>Controller: throw ValidationError
         Controller-->>Middleware: next(error)
-        Middleware-->>Controller: HTTP Response
+        Middleware-->>App: HTTP Response
         App-->>Client: HTTP Response
     end
 
@@ -868,7 +868,7 @@ sequenceDiagram
         ErrorFactory-->>-Service: ValidationError
         Service-->>Controller: throw ValidationError
         Controller-->>Middleware: next(error)
-        Middleware-->>Controller: HTTP Response
+        Middleware-->>App: HTTP Response
         App-->>Client: HTTP Response
     end
 
@@ -896,15 +896,17 @@ sequenceDiagram
     Controller->>+Service: payReservation(paymentId, userId)
     alt data valid
         Service->>+DAO: findById(paymentId)
-        DAO->>+ORM: findById(reservationId)
+        DAO->>+ORM: findByPk(reservationId)
         ORM-->>-DAO: Payment
+        DAO->>-Service: Payment
         alt payment exists
-          DAO->>+ORM: findById(payment.reservationId)
+          Service->>+DAO: findById(payment.reservationId)
+          DAO->>+ORM: findByPk(payment.reservationId)
           ORM-->>-DAO: Reservation
           alt reservation exists
-            DAO->>+ORM: findById(userId)
+            Service->>+DAO: findById(userId)
+            DAO->>+ORM: findByPk(userId)
             ORM-->>-DAO: User
-            Service->>Service:calculatePrice(pricePerMinute, startTime, endTime)
             Service-->>Controller: Reservation
             DAO-->>-Service: Payment
             Service-->>-Controller: Payment
@@ -959,10 +961,17 @@ sequenceDiagram
     Controller->>+Service: downloadPaymentSlip(reservationId,user.id)
     alt reservation exists
       Service->>+DAO: findById(reservationId)
-      DAO->>+ORM: findByParkingAndType(reservation.parkingId, reservation.vehicle)
-      ORM-->>-DAO: Parking
+      DAO->>+ORM: findByPk(reservationId)
+      ORM-->>-DAO: Reservation
+      DAO-->>-Service: Reservation
       alt parking exists
-        DAO->>+ORM: findById(reservation.userId)
+        Service->>+DAO: findByParkingAndType(reservation.parkingId, reservation.vehicle)
+        DAO->>+ORM: findOne(reservation.parkingId, reservation.vehicle)
+        ORM-->>-DAO: Parking
+        DAO-->>-Service: Parking
+        Service->>Service:calculatePrice(pricePerMinute, startTime, endTime)
+        Service->>+DAO: findById(reservation.userId)
+        DAO->>+ORM: findByPk(reservation.userId)
         ORM-->>-DAO: User
         alt user exists
             DAO->>+ORM: create(paymentData)
@@ -1061,7 +1070,7 @@ sequenceDiagram
         ErrorFactory-->>-Service: ValidationError
         Service-->>Controller: throw ValidationError
         Controller-->>Middleware: next(error)
-        Middleware-->>Controller: HTTP Response
+        Middleware-->>App: HTTP Response
         App-->>Client: HTTP Response
     end
 
@@ -1094,6 +1103,7 @@ sequenceDiagram
       ORM-->>-DAO: Reservation[]
       DAO->>-Service: Reservation[]
       Service->>-Controller: Reservation[]
+      Controller->>Controller: create PDF or Csv or JSON
       Controller-->>App: HTTP Response
       App-->>Client: HTTP Response
 
@@ -1149,7 +1159,7 @@ sequenceDiagram
         ErrorFactory-->>-Service: ValidationError
         Service-->>Controller: throw ValidationError
         Controller-->>Middleware: next(error)
-        Middleware-->>Controller: HTTP Response
+        Middleware-->>App: HTTP Response
         App-->>Client: HTTP Response
     end
 
@@ -1271,7 +1281,7 @@ sequenceDiagram
         ErrorFactory-->>-Service: ValidationError
         Service-->>Controller: throw ValidationError
         Controller-->>Middleware: next(error)
-        Middleware-->>Controller: HTTP Response
+        Middleware-->>App: HTTP Response
         App-->>Client: HTTP Response
     end
 ```
@@ -1302,10 +1312,13 @@ sequenceDiagram
       DAO->>+ORM: findByPk(userId)
       alt user exist
         ORM-->>-DAO: User
-        DAO->>DAO: user.tokens + delta
-        DAO->>+ORM: update(userId)
+        DAO->>-Service: User
+        Service->>Service: user.tokens + delta
+        Service->>+DAO: update(userId)
+        DAO->>+ORM: save()
         ORM-->>-DAO: User
         DAO->>-Service: User
+        Service->>-Controller: User
         Controller-->>App: HTTP Response (User )
         App-->>Client: HTTP Response
 
