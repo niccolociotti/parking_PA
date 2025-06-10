@@ -83,7 +83,7 @@ router.post('/reports/reservations',reservationController.postReservationsReport
 router.get('/stats/:parkingId',uuidMiddleware.validateUUID,parkingController.getStats);
 
 /**
- * @route POST /updateTokens
+ * @route PUT /user/tokens
  * @description Questa rotta consente agli operatori di aggiornare i token degli utenti.
  * Gli operatori possono inviare una richiesta POST per aggiornare i token associati agli utenti.
  * Il controller `operatorController` gestisce la logica per aggiornare i token e restituire una risposta appropriata.
@@ -91,6 +91,6 @@ router.get('/stats/:parkingId',uuidMiddleware.validateUUID,parkingController.get
  * @throws Se si verifica un errore durante l'aggiornamento dei token.
  */
 
-router.post('/updateTokens',  operatorController.updateTokens);
+router.put('/user/tokens', operatorController.updateTokens);
 
 export default router;

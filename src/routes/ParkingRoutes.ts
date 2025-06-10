@@ -64,11 +64,11 @@ router.delete('/parking/:id',uuidMiddleware.validateUUID, parkingController.Dele
 router.get('/parking/:id',uuidMiddleware.validateUUID, parkingController.getParking);
 
 /** Rotte per aggiornare un parcheggio
- * @route POST /parking/update/:id - Aggiornamento di un parcheggio
+ * @route PUT /parking/:id - Aggiornamento di un parcheggio
  * @param req - Request con parametro `id` del parcheggio da aggiornare e i dati nel body
  * @param res - Response con il parcheggio aggiornato
  * @param next - Funzione di middleware per gestire errori
  */
-router.post('/parking/update/:id',uuidMiddleware.validateUUID ,parkingController.UpdateParking);
+router.put('/parking/:id',uuidMiddleware.validateUUID ,parkingController.UpdateParking);
 
 export default router;

@@ -129,7 +129,6 @@ export class PaymentService {
     const reservation = await this.reservationDAO.findById(reservationId);
     if (!reservation) throw ErrorFactory.entityNotFound('Reservation');
 
-    console.log(reservation.status);
     if (reservation.status == Status.CONFIRMED) {
       throw ErrorFactory.customMessage('Reservation is already confirmed', StatusCodes.BAD_REQUEST);
     }
