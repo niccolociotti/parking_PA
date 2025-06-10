@@ -209,19 +209,13 @@ export class ParkingService {
     
     // 7) Fatturato totale (solo status CONFIRMED o COMPLETED)
 
-    const price: Record<string, number> = {};
-    parkingCapacity.forEach(cap => {
-      // cap.vehicle es. "auto", cap.price es. 2.5
-      price[cap.vehicle] = cap.price;
-  });
-
     let revenue = 0;
     allReservations.filter(r => r.status && [Status.CONFIRMED].includes(r.status as Status))
       .forEach(r => {
         // 4.a) Estrai il tipo di veicolo dalla prenotazione
         const veh = r.vehicle;
         // 4.b) Prendi la tariffa al minuto corrispondente
-        const pricePerMin = price[veh];      
+        const pricePerMin = priceByVehicle[veh];      
         // 4.d) Calcola il prezzo totale della singola prenotazione passando prezzo al minuto, startTime e endTime
         revenue += PaymentService.calculatePrice(pricePerMin, r.startTime, r.endTime);
       });    
