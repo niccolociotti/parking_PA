@@ -1276,10 +1276,59 @@ sequenceDiagram
         Middleware-->>Controller: HTTP Response
         App-->>Client: HTTP Response
     end
-
-
 ```
+## POST /operator/updateTokens
 
+```mermaid
+sequenceDiagram
+    actor Client
+    participant App
+    participant Middleware
+    participant Controller
+    participant Service
+    participant DAO
+    participant ORM
+    participant ErrorFactory
+
+    Client->>App: POST  /operator/updateTokens
+    App->>+Middleware: authenticateJWT
+    Middleware-->>-App: next()
+    App->>+Middleware: isUser
+    App->>+Middleware: validateUUID
+    Middleware-->>-App: next()
+    Middleware-->>-App: next()
+    App->>+Controller: updateTokens(req)
+    Controller->>+Service: updateTokens(userId, parseInt(delta))
+    alt data valid
+      Service->>+DAO: findById(userId)
+      DAO->>+ORM: findByPk(userId)
+      alt user exist
+        ORM-->>-DAO: User
+        DAO->>DAO: user.tokens + delta
+        DAO->>+ORM: update(userId)
+        ORM-->>-DAO: User
+        DAO->>-Service: User
+        Controller-->>App: HTTP Response (User )
+        App-->>Client: HTTP Response
+
+      else user not found
+        Service->>+ErrorFactory: entityNotFound()
+        ErrorFactory-->>-Service: NotFound Error
+        Service-->>Controller: throw NotFound Error
+        Controller-->>Middleware: next(error)
+        Middleware-->>App: HTTP Response
+        App-->>Client: HTTP Response
+      end
+
+    else data not valid
+      Service->>+ErrorFactory: customMessage("Formato non valido")
+      ErrorFactory-->>-Service: badRequest
+      Service-->>Controller: throw badRequest
+      Controller-->>Middleware: next(error)
+      Middleware-->>App: HTTP Response
+      App-->>Client: HTTP Response
+    end
+```
 # API Routes
 | Verbo HTTP | Endpoint | Descrzione | Autenticazione JWT |
 |:----------:|:--------:|:-----------:|:------------------:|
