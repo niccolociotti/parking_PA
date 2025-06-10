@@ -1068,7 +1068,46 @@ sequenceDiagram
     end
 
 ```
+## GET /api/reservationsReport/:format
 
+```mermaid
+sequenceDiagram
+    actor Client
+    participant App
+    participant Middleware
+    participant Controller
+    participant Service
+    participant DAO
+    participant ORM
+    participant ErrorFactory
+
+    Client->>App: GET /api/reservationsReport/:format
+    App->>+Middleware: authenticateJWT
+    Middleware-->>-App: next()
+    App->>+Middleware: isUser
+    App->>+Middleware: validateUUID
+    Middleware-->>-App: next()
+    Middleware-->>-App: next()
+    App->>+Controller: reportReservations(req)
+    Controller->>+Service: getReservationsReport(userId,parkingId, startTime, endTime)
+    alt data valid
+      Service->>+DAO: report(userId,parkingId, startTime, endTime)
+      DAO->>+ORM: findAll(whereClause)
+      ORM-->>-DAO: Reservation[]
+      DAO->>-Service: Reservation[]
+      Service->>-Controller: Reservation[]
+      Controller-->>App: HTTP Response
+      App-->>Client: HTTP Response
+
+    else data not valid
+      Service->>+ErrorFactory: customMessage("Formato non valido")
+      ErrorFactory-->>-Service: badRequest
+      Service-->>Controller: throw badRequest
+      Controller-->>Middleware: next(error)
+      Middleware-->>App: HTTP Response
+      App-->>Client: HTTP Response
+    end
+```
 ## POST /operator/reports/reservations
 
 ```mermaid
@@ -1117,7 +1156,64 @@ sequenceDiagram
     end
 
 ```
+## GET /operator/stats/:parkingId
+```mermaid
+sequenceDiagram
+    actor Client
+    participant App
+    participant Middleware
+    participant Controller
+    participant Service
+    participant DAO
+    participant ORM
+    participant ErrorFactory
 
+    Client->>App: GET  /operator/stats/:parkingId
+    App->>+Middleware: authenticateJWT
+    Middleware-->>-App: next()
+    App->>+Middleware: isUser
+    App->>+Middleware: validateUUID
+    Middleware-->>-App: next()
+    Middleware-->>-App: next()
+    App->>+Controller: getStats(req)
+    Controller->>+Service: getParkingStatistics(parkingId,startTime,endTime)
+    alt data valid
+      Service->>+DAO: findById(parkingId)
+      DAO->>+ORM: findByPk(id)
+      alt parking exist
+        ORM-->>-DAO: Parking
+        DAO->>-Service: Parking
+        Service->>+DAO: findByParkingsById(parkingId) 
+        DAO->>+ORM: findAll(parkingId)
+        ORM-->>-DAO: parkingCapacity[]
+        DAO->>-Service: parkingCapacity[]
+        Service->>+DAO: findAllByParkingAndPeriod(parkingId,startTime,endTime) 
+        DAO->>+ORM: findAll(whereClause)
+        ORM-->>-DAO: Reservation[]
+        DAO->>-Service: Reservation[]
+        Service->>-Controller: averageOccupancy,contemporaryMaxOccupancy,contemporaryMinOccupancy, revenue,rejectedCount,mostRequestedSlot
+        Controller-->>App: HTTP Response (report )
+        App-->>Client: HTTP Response
+
+      else parking not found
+        Service->>+ErrorFactory: entityNotFound()
+        ErrorFactory-->>-Service: NotFound Error
+        Service-->>Controller: throw NotFound Error
+        Controller-->>Middleware: next(error)
+        Middleware-->>App: HTTP Response
+        App-->>Client: HTTP Response
+      end
+
+    else data not valid
+      Service->>+ErrorFactory: customMessage("Formato non valido")
+      ErrorFactory-->>-Service: badRequest
+      Service-->>Controller: throw badRequest
+      Controller-->>Middleware: next(error)
+      Middleware-->>App: HTTP Response
+      App-->>Client: HTTP Response
+    end
+
+```
 ## POST /check/transit/:type
 
 ```mermaid
