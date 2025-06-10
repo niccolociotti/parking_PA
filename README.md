@@ -541,7 +541,7 @@ sequenceDiagram
                 App-->>Client: HTTP Response
     end
 ```
-## POST /park/parking/update/:id
+## PUT /park/parking/:id
 
 ```mermaid
 sequenceDiagram
@@ -554,7 +554,7 @@ sequenceDiagram
     participant ORM
     participant ErrorFactory
 
-    Client->>App: POST /park/parking/update/:id
+    Client->>App: PUT /park/parking/:id
     App->>+Middleware: authenticateJWT
     Middleware-->>-App: next()
     App->>+Middleware: isOperator
@@ -823,7 +823,7 @@ sequenceDiagram
 
 ```
 
-## POST /api/reservation/update/:id
+## PUT /api/reservation/:id
 ```mermaid
 sequenceDiagram
     actor Client
@@ -835,7 +835,7 @@ sequenceDiagram
     participant ORM
     participant ErrorFactory
 
-    Client->>App: POST /api/reservation/update/:id
+    Client->>App: PUT /api/reservation/:id
     App->>+Middleware: authenticateJWT
     Middleware-->>-App: next()
     App->>+Middleware: isUser
@@ -1034,8 +1034,6 @@ sequenceDiagram
         Service->>+DAO: update status
         DAO->>+ORM: save()
         ORM-->>-DAO: Reservation
-        Service->>Service:calculatePrice(pricePerMinute, startTime, endTime)
-        Service-->>Controller: Reservation
         DAO->>+ORM:delete(paymentId)
         ORM-->>-DAO:deletedPayment
         end
@@ -1277,7 +1275,7 @@ sequenceDiagram
         App-->>Client: HTTP Response
     end
 ```
-## POST /operator/updateTokens
+## PUT /operator/user/tokens
 
 ```mermaid
 sequenceDiagram
@@ -1290,7 +1288,7 @@ sequenceDiagram
     participant ORM
     participant ErrorFactory
 
-    Client->>App: POST  /operator/updateTokens
+    Client->>App: PUT  /operator/user/tokens
     App->>+Middleware: authenticateJWT
     Middleware-->>-App: next()
     App->>+Middleware: isUser
@@ -1337,13 +1335,13 @@ sequenceDiagram
 | GET| `/park/parkings`| Recupero della lista dei parcheggi | ✅|
 | DELETE| `/park/parking:id`| Cancellazione di un parcheggio| ✅|
 | GET| `/park/parking/:id`| Recupero infomazioni di un parcheggio| ✅ |
-| POST| `/park/parking/update/:id`| Aggiornamento parametri percheggio | ✅ |
+| PUT| `/park/parking/:id`| Aggiornamento parametri percheggio | ✅ |
 | GET| `/info/parcheggi/:id/:vehicle/:data/:period`| Verifica della disponibilità di un parcheggio | ❌ |
 | POST| `/api/reservation`| Creazione di una prenotazione | ✅ |
 | GET| `/api/reservation/:id`| Recupero informazioni di una prenotazione | ✅ |
 | GET| `/api/reservations`| Recupero prenotazioni di un utente| ✅ |
 | DELETE| `/api/reservation/:id`| Cancellazione di una prenotazione| ✅ |
-| POST| `/api/reservation/update/:id`| Aggiornamenot della prenotazione | ✅ |
+| PUT| `/api/reservation/:id`| Aggiornamenot della prenotazione | ✅ |
 | GET| `/api/pay/:paymentId`| Esecuzione del pagamento della prenotazione | ✅ |
 | GET| `/api/paymentslip/:id`| Generazione del bollettino di una prenotazione | ✅ |
 | DELETE| `/api/pay/:paymentId`| Annullamento del pagamento di una prenotazione esclusivamente se il suo stato è in attesa.| ✅ |
@@ -1351,7 +1349,7 @@ sequenceDiagram
 | POST| `/operator/reports/reservations`| Generazione di una report sulle prenotazioni degli utenti| ✅ |
 | GET| `/operator/stats/:parkingId`|Generazione di una report sulle prenotazioni di un parcheggio | ✅ |
 | POST| `/check/transit/:type`|Acquisizione del trasito di un vericolo per la generazione di una multa | ✅ |
-| POST| `/operator/updateTokens` | Modifica dei token dell'utente| ✅ |
+| PUT| `/operator/user/tokens` | Modifica dei token dell'utente| ✅ |
 
 # POST /login
 **Parametri**
@@ -1513,7 +1511,7 @@ Authorization: Bearer {{JWT_TOKEN}}
     "updatedAt": "2025-06-06T10:06:21.095Z"
 }
 ```
-# POST /parking/update/:id
+# PUT /parking/:id
 **Parametri**
 | Posizione | Nome    | Tipo     | Descrizione  |Obbligatorio  |
 |:---------:|:-------:|:--------:|:------------:|:------------:|
@@ -1526,7 +1524,7 @@ Authorization: Bearer {{JWT_TOKEN}}
 **Esempio di richiesta**
 
 ```http
-POST /parking/update/66fe25c9-a390-4326-8193-99b0513ad973 HTTP/1.1
+PUT /parking/66fe25c9-a390-4326-8193-99b0513ad973 HTTP/1.1
 Content-Type: application/json
 Authorization: Bearer {{JWT_TOKEN}}
 ```
@@ -1753,7 +1751,7 @@ Authorization: Bearer {{JWT_TOKEN}}
 }
 ```
 
-# POST /api/reservation/update/:id
+# PUT /api/reservation/:id
 ### Parametri
 
 | **Posizione**      | **Nome**   | **Tipo**  | **Descrizione**                                                                                    | **Obbligatorio** |
@@ -1765,7 +1763,7 @@ Authorization: Bearer {{JWT_TOKEN}}
 **Esempio di richiesta**
 
 ```http
-POST /api/reservation/update/e40fa6c9-8e16-4305-86a6-14f10bdbb4e1 HTTP/1.1
+PUT /api/reservation/e40fa6c9-8e16-4305-86a6-14f10bdbb4e1 HTTP/1.1
 Authorization: Bearer {{JWT_TOKEN}}
 ```
 ```json
@@ -2238,7 +2236,7 @@ oppure
     }
 }
 ```
-# POST operator/updateTokens
+# PUT operator/user/tokens
 **Parametri**
 | Posizione | Nome    | Tipo     | Descrizione  |Obbligatorio  |
 |:---------:|:-------:|:--------:|:------------:|:------------:|
@@ -2249,7 +2247,7 @@ oppure
 **Esempio di richiesta**
 
 ```http
-GET /operator/updateTokens HTTP/1.1
+PUT /operator/user/tokens HTTP/1.1
 Content-Type: application/json
 Authorization: Bearer {{JWT_TOKEN}}
 ```
