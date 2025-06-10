@@ -5,3 +5,4 @@ sync.ts
 repositories
 jwtRS256.key
 jwtRS256.key.pub
+coverage
