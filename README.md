@@ -2292,6 +2292,12 @@ Chiave pubblica
 openssl rsa -in jwtRS256.key -pubout -outform PEM -out
 jwtRS256.key.pub
 ```
+
+Una volta create, le chiavi devono essere copiate in un volume docker con il comando
+```bash
+docker run --rm -v keys-volume:/keys -v $(pwd):/rootdir busybox sh -c "cp /rootdir/jwtRS256.key /keys/ && cp /rootdir/jwtRS256.key.pub /keys/"
+```
+
 ### Passo 4
 
 Successivamente, a partire dalla cartella `parking_PA`(la directory principale del progetto), si può avviare l'applicazione eseguendo il seguente comando:
