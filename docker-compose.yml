@@ -13,7 +13,8 @@ services:
         condition: service_healthy
     command: npm start
     restart: always
-
+    volumes:
+      - keys-volume:/usr/src/app/keys:ro 
   db:
     image: postgres:13
     container_name: parking-postgres-database
@@ -29,3 +30,7 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
+
+volumes:
+  keys-volume:
+    name: keys-volume 

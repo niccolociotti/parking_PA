@@ -7,18 +7,19 @@ import dotenv from 'dotenv';
  */
 dotenv.config();
 
-// Percorsi delle chiavi
-//const PRIVATE_KEY_PATH = process.env.PRIVATE_KEY_PATH || path.join(__dirname, '../../jwtRS256.key');
-
-//const PUBLIC_KEY_PATH = process.env.PUBLIC_KEY_PATH || path.join(__dirname, '../../jwtRS256.key.pub');
-
 /**
  * Percorsi delle chiavi per la firma JWT.
  * @constant PRIVATE_KEY_PATH - Il percorso della chiave privata per la firma JWT.
  * @constant PUBLIC_KEY_PATH - Il percorso della chiave pubblica per la verifica della firma JWT.
  */
-const PRIVATE_KEY_PATH = path.join(__dirname, '../../jwtRS256.key');
-const PUBLIC_KEY_PATH =  path.join(__dirname, '../../jwtRS256.key.pub');
+// Percorsi delle chiavi
+const PRIVATE_KEY_PATH = process.env.PRIVATE_KEY_PATH || path.join(__dirname, '../../jwtRS256.key');
+
+const PUBLIC_KEY_PATH = process.env.PUBLIC_KEY_PATH || path.join(__dirname, '../../jwtRS256.key.pub');
+
+
+//const PRIVATE_KEY_PATH = path.join(__dirname, '../../jwtRS256.key');
+//const PUBLIC_KEY_PATH =  path.join(__dirname, '../../jwtRS256.key.pub');
 
 /**
  * Lettura della chiave privata e pubblica per la firma JWT.
