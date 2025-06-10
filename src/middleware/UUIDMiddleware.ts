@@ -1,4 +1,3 @@
-// src/middlewares/UUIDMiddleware.ts
 import { Request, Response, NextFunction } from 'express';
 import { validate as isUUID } from 'uuid';
 import { ErrorFactory } from '../factories/errorFactory';

@@ -12,6 +12,7 @@ services:
       db:
         condition: service_healthy
     command: npm start
+    restart: always
 
   db:
     image: postgres:13

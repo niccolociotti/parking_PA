@@ -34,8 +34,6 @@ export class TransitService {
 
         // Cerca una prenotazione attiva per la targa, data e parcheggio
         const reservation = await this.reservationDAO.findActiveReservation(licensePlate, time, parkingId);
-       
-        console.log("Prenotazione trovata:", reservation);
         
         if(!reservation) {
             // Se non c'è prenotazione valida, genera una multa
