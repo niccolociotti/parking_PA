@@ -27,7 +27,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"userId\": \"ab7c99b2-1469-4f70-bba2-b60d6114ab6f\",\n    \"parkingId\": \"f42245be-29d9-4e9d-a84c-5a8082937d5f\",\n    \"licensePlate\": \"ATRYSA\",\n    \"vehicle\": \"auto\",\n    \"startTime\": \"23-06-2025\",\n    \"endTime\": \"25-06-2025\"\n}",
+							"raw": "{\n    \"userId\": \"a87216b4-bf8b-41b4-a0ce-34be9711aa4c\",\n    \"parkingId\": \"f79727cb-6c59-420c-b5ac-3c60a33edbc6\",\n    \"licensePlate\": \"ATRYSA\",\n    \"vehicle\": \"auto\",\n    \"startTime\": \"23-06-2025\",\n    \"endTime\": \"25-06-2025\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -95,7 +95,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:3000/api/reservation/9a14ba00-f7b7-49db-a089-3cfb6e08a5de",
+							"raw": "http://localhost:3000/api/reservation/12d61604-2506-4c77-8ff1-c1c10f1c4524",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -104,39 +104,7 @@
 							"path": [
 								"api",
 								"reservation",
-								"9a14ba00-f7b7-49db-a089-3cfb6e08a5de"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "getReservationsByUser",
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "{{JWT_TOKEN}}",
-									"type": "string"
-								}
-							]
-						},
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "http://localhost:3000/api/reservations/user/5fd090e1-2ba5-4afb-8218-708a4569a13b",
-							"protocol": "http",
-							"host": [
-								"localhost"
-							],
-							"port": "3000",
-							"path": [
-								"api",
-								"reservations",
-								"user",
-								"5fd090e1-2ba5-4afb-8218-708a4569a13b"
+								"12d61604-2506-4c77-8ff1-c1c10f1c4524"
 							]
 						}
 					},
@@ -155,11 +123,11 @@
 								}
 							]
 						},
-						"method": "POST",
+						"method": "PUT",
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"status\":\"confdasskmklfmnkewnfgklaqwernermato\"\n}",
+							"raw": "{\n    \"licensePlate\": \"AAAAAA\",\n    \"vehicle\": \"moto\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -167,7 +135,7 @@
 							}
 						},
 						"url": {
-							"raw": "http://localhost:3000/api/reservation/update/99cff92d-c1ba-4726-a21a-10f4b12ad87b",
+							"raw": "http://localhost:3000/api/reservation/18c55197-7752-4062-b42f-953921285efd",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -176,8 +144,7 @@
 							"path": [
 								"api",
 								"reservation",
-								"update",
-								"99cff92d-c1ba-4726-a21a-10f4b12ad87b"
+								"18c55197-7752-4062-b42f-953921285efd"
 							]
 						}
 					},
@@ -199,7 +166,7 @@
 						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:3000/api/reservation/99cff92d-c1ba-4726-a21a-10f4b12ad87b",
+							"raw": "http://localhost:3000/api/reservation/661697de-be7c-4a4a-ab27-59eeeac750a5",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -208,46 +175,7 @@
 							"path": [
 								"api",
 								"reservation",
-								"99cff92d-c1ba-4726-a21a-10f4b12ad87b"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "check-access",
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "{{JWT_TOKEN}}",
-									"type": "string"
-								}
-							]
-						},
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"licensePlate\":\"AB124CD\",\n    \"parkingId\":\"c957e6f9-0f32-4aa2-b9ca-6275dc8ccb4a\"\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "http://localhost:3000/check/fine",
-							"protocol": "http",
-							"host": [
-								"localhost"
-							],
-							"port": "3000",
-							"path": [
-								"check",
-								"fine"
+								"661697de-be7c-4a4a-ab27-59eeeac750a5"
 							]
 						}
 					},
@@ -273,6 +201,15 @@
 						},
 						"method": "POST",
 						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\":\"Parcheggio Prova\",\n    \"address\":\"Via prova\",\n    \"capacity\":30,\n    \"closedData\":[\"2025-07-10\"]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
 						"url": {
 							"raw": "http://localhost:3000/park/parking",
 							"protocol": "http",
@@ -362,10 +299,19 @@
 								}
 							]
 						},
-						"method": "POST",
+						"method": "PUT",
 						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\":\"Provadsafcasd\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
 						"url": {
-							"raw": "http://localhost:3000/park/parking/update/",
+							"raw": "http://localhost:3000/park/parking/bda6b8b3-e90f-456c-8dcf-7154cb80e1f1",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -374,8 +320,7 @@
 							"path": [
 								"park",
 								"parking",
-								"update",
-								""
+								"bda6b8b3-e90f-456c-8dcf-7154cb80e1f1"
 							]
 						}
 					},
@@ -434,7 +379,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"email\": \"luigi@example.com\",\n    \"password\": \"luigi\"\n}",
+					"raw": "{\n    \"email\": \"luigi.bianchi@example.com\",\n    \"password\": \"luigi\"\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -503,7 +448,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"plates\": [\n        \"AB124CD\",\n        \"AB123CD\"\n    ],\n    \"start\": \"01-06-2025\",\n    \"end\": \"02-07-2025\",\n    \"format\": \"pdf\"\n}",
+					"raw": "{\n    \"licensePlates\": [\n        \"AB124CD\",\n        \"ZZ123YY\"\n    ],\n    \"start\": \"14-07-2025\",\n    \"end\": \"02-09-2025\",\n    \"format\": \"json\"\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -542,7 +487,7 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://localhost:3000/operator/stats/c53c6174-2dc6-4b9c-96d1-64d124ac24cd?start=31-05-2025 08:00&end=02-08-2025 20:00",
+					"raw": "http://localhost:3000/operator/stats/f2ec3c81-649d-46a9-b9df-c6ad73f18262?start=31-05-2025 08:00&end=02-08-2025 20:00",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -551,7 +496,7 @@
 					"path": [
 						"operator",
 						"stats",
-						"c53c6174-2dc6-4b9c-96d1-64d124ac24cd"
+						"f2ec3c81-649d-46a9-b9df-c6ad73f18262"
 					],
 					"query": [
 						{
@@ -604,7 +549,7 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://localhost:3000/info/parcheggi/e241bccc-96b5-40ad-be7c-b7e79be91a65/auto/2025-07-01/10",
+					"raw": "http://localhost:3000/info/parcheggi/f79727cb-6c59-420c-b5ac-3c60a33edbc6/auto/2025-07-01/10",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -613,7 +558,7 @@
 					"path": [
 						"info",
 						"parcheggi",
-						"e241bccc-96b5-40ad-be7c-b7e79be91a65",
+						"f79727cb-6c59-420c-b5ac-3c60a33edbc6",
 						"auto",
 						"2025-07-01",
 						"10"
@@ -638,7 +583,7 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://localhost:3000/api/reservationsReport/044e84b7-8db5-4f1b-a7b0-f4131e1a4122/json?start=01-03-2025&end=04-06-2025&parkingId=e241bccc-96b5-40ad-be7c-b7e79be91a65",
+					"raw": "http://localhost:3000/api/reservationsReport/json?start=01-03-2025&end=12-07-2025&parkingId=f79727cb-6c59-420c-b5ac-3c60a33edbc6",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -647,7 +592,6 @@
 					"path": [
 						"api",
 						"reservationsReport",
-						"044e84b7-8db5-4f1b-a7b0-f4131e1a4122",
 						"json"
 					],
 					"query": [
@@ -657,12 +601,121 @@
 						},
 						{
 							"key": "end",
-							"value": "04-06-2025"
+							"value": "12-07-2025"
 						},
 						{
 							"key": "parkingId",
-							"value": "e241bccc-96b5-40ad-be7c-b7e79be91a65"
+							"value": "f79727cb-6c59-420c-b5ac-3c60a33edbc6"
 						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "abortPayment",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{JWT_TOKEN}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3000/api/pay/c9c9e9a1-c173-4788-ab1e-e4872e7a784c",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"pay",
+						"c9c9e9a1-c173-4788-ab1e-e4872e7a784c"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "newTransit",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{JWT_TOKEN}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"licensePlate\": \"ZZ123YY\",\n    \"parkingId\": \"bff72ce4-d228-4eba-88c2-ecbd486a0bb6\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3000/check/transit/ingresso",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"check",
+						"transit",
+						"ingresso"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "updateTokens",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{JWT_TOKEN}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"userId\":\"12dd5b52-cb3e-4b8b-b814-81746c2b1cb3\",\n    \"delta\":\"100\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:3000/operator/updateTokens",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"operator",
+						"updateTokens"
 					]
 				}
 			},
