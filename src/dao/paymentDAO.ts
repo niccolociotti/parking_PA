@@ -10,6 +10,7 @@ import { PaymentCreationAttributes } from '../models/payment';
 interface PaymentDAOInterface {
   create(data: Payment): Promise<Payment>;
   findById(id: string): Promise<Payment | null>;
+  findByReservationId(reservationId: string): Promise<Payment | null>
   delete(id: string): Promise<number>;
 }
 
@@ -35,6 +36,15 @@ export class PaymentDAO implements PaymentDAOInterface {
    */
   async findById(id: string): Promise<Payment | null> {
     return await Payment.findByPk(id);
+  }
+
+   /**
+   * Trova un pagamento tramite ID
+   * @param id - ID della prenotazione
+   * @returns Il pagamento trovato o null se non esiste
+   */
+  async findByReservationId(reservationId: string): Promise<Payment | null> {
+    return await Payment.findOne({ where: { reservationId } });
   }
 
   /**

@@ -14,8 +14,9 @@ import { Status } from '../utils/Status';
 interface ReservationDAOInterface {
     create(data: Reservation): Promise<Reservation>;
     update(id: string, updates:Partial<Reservation>): Promise<Reservation | null>;
-    findAllByUser(userId:string): Promise<Reservation[]>;
     findById(id: string): Promise<Reservation | null>;
+    findAllByUser(userId:string): Promise<Reservation[]>;
+    findByIdAndUser(id: string,userId:string): Promise<Reservation | null>;
     delete(id: string): Promise<number>;
     findAll(): Promise<Reservation[]>;
     report(userId: string,parkingId?: string, startTime?: Date, endTime?: Date): Promise<Reservation[]>;
@@ -50,6 +51,15 @@ export class ReservationDAO implements ReservationDAOInterface {
         return await reservation.update(updates);
     }
 
+     /**
+     * Trova una prenotazione tramite ID.
+     * @param id - ID della prenotazione
+     * @returns La prenotazione trovata o null se non esiste
+     */
+    async findById(id: string): Promise<Reservation | null> {
+        return await Reservation.findByPk(id);
+    }
+
     /**
      * Trova tutte le prenotazioni di un utente.
      * @param userId - ID dell'utente
@@ -60,12 +70,15 @@ export class ReservationDAO implements ReservationDAOInterface {
     }
 
     /**
-     * Trova una prenotazione tramite ID.
+     * Trova una prenotazione tramite ID e User.
      * @param id - ID della prenotazione
+     * @param userId - ID dell'utente
      * @returns La prenotazione trovata o null se non esiste
      */
-    async findById(id: string): Promise<Reservation | null> {
-        return await Reservation.findByPk(id);
+    async findByIdAndUser(id: string,userId:string): Promise<Reservation | null> {
+        return await Reservation.findOne({
+            where: { id, userId }
+        });
     }
 
     /**

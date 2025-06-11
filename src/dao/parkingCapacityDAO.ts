@@ -5,6 +5,7 @@ import { ErrorFactory } from "../factories/errorFactory";
 import { Op } from "sequelize";
 import { Vehicles } from "../utils/Vehicles";
 import { Status } from "../utils/Status";
+import { StatusCodes } from "http-status-codes";
 
 /** ParkingCapacityDao per gestire le operazioni sulle capacità dei parcheggi nel database.
  * @class ParkingCapacityDao
@@ -47,13 +48,30 @@ export class ParkingCapacityDao implements IDaoParkingCapacityInterface {
    * @param vehicle - Tipo di veicolo
    * @return Promise<ParkingCapacity | null> - La capacità trovata o null se non esiste
    * */
-  async findByVeicleTypeAndDayAndPeriod(id: string, vehicle: string, startTime: Date, endTime: Date): Promise<ParkingCapacity | null> {
-    const capacity = await ParkingCapacity.findOne({ where: { parkingId: id, vehicle: vehicle } });
-    if (!capacity) {
-      throw ErrorFactory.entityNotFound("Parking Capacity");
-    } 
+  async findByVeicleTypeAndDayAndPeriod(parkingId: string, vehicle: string, startTime: Date, endTime: Date): Promise<ParkingCapacity | null> {
   
-    const prenotazioniAttive = await Reservation.count({ where: {parkingId: id , status: [Status.CONFIRMED, Status.PENDING],
+  const parking = await Parking.findByPk(parkingId);
+  if (!parking) {
+    throw ErrorFactory.entityNotFound('Parcheggio non trovato');
+  }
+
+  console.log(`Controllo capacità parcheggio ${parkingId} per veicolo ${vehicle}`);
+  // 2) Controllo del tipo di veicolo supportato in quel parcheggio
+  const capacityRecord = await ParkingCapacity.findOne({
+    where: { parkingId, vehicle }
+  });
+
+  console.log(`Capacità trovata: ${capacityRecord ? capacityRecord.capacity : 'Nessuna'}`);
+  if (!capacityRecord) {
+    throw ErrorFactory.customMessage(`Nessun posto per ${vehicle} in questo parcheggio`,StatusCodes.NOT_FOUND);
+  }
+
+  // 3) Controllo dei parametri di periodo
+  if (startTime >= endTime) {
+    throw ErrorFactory.badRequest('Intervallo di tempo non valido: la data di inizio deve essere precedente a quella di fine');
+  }
+  
+    const prenotazioniAttive = await Reservation.count({ where: {parkingId: parkingId , status: [Status.CONFIRMED, Status.PENDING],
         [Op.or]: [
           {
             startTime: { [Op.lt]: endTime },
@@ -61,9 +79,12 @@ export class ParkingCapacityDao implements IDaoParkingCapacityInterface {
           }
         ]
       }});
-    const availableCapacity = Math.max(0, capacity.capacity - prenotazioniAttive);
-    capacity.setDataValue('capacity', availableCapacity);
-    return capacity;
+    const available = Math.max(0, capacityRecord.capacity - prenotazioniAttive);
+     if (available === 0) {
+    throw ErrorFactory.customMessage('Nessun posto disponibile', StatusCodes.NOT_FOUND);
+  }
+    capacityRecord.setDataValue('capacity', available);
+    return capacityRecord;
   }
 
   /** Trova una capacità di parcheggio per ID e tipo di veicolo.

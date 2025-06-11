@@ -82,31 +82,14 @@ export class ReservationController {
    */
   listById = async (req: Request, res: Response, next: NextFunction) => {
     const reservationId = req.params.id;
+    const userId = (req as any).user.id as string;
     try {
-      const reservation = await this.reservationService.findReservationById(reservationId);
+      const reservation = await this.reservationService.findReservationByIdAndUser(reservationId, userId);
       if (reservation) {
         res.status(StatusCodes.OK).json(reservation);
       } else {
-        throw ErrorFactory.entityNotFound("Reservation");
+        throw ErrorFactory.entityNotFound("Reservation for this user");
       }
-    } catch (error) {
-      next(error);
-    }
-  }
-
-  /**
-   * Restituisce tutte le prenotazioni presenti nel sistema.
-   * Chiama il ReservationService per ottenere tutte le prenotazioni senza filtri.
-   * Usata nella rotta GET /reservations.
-   * @param req - Richiesta HTTP
-   * @param res - Risposta HTTP con tutte le prenotazioni
-   * @param next - Funzione per la gestione degli errori
-   * @returns Restituisce una risposta HTTP con tutte le prenotazioni o un errore se non trovate
-   */
-  list = async (req: Request, res: Response, next: NextFunction) => {
-    try {
-      const reservations = await this.reservationService.findAllReservations();
-      res.status(StatusCodes.OK).json(reservations);
     } catch (error) {
       next(error);
     }
@@ -121,8 +104,16 @@ export class ReservationController {
    * @returns Restituisce una risposta HTTP di conferma eliminazione o un errore se la prenotazione non esiste
    */
   delete = async (req: Request, res: Response) => {   
-    const deleted = await this.reservationService.deleteReservation(req.params.id);
+    const userId = (req as any).user.id as string;
 
+    const reservation = await this.reservationService.findReservationById(req.params.id);
+
+    if (userId!==reservation.userId) {  
+      throw ErrorFactory.badRequest("Non puoi eliminare questa prenotazione.");
+    }
+
+    const deleted = await this.reservationService.deleteReservation(req.params.id);
+   
     if (deleted > 0) {
     res.status(StatusCodes.OK).json({ message: `Reservation with ID ${req.params.id} deleted.` });
   } else {
@@ -161,6 +152,13 @@ export class ReservationController {
 }
 
     try {
+
+      const reservation = await this.reservationService.findReservationById(reservationId);
+
+      if (userId !== reservation.userId) {
+          throw ErrorFactory.forbidden("Non puoi aggiornare questa prenotazione.");
+            }      
+      
       const updatedReservation = await this.reservationService.updateReservation(reservationId, updates);
 
       if (updatedReservation) {
@@ -214,6 +212,10 @@ export class ReservationController {
         startTime,
         endTime,
       );
+
+      if (reservations.length === 0) {
+        throw ErrorFactory.entityNotFound("Reservations");
+      }
 
       // Restituisco JSON oppure genero PDF
       if (format === 'json') {

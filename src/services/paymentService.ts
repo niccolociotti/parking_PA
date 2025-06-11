@@ -12,6 +12,7 @@ import { PassThrough } from "stream";
 import { buffer } from "stream/consumers";
 import QRCode from 'qrcode';
 import {PaymentDAO} from "../dao/paymentDAO";
+import DatabaseConnection from "../database/databaseConnection";
 /**
  * Questa classe fornisce metodi per effettuare il pagamento di una prenotazione,
  * calcolare il prezzo in base a regole tariffarie, generare e scaricare la ricevuta PDF
@@ -19,6 +20,9 @@ import {PaymentDAO} from "../dao/paymentDAO";
  * automatica della prenotazione dopo 3 tentativi falliti.
  * @class PaymentService
  */
+
+const sequelize = DatabaseConnection.getInstance()
+
 export class PaymentService {
   constructor(
     private userDAO: UserDAO,
@@ -60,7 +64,7 @@ export class PaymentService {
     const price = Math.floor(payment.price);
 
     if (reservation.status == Status.CONFIRMED) {
-      throw ErrorFactory.customMessage('Prenotazione già confermata', StatusCodes.BAD_REQUEST);
+      throw ErrorFactory.badRequest('Prenotazione già confermata');
     }
 
     if (user.tokens >= price) {
@@ -130,7 +134,11 @@ export class PaymentService {
     if (!reservation) throw ErrorFactory.entityNotFound('Reservation');
 
     if (reservation.status == Status.CONFIRMED) {
-      throw ErrorFactory.customMessage('Reservation is already confirmed', StatusCodes.BAD_REQUEST);
+      throw ErrorFactory.badRequest('Reservation is already confirmed');
+    }
+
+    if (reservation.status === Status.REJECTED) {
+      throw ErrorFactory.badRequest('Reservation is rejected, cannot download payment slip');
     }
 
     if(reservation.userId !== userId)
@@ -144,6 +152,11 @@ export class PaymentService {
 
     const user = await this.userDAO.findById(reservation.userId);
     if (!user) throw ErrorFactory.entityNotFound('User');
+
+    const existing = await this.paymentDAO.findByReservationId(reservationId);
+    if (existing) {
+      throw ErrorFactory.badRequest('Bollettino già generato per questa prenotazione');
+    }
 
     //Genera UUID pagamento
     const paymentId = uuidv4();
@@ -205,7 +218,7 @@ export class PaymentService {
 
       const payment = await this.paymentDAO.findById(id);
       if (!payment?.reservationId) {
-        throw ErrorFactory.entityNotFound('Payment not associated with a reservation');
+        throw ErrorFactory.entityNotFound('Payment associated with this reservation');
       }
       const reservation = await this.reservationDAO.findById(payment.reservationId);
       if (!reservation) {

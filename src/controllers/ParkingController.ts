@@ -25,7 +25,7 @@ constructor(private parkingService: ParkingService) {}
 
     const { name, address,capacity, closedData } = req.body;
     if (!name || !address || !closedData) {
-     throw ErrorFactory.entityNotFound("Parking");;
+     throw ErrorFactory.badRequest("Insert all data");;
     }
 
     const parking = await this.parkingService.create(name, address,capacity,closedData );
@@ -98,16 +98,20 @@ constructor(private parkingService: ParkingService) {}
    * @param res - Response con oggetto parcheggio aggiornato
    * @param next - Funzione di middleware per gestire errori
    */
-  UpdateParking = async (req: Request, res: Response, next: NextFunction) => {
+  updateParking = async (req: Request, res: Response, next: NextFunction) => {
 
-    const status = req.body; 
-    const parkingid = req.params.id;
+    const updates = req.body; 
+    const parkingId = req.params.id;
 
-    if (!parkingid || !status) {
-      throw ErrorFactory.badRequest("ID del parcheggio o dati di aggiornamento mancanti");
+    if (!parkingId) {
+      throw ErrorFactory.badRequest("ID del parcheggio mancante");
+    }
+
+    if (!updates || Object.keys(updates).length === 0) {
+      throw ErrorFactory.badRequest("Dati di aggiornamento mancanti");
     }
     try {
-      const updatedParking = await this.parkingService.update(parkingid, status);
+      const updatedParking = await this.parkingService.update(parkingId, updates);
       if (updatedParking) {
         res.status(StatusCodes.OK).json(updatedParking);
       } else {

@@ -69,6 +69,6 @@ router.get('/parking/:id',uuidMiddleware.validateUUID, parkingController.getPark
  * @param res - Response con il parcheggio aggiornato
  * @param next - Funzione di middleware per gestire errori
  */
-router.put('/parking/:id',uuidMiddleware.validateUUID ,parkingController.UpdateParking);
+router.put('/parking/:id',uuidMiddleware.validateUUID ,parkingController.updateParking);
 
 export default router;

@@ -5,6 +5,7 @@ import { Fine } from "../models/fine";
 import { ErrorFactory } from "../factories/errorFactory";
 import { TransitType } from "../models/transit";
 import { Transit } from "../models/transit";
+import { ParkingService } from "../services/ParkingService";
 
 /**
  * Classe che fornisce un endpoint per registrare un transito (ingresso/uscita) di un veicolo in un parcheggio.
@@ -14,7 +15,7 @@ import { Transit } from "../models/transit";
  * @class FineTransitController
  */
 export class FineTransitController {   
-    constructor(private transitService: TransitService) {}
+    constructor(private transitService: TransitService, private parkingService : ParkingService) {}
     
     /**
      * Registra un transito o genera una multa se il transito non è valido.
@@ -29,6 +30,13 @@ export class FineTransitController {
       const type = req.params.type;
       const { licensePlate, parkingId } = req.body;
       try {
+        if (!licensePlate || !parkingId) {
+          throw ErrorFactory.badRequest("License plate and parking ID are required.");
+        }
+        const parking = await this.parkingService.findById(parkingId);
+        if (!parking) {
+          throw ErrorFactory.entityNotFound("Parking");
+        }
         const fineOrTransit = await this.transitService.creaTransitoFine(licensePlate, parkingId, type as TransitType);
         if (!fineOrTransit) {
           throw ErrorFactory.badRequest();

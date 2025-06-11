@@ -91,6 +91,14 @@ export class ReservationService {
     return reservations;
   }
 
+  async findReservationById(reservationId: string): Promise<Reservation> {
+    const reservation = await this.reservationDAO.findById(reservationId);
+    if (!reservation) {
+      throw ErrorFactory.entityNotFound('Reservation');
+    }
+    return reservation;
+  }
+
   /**
    * Restituisce una singola prenotazione dato il suo ID.
    * La funzione cerca la prenotazione tramite il DAO e restituisce i dettagli se trovata.
@@ -100,10 +108,10 @@ export class ReservationService {
    * @returns La prenotazione trovata
    * @throws Errore se la prenotazione non esiste
    */
-  async findReservationById(id: string): Promise<Reservation | null> {
-    const reservation = this.reservationDAO.findById(id);
+  async findReservationByIdAndUser(id: string,userId:string): Promise<Reservation | null> {
+    const reservation = this.reservationDAO.findByIdAndUser(id,userId);
     if(!reservation) {
-      throw ErrorFactory.entityNotFound('Reservation');
+      throw ErrorFactory.entityNotFound('Reservation for this user');
     }
     return reservation;
   }

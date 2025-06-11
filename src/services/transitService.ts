@@ -7,7 +7,6 @@ import { FineService } from './fineService';
 import { Fine } from '../models/fine';
 import { Status } from '../utils/Status';
 import { ErrorFactory } from '../factories/errorFactory';
-import { StatusCodes } from 'http-status-codes';
 
 /**
  * Questa classe fornisce metodi per registrare un transito (ingresso/uscita) di un veicolo in un parcheggio,
@@ -50,6 +49,7 @@ export class TransitService {
 
         // Se il transito avviene fuori dall'orario della prenotazione, genera una multa
         if ((time < reservation.startTime)||(time > reservation.endTime)) {
+            
             const fine = await this.fineService.createFine(
                 licensePlate,
                 parkingId,
@@ -72,7 +72,7 @@ export class TransitService {
                 throw new Error("Errore nella creazione della multa");
             }
             return fine;
-        }
+        }     
         
         // Se tutto è valido, registra il transito
         const transitData ={

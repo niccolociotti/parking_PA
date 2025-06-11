@@ -8,15 +8,20 @@ import { AuthMiddleware } from "../middleware/authMiddleware";
 import { UserDAO } from "../dao/userDAO";
 import { TransitDAO } from "../dao/transitDAO";
 import { ReservationDAO } from "../dao/reservationDAO";
+import { ParkingService } from "../services/ParkingService";
+import { ParkingDao } from "../dao/ParkingDao";
+
 
 const router = Router();
 
 const fineDAO = new FineDAO();
 const transitDAO = new TransitDAO();
+const parkingDao = new ParkingDao();
 const reservatioDAO = new ReservationDAO();
 const fineService = new FineService(fineDAO);
 const transitService = new TransitService(transitDAO,reservatioDAO,fineService);
-const fineController = new FineTransitController(transitService);
+const parkingService = new ParkingService(parkingDao,reservatioDAO);
+const fineController = new FineTransitController(transitService,parkingService);
 const userDAO = new UserDAO();
 const authService = new AuthService(userDAO);
 const authMiddleware = new AuthMiddleware(authService);
