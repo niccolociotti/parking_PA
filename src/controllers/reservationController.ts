@@ -187,7 +187,7 @@ export class ReservationController {
               throw ErrorFactory.badRequest("La data di inizio deve essere precedente alla data di fine.");
             }
           }
-        if (!Object.values(Vehicles).includes(updates.vehicle)) {
+        if (updates.vehicle && !Object.values(Vehicles).includes(updates.vehicle)) {
         throw ErrorFactory.badRequest("Veicolo non valido. Usa uno tra: " + Object.values(Vehicles).join(', '));
       }
       
