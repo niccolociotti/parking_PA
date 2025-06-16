@@ -27,6 +27,11 @@ constructor(private parkingService: ParkingService) {}
     if (!name || !address || !closedData) {
      throw ErrorFactory.badRequest("Insert all data");;
     }
+    closedData.forEach((date: string) => {
+      if (!parseDateString(date)) {
+        throw ErrorFactory.badRequest("Invalid date format in closedData");
+      }
+    });
 
     const parking = await this.parkingService.create(name, address,capacity,closedData );
     res.status(StatusCodes.CREATED).json(parking);

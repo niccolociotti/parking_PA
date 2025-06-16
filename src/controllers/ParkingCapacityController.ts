@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import { StatusCodes } from "http-status-codes";
 import { ErrorFactory } from "../factories/errorFactory";
 import { ParkingCapacityService } from "../services/parkingCapacityService";
+import { parseDateString } from "../helpers/dateParser";
 
 /**
  * Controller per gestire le operazioni sulle capacità dei parcheggi.
@@ -21,16 +22,19 @@ export class ParkingCapacityController {
      try {
        const parkingId = req.params.id;
        const vehicle = req.params.vehicle;
-       const startTime = new Date(req.params.data);
        const period = parseFloat(req.params.period as string);
 
-        if (!parkingId || !vehicle || !startTime || isNaN(period)) {
+        if (!parkingId || !vehicle || isNaN(period)) {
           throw ErrorFactory.customMessage("Parametri non corretti", StatusCodes.BAD_REQUEST);
         }
+        const parsedStartTime = parseDateString(req.params.data);
+        if (!parsedStartTime) {
+          throw ErrorFactory.customMessage("Data non valida", StatusCodes.BAD_REQUEST);
+        }
        
-       const endTime = new Date(startTime.getTime() + period * 60 * 60 * 1000);
+       const endTime = new Date(parsedStartTime.getTime() + period * 60 * 60 * 1000);
 
-       const parkingCapacity = await this.parkingCapacityService.findByVehicleTypeAndDayAndPeriod(parkingId, vehicle, startTime, endTime);
+       const parkingCapacity = await this.parkingCapacityService.findByVehicleTypeAndDayAndPeriod(parkingId, vehicle, parsedStartTime, endTime);
        if (parkingCapacity) {
          res.status(StatusCodes.OK).json({Disponibilità : parkingCapacity.capacity});
         } else {
