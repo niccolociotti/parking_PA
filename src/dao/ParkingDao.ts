@@ -1,3 +1,4 @@
+import { ErrorFactory } from "../factories/errorFactory";
 import { Parking, ParkingCreationAttributes } from "../models/parking";
 
 /** ParkingDao per gestire le operazioni sui parcheggi nel database.
@@ -56,7 +57,7 @@ export class ParkingDao implements IDaoParkingInterface {
   async update(id: string, updates: Partial<Parking>): Promise<Parking | null> {
     const parking = await Parking.findByPk(id);
     if (parking === null) {    
-      throw new Error(`Parking with id ${id} not found`);
+      throw ErrorFactory.entityNotFound(`Parking with id ${id}`);
       }
     return await parking.update(updates);
   }

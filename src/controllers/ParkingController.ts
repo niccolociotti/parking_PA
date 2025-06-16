@@ -115,6 +115,14 @@ constructor(private parkingService: ParkingService) {}
     if (!updates || Object.keys(updates).length === 0) {
       throw ErrorFactory.badRequest("Dati di aggiornamento mancanti");
     }
+
+    if (updates.closedData) {
+      updates.closedData.forEach((date: string) => {
+        if (!parseDateString(date)) {
+          throw ErrorFactory.badRequest("Formato data non valido in closedData");
+        }
+      });
+    }
     try {
       const updatedParking = await this.parkingService.update(parkingId, updates);
       if (updatedParking) {

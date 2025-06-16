@@ -44,6 +44,9 @@ export class ReservationController {
       if (parsedStartTime.getTime() >= parsedEndTime.getTime()) {
         throw ErrorFactory.badRequest("La data di inizio deve essere precedente alla data di fine.");
       }
+      if (!Object.values(Vehicles).includes(vehicle)) {
+        throw ErrorFactory.badRequest("Veicolo non valido. Usa uno tra: " + Object.values(Vehicles).join(', '));
+      }
 
       const capacityRejected = res.locals.capacityRejected;
 
@@ -172,8 +175,23 @@ export class ReservationController {
 
       if (userId !== reservation.userId) {
           throw ErrorFactory.forbidden("Non puoi aggiornare questa prenotazione.");
-            }      
+          }      
+
+          if(updates.startTime || updates.endTime) {
+            updates.startTime = parseDateString(updates.startTime);
+            updates.endTime = parseDateString(updates.endTime);
+            if (!updates.startTime || !updates.endTime) {
+              throw ErrorFactory.badRequest("Formati di data non validi. Usa “DD-MM-YYYY” o ISO.");
+            }
+            if (updates.startTime.getTime() >= updates.endTime.getTime()) {
+              throw ErrorFactory.badRequest("La data di inizio deve essere precedente alla data di fine.");
+            }
+          }
+        if (!Object.values(Vehicles).includes(updates.vehicle)) {
+        throw ErrorFactory.badRequest("Veicolo non valido. Usa uno tra: " + Object.values(Vehicles).join(', '));
+      }
       
+
       const updatedReservation = await this.reservationService.updateReservation(reservationId, updates);
 
       if (updatedReservation) {
