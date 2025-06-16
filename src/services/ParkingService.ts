@@ -6,7 +6,8 @@ import { ReservationDAO } from "../dao/reservationDAO";
 import { ParkingCapacityDao } from "../dao/parkingCapacityDAO";
 import { PaymentService } from "./paymentService";
 import { Status } from "../utils/Status";
-import { eachHourOfInterval, endOfHour } from "date-fns";
+import { eachHourOfInterval, endOfHour, subHours } from "date-fns";
+import { timeStamp } from "console";
 
 type DayOfWeek = 'Lun' | 'Mar' | 'Mer' | 'Gio' | 'Ven' | 'Sab' | 'Dom';
 
@@ -143,9 +144,11 @@ export class ParkingService {
     earliest.setMinutes(0, 0, 0);
     latest.setMinutes(0, 0, 0);
 
+    const cappedEnd = subHours(latest, 1); 
+
     const hours = eachHourOfInterval({
       start: earliest,
-      end: latest
+      end: cappedEnd
     });  
     const occupationPoints = hours.map(hourStart => {
       
@@ -198,6 +201,11 @@ export class ParkingService {
 
     // 6) Occupazione max e min
     const allOccValues = occupationPoints.map(p => p.occupied);
+    for (const point of occupationPoints) {
+  if (point.occupied === 0) {
+    console.log(`Slot alle ${point.timestamp}: occupazione = ${point.occupied}`);
+  }
+}
     const contemporaryMaxOccupancy = Math.max(...allOccValues);
     const contemporaryMinOccupancy = Math.min(...allOccValues);
 

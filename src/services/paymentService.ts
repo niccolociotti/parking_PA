@@ -46,7 +46,7 @@ export class PaymentService {
     const payment = await this.paymentDAO.findById(paymentId);
 
     if (!payment) 
-      throw ErrorFactory.entityNotFound('Reservation');
+      throw ErrorFactory.entityNotFound('Payment');
 
     if (!payment.reservationId) {
       throw ErrorFactory.customMessage('Pagamento non associato a una prenotazione valida', StatusCodes.BAD_REQUEST);
