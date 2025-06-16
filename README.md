@@ -54,7 +54,7 @@ L'obiettivo è realizzare un sistema di back-end per la gestione delle prenotazi
 - Implementazione delle operazioni CRUD per la gestione delle prenotazioni, con verifica al momento del transito per identificare eventuali veicoli non conformi alle prenotazioni effettuate.
 - Creazione di endpoint per fornire la disponibilità del parcheggio, in base alla tipologia di veicolo e alla fascia oraria richiesta.
 - Realizzazione di un workflow guidato per l’automobilista, che consenta la generazione del bollettino di pagamento e il successivo completamento del pagamento del parcheggio.
-- Sviluppo di statistiche di monitoraggio in grado di:
+- Sviluppo di statistiche di monitoraggio in grado di ottenere:
   - l'occupazione media parcheggio distinguendo per giorno della settimana e fascia oraria.
   - Occupazione massima
   - Occupazione minima
@@ -93,9 +93,11 @@ PARKING_PA/
 │   ├── utils
 │   └── app.ts
 │
+├── test
 ├── .dockerignore
 ├── .env
 ├── .gitignore
+├── docker-entrypoint.sh
 ├── docker-compose.yml
 ├── Dockerfile
 ├── jwkRS256.key
