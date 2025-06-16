@@ -1356,7 +1356,7 @@ sequenceDiagram
 | GET| `/api/reservation/:id`| Recupero informazioni di una prenotazione | ✅ |
 | GET| `/api/reservations`| Recupero prenotazioni di un utente| ✅ |
 | DELETE| `/api/reservation/:id`| Cancellazione di una prenotazione| ✅ |
-| PUT| `/api/reservation/:id`| Aggiornamenot della prenotazione | ✅ |
+| PUT| `/api/reservation/:id`| Aggiornamento della prenotazione | ✅ |
 | GET| `/api/pay/:paymentId`| Esecuzione del pagamento della prenotazione | ✅ |
 | GET| `/api/paymentslip/:id`| Generazione del bollettino di una prenotazione | ✅ |
 | DELETE| `/api/pay/:paymentId`| Annullamento del pagamento di una prenotazione esclusivamente se il suo stato è in attesa.| ✅ |
@@ -1848,7 +1848,7 @@ Authorization: Bearer {{JWT_TOKEN}}
 
 **Esempio di risposta (Formato PDF)**
 
-[Scarica il PDF](./pdf/payment-slip-938c89e4-7bbb-4143-b873-d5a56ff1a4fb.pdf)
+[Scarica il PDF](./pdf/payment-slip-b0dc1c76-c603-4aa2-b714-cd611dfe206b.pdf)
 
 # DELETE /api/pay/:paymentId
 ### Parametri
