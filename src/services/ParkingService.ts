@@ -6,6 +6,7 @@ import { ReservationDAO } from "../dao/reservationDAO";
 import { ParkingCapacityDao } from "../dao/parkingCapacityDAO";
 import { PaymentService } from "./paymentService";
 import { Status } from "../utils/Status";
+import { eachHourOfInterval, endOfHour } from "date-fns";
 
 type DayOfWeek = 'Lun' | 'Mar' | 'Mer' | 'Gio' | 'Ven' | 'Sab' | 'Dom';
 
@@ -142,58 +143,52 @@ export class ParkingService {
     earliest.setMinutes(0, 0, 0);
     latest.setMinutes(0, 0, 0);
 
-    const hourBins: Date[] = [];
-    let cursor = new Date(earliest);
-    while (cursor.getTime() <= latest.getTime()) {
-      hourBins.push(new Date(cursor));
-      cursor.setHours(cursor.getHours() + 1);
-    }
+    const hours = eachHourOfInterval({
+      start: earliest,
+      end: latest
+    });  
+    const occupationPoints = hours.map(hourStart => {
+      
+    const hourEnd = endOfHour(hourStart);
+    const occupied = allReservations.filter(r =>
+      [Status.PENDING, Status.CONFIRMED].includes(r.status as Status) &&
+      r.startTime < hourEnd &&
+      r.endTime > hourStart
+    ).length;
 
-    const occupationPoints: { timestamp: Date; occupied: number }[] = [];
-
-    hourBins.forEach(hourStart => {
-      const hourEnd = new Date(hourStart);
-      hourEnd.setHours(hourStart.getHours() + 1);
-
-      const countHere = allReservations.filter(r => {
-        // Solo prenotazioni “active” per occupazione
-        if (!r.status || ![Status.PENDING, Status.CONFIRMED].includes(r.status as Status)) return false;
-        // Verifica overlap con [hourStart, hourEnd)
-        return !(r.endTime <= hourStart || r.startTime >= hourEnd);
-      }).length;
-
-      occupationPoints.push({ timestamp: hourStart, occupied: countHere });
-    });
-
+    return { timestamp: hourStart, occupied }
+  })    
     const daysMap: DayOfWeek[] = ['Dom', 'Lun', 'Mar', 'Mer', 'Gio', 'Ven', 'Sab'];
-
+    
     // 5) Raggruppo per giorno della settimana e fascia oraria
     const groupByDayHour: Record<DayOfWeek, Record<string, number[]>> = {
       'Lun': {}, 'Mar': {}, 'Mer': {}, 'Gio': {}, 'Ven': {}, 'Sab': {}, 'Dom': {}
     };
-
+    
     occupationPoints.forEach(({ timestamp, occupied }) => {
-  // 1) Ottengo l’indice numerico del giorno (0 = Dom, 1 = Lun, …, 6 = Sab)
-  const dowIndex = timestamp.getDay(); 
-  
-  // 2) Converto in "Lun", "Mar", …, "Dom"
-  const dow: DayOfWeek = daysMap[dowIndex];
+    // 1) Ottengo l’indice numerico del giorno (0 = Dom, 1 = Lun, …, 6 = Sab)
+    const dowIndex = timestamp.getDay(); 
 
-  // 3) Creo la stringa per la fascia oraria, es. "08:00-09:00"
-  const hh = timestamp.getHours(); 
-  const slot = `${hh.toString().padStart(2, '0')}:00-${(hh + 1).toString().padStart(2, '0')}:00`;
+    // 2) Converto in "Lun", "Mar", …, "Dom"
+    const dow: DayOfWeek = daysMap[dowIndex];
 
-  // 4) Se non esiste ancora, inizializzo l’array
-  if (!groupByDayHour[dow][slot]) {
-    groupByDayHour[dow][slot] = [];
-  }
+    // 3) Creo la stringa per la fascia oraria, es. "08:00-09:00"
+    const hh = timestamp.getHours(); 
+    const slot = `${hh.toString().padStart(2, '0')}:00-${(hh + 1).toString().padStart(2, '0')}:00`;
 
-  // 5) Aggiungo il valore di occupazione
-  groupByDayHour[dow][slot].push(occupied);
+    // 4) Se non esiste ancora, inizializzo l’array
+    if (!groupByDayHour[dow][slot]) {
+      groupByDayHour[dow][slot] = [];
+    }
+    
+    // 5) Aggiungo il valore di occupazione
+    groupByDayHour[dow][slot].push(occupied);
 });
+
     const averageOccupancy: Record<DayOfWeek, Record<string, number>> = {
       'Lun': {}, 'Mar': {}, 'Mer': {}, 'Gio': {}, 'Ven': {}, 'Sab': {}, 'Dom': {}
     };
+
     Object.entries(groupByDayHour).forEach(([dow, slotMap]) => {
       (Object.entries(slotMap) as [string, number[]][]).forEach(([slot, arr]) => {
         const sum = arr.reduce((a, b) => a + b, 0);
@@ -212,11 +207,11 @@ export class ParkingService {
     let revenue = 0;
     allReservations.filter(r => r.status && [Status.CONFIRMED].includes(r.status as Status))
       .forEach(r => {
-        // 4.a) Estrai il tipo di veicolo dalla prenotazione
+        // Estrai il tipo di veicolo dalla prenotazione
         const veh = r.vehicle;
-        // 4.b) Prendi la tariffa al minuto corrispondente
+        // Prendi la tariffa al minuto corrispondente
         const pricePerMin = priceByVehicle[veh];      
-        // 4.d) Calcola il prezzo totale della singola prenotazione passando prezzo al minuto, startTime e endTime
+        // Calcola il prezzo totale della singola prenotazione passando prezzo al minuto, startTime e endTime
         revenue += PaymentService.calculatePrice(pricePerMin, r.startTime, r.endTime);
       });    
  

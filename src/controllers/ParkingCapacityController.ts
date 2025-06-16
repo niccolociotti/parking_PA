@@ -34,7 +34,7 @@ export class ParkingCapacityController {
        if (parkingCapacity) {
          res.status(StatusCodes.OK).json({Disponibilità : parkingCapacity.capacity});
         } else {
-          throw ErrorFactory.entityNotFound("Parking Capacity");
+          throw ErrorFactory.entityNotFound("Parking");
           }  
         } catch (error) {
           next(error);

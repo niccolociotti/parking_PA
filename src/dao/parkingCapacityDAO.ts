@@ -52,16 +52,13 @@ export class ParkingCapacityDao implements IDaoParkingCapacityInterface {
   
   const parking = await Parking.findByPk(parkingId);
   if (!parking) {
-    throw ErrorFactory.entityNotFound('Parcheggio non trovato');
+    throw ErrorFactory.entityNotFound('Parcheggio');
   }
-
-  console.log(`Controllo capacità parcheggio ${parkingId} per veicolo ${vehicle}`);
   // 2) Controllo del tipo di veicolo supportato in quel parcheggio
   const capacityRecord = await ParkingCapacity.findOne({
     where: { parkingId, vehicle }
   });
 
-  console.log(`Capacità trovata: ${capacityRecord ? capacityRecord.capacity : 'Nessuna'}`);
   if (!capacityRecord) {
     throw ErrorFactory.customMessage(`Nessun posto per ${vehicle} in questo parcheggio`,StatusCodes.NOT_FOUND);
   }
