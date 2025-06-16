@@ -438,25 +438,86 @@ export class ReservationController {
     }
 
     if (format === 'pdf') {
-      const pdfDoc = new PDFDocument();
+      const pdfDoc = new PDFDocument({ margin : 40, size: 'A4', layout: 'landscape', autoFirstPage: false});
       const filename = `reservations-${userId}.pdf`;
       const filePath = path.join(__dirname, '../../pdf', filename);
       await mkdir(path.dirname(filePath), { recursive: true });
       const writeStream = fs.createWriteStream(filePath);
       pdfDoc.pipe(writeStream);
 
-      pdfDoc.fontSize(20).text('Report Prenotazioni', { align: 'center' });
-      pdfDoc.moveDown();
+       // Aggiungo la prima pagina
+      pdfDoc.addPage();
+      const pageWidth = pdfDoc.page.width;
+      const leftMargin = pdfDoc.page.margins.left;
+      const rightMargin = pdfDoc.page.margins.right;
 
-      // Aggiungo le intestazioni
-      pdfDoc.fontSize(12).text('ID Prenotazione | Parking ID | Targa | Veicolo | Inizio | Fine | Stato');
-      pdfDoc.moveDown();
+      // Definisco posizioni X fisse per le colonne
+      const colX = {
+        id: leftMargin,
+        parking: leftMargin + 130,
+        plate: leftMargin + 260,
+        vehicle: leftMargin + 345,
+        start: leftMargin + 420,
+        end: leftMargin + 505,
+        status: leftMargin + 590,
+      };
+      // Altezza fissa riga
+      const rowHeight = 20;
 
-      // Aggiungo i dati delle prenotazioni
-      reservations.forEach(reservation => {
-        const startStr = new Date(reservation.startTime).toLocaleString('it-IT', { hour12: false });
-        const endStr = new Date(reservation.endTime).toLocaleString('it-IT', { hour12: false });
-        pdfDoc.text(`${reservation.id} | ${reservation.parkingId} | ${reservation.licensePlate} | ${reservation.vehicle} | ${startStr} | ${endStr} | ${reservation.status}`);
+      // Funzione per disegnare l’intestazione di pagina (header + colonne)
+      const drawHeader = () => {
+        pdfDoc.font('Helvetica-Bold').fontSize(18).text('Report Prenotazioni', { align: 'center' });
+        pdfDoc.moveDown(0.5);
+
+        const headerY = pdfDoc.y;
+        // Riga di intestazione colonna
+        pdfDoc.font('Helvetica-Bold').fontSize(12).fillColor('black');
+        pdfDoc.text('ID Prenot.',   colX.id,       headerY);
+        pdfDoc.text('Parking ID',   colX.parking,  headerY);
+        pdfDoc.text('Targa',        colX.plate,    headerY);
+        pdfDoc.text('Veicolo',      colX.vehicle,  headerY);
+        pdfDoc.text('Inizio',       colX.start,    headerY);
+        pdfDoc.text('Fine',         colX.end,      headerY);
+        pdfDoc.text('Stato',        colX.status,   headerY);
+        pdfDoc.moveDown(0.3);
+
+        // Riga orizzontale sotto l’intestazione
+        const yLine = pdfDoc.y;
+        pdfDoc.strokeColor('#AAAAAA').lineWidth(0.5)
+           .moveTo(leftMargin, yLine)
+           .lineTo(pageWidth - rightMargin, yLine)
+           .stroke();
+        pdfDoc.moveDown(0.5);
+      };
+
+      // Disegno l’intestazione sulla prima pagina
+      drawHeader();
+
+      // e) Righe dati
+      pdfDoc.font('Helvetica').fontSize(8).fillColor('black');
+      let currentY = pdfDoc.y;
+
+      reservations.forEach((r, index) => {
+        // Se supero il margine inferiore, aggiungo nuova pagina e re-disegno header
+        if (currentY + rowHeight > pdfDoc.page.height - pdfDoc.page.margins.bottom) {
+          pdfDoc.addPage();
+          drawHeader();
+          currentY = pdfDoc.y;
+        }
+
+        const startStr = new Date(r.startTime).toLocaleString('it-IT', { hour12: false });
+        const endStr   = new Date(r.endTime).toLocaleString('it-IT',   { hour12: false });
+
+        // Disegno ogni campo esattamente a X fisso
+        pdfDoc.text(r.id,           colX.id,     currentY, { width: 120, height: rowHeight });
+        pdfDoc.text(r.parkingId,    colX.parking, currentY, { width: 120, height: rowHeight });
+        pdfDoc.text(r.licensePlate, colX.plate,   currentY, { width: 80,  height: rowHeight });
+        pdfDoc.text(r.vehicle,      colX.vehicle, currentY, { width: 80,  height: rowHeight });
+        pdfDoc.text(startStr,       colX.start,   currentY, { width: 80,  height: rowHeight });
+        pdfDoc.text(endStr,         colX.end,     currentY, { width: 80,  height: rowHeight });
+        pdfDoc.text(r.status ?? '', colX.status,  currentY, { width: 100, height: rowHeight });
+
+        currentY += rowHeight;
       });
 
       pdfDoc.end();
