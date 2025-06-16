@@ -26,10 +26,12 @@ export class ReservationService {
    * @param licensePlate - Targa del veicolo da associare alla prenotazione
    * @param vehicle - Tipo di veicolo (auto, moto, ecc.)
    * @param status - Stato iniziale della prenotazione (es. "pending")
+   * @param parsedStartTime - Data e ora di inizio della prenotazione
+   * @param parsedEndTime - Data e ora di fine della prenotazione
    * @returns La prenotazione creata
    * @throws Errore se l'utente o il parcheggio non esistono
    */
-  async createReservation(userId: string, parkingId: string, licensePlate: string, vehicle: Vehicles, status: Status): Promise<Reservation> {
+  async createReservation(userId: string, parkingId: string, licensePlate: string, vehicle: Vehicles, status: Status, parsedStartTime: Date, parsedEndTime: Date): Promise<Reservation> {
   
     const user = await User.findByPk(userId);
     if (!user) throw ErrorFactory.entityNotFound("User");
@@ -37,10 +39,9 @@ export class ReservationService {
     const parking = await this.parkingDAO.findById(parkingId);
     if (!parking) throw ErrorFactory.entityNotFound("Parking");
 
-    const startTime = new Date();
-    const endTime = new Date(startTime);
-    endTime.setDate(startTime.getDate() + 5);
-
+    if (!Object.values(vehicle.trim).includes(vehicle as Vehicles)) {
+      throw ErrorFactory.entityNotFound("Vehicle type");
+    }
 
     const reservationData= {
       id: randomUUID(),
@@ -49,8 +50,8 @@ export class ReservationService {
       licensePlate,
       vehicle,
       status,
-      startTime,
-      endTime,
+      startTime: parsedStartTime,
+      endTime: parsedEndTime,
       paymentAttemps : 0
   }
     return this.reservationDAO.create(reservationData);

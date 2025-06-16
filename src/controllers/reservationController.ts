@@ -9,6 +9,7 @@ import path from 'path';
 import fs from 'fs';
 import { Parser as CsvParser } from 'json2csv';
 import { mkdir, writeFile } from 'fs/promises'; 
+import { Vehicles } from "../utils/Vehicles";
 
 
 
@@ -21,7 +22,7 @@ export class ReservationController {
    * Questa funzione riceve i dati della prenotazione dal body della richiesta, imposta lo stato in base alla disponibilità
    * (pending o rejected), e chiama il ReservationService per creare la prenotazione. Se la capacità è esaurita, restituisce errore.
    * Viene utilizzata nella rotta POST /reservation.
-   * @param req - Richiesta HTTP contenente userId, parkingId, licensePlate, vehicle
+   * @param req - Richiesta HTTP contenente userId, parkingId, licensePlate, vehicle,startTime, endTime
    * @param res - Risposta HTTP con la prenotazione creata o errore
    * @param next - Funzione per la gestione degli errori
    */
@@ -29,13 +30,27 @@ export class ReservationController {
     try {
 
       const userId = (req as any).user.id as string;
-      const { parkingId, licensePlate, vehicle} = req.body;
+      const { parkingId, licensePlate, vehicle, startTime, endTime} = req.body;
+
+      if (!userId || !parkingId || !licensePlate || !vehicle) {
+        throw ErrorFactory.badRequest("Tutti i campi sono obbligatori.");
+      }
+      const parsedStartTime = parseDateString(startTime);
+      const parsedEndTime = parseDateString(endTime);
+
+      if (!parsedStartTime || !parsedEndTime) {
+        throw ErrorFactory.badRequest("Formati di data non validi. Usa “DD-MM-YYYY” o ISO.");
+      }
+      if (parsedStartTime.getTime() >= parsedEndTime.getTime()) {
+        throw ErrorFactory.badRequest("La data di inizio deve essere precedente alla data di fine.");
+      }
 
       const capacityRejected = res.locals.capacityRejected;
 
       const finalStatus = capacityRejected ? Status.REJECTED : Status.PENDING;
 
-      const reservation = await this.reservationService.createReservation( userId, parkingId, licensePlate, vehicle,finalStatus);
+
+      const reservation = await this.reservationService.createReservation( userId, parkingId, licensePlate, vehicle,finalStatus, parsedStartTime, parsedEndTime);
       if(!res.locals.capacityRejected){
         res.status(StatusCodes.CREATED).json({Prenotazione:reservation});
       }else{
