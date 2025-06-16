@@ -175,18 +175,25 @@ export class ReservationController {
 
       if (userId !== reservation.userId) {
           throw ErrorFactory.forbidden("Non puoi aggiornare questa prenotazione.");
-          }      
-
-          if(updates.startTime || updates.endTime) {
-            updates.startTime = parseDateString(updates.startTime);
-            updates.endTime = parseDateString(updates.endTime);
+          } 
+    
+          if(updates.startTime) {
+            updates.startTime = parseDateString(updates.startTime as string);
+          }else {
+            updates.startTime = reservation.startTime;
+          }
+          if(updates.endTime) {
+            updates.endTime = parseDateString(updates.endTime as string);
+          }else {
+            updates.endTime = reservation.endTime;
+          }
+            
             if (!updates.startTime || !updates.endTime) {
               throw ErrorFactory.badRequest("Formati di data non validi. Usa “DD-MM-YYYY” o ISO.");
             }
             if (updates.startTime.getTime() >= updates.endTime.getTime()) {
               throw ErrorFactory.badRequest("La data di inizio deve essere precedente alla data di fine.");
             }
-          }
         if (updates.vehicle && !Object.values(Vehicles).includes(updates.vehicle)) {
         throw ErrorFactory.badRequest("Veicolo non valido. Usa uno tra: " + Object.values(Vehicles).join(', '));
       }

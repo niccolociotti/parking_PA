@@ -179,7 +179,6 @@ constructor(private parkingService: ParkingService) {}
     res.json({ parkingId, stats });
 
     }catch (error) {
-      console.error("Error in getStats:", error);
       next(error);
     }
   } 

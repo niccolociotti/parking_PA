@@ -26,15 +26,15 @@ export class ParkingMiddleware {
   checkCapacity = async (req: Request, res: Response, next: NextFunction ) => {
     try {
       const { parkingId, vehicle, startTime : startRaw ,endTime : endRaw } = req.body;
-      if (!parkingId || !vehicle ) {
-        throw ErrorFactory.badRequest();
+      if (!parkingId) {
+        throw ErrorFactory.badRequest("Manca il parametro 'parkingId'.");
       }
 
       const startTime = parseDateString(startRaw as string);
       const endTime = parseDateString(endRaw as string);
 
       if (!startTime || !endTime) {
-          throw ErrorFactory.badRequest();
+          throw ErrorFactory.badRequest("Formato data non valido. Usa 'DD-MM-YYYY' o ISO.");
         }
 
       if (!Object.values(Vehicles).includes(vehicle)) {

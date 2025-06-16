@@ -40,7 +40,6 @@ export class ReservationService {
     if (!parking) throw ErrorFactory.entityNotFound("Parking");
    
     if (!Object.values(Vehicles).includes(vehicle as Vehicles)) {
-      console.error(`Invalid vehicle type: ${vehicle}`,Vehicles);
       throw ErrorFactory.entityNotFound("Vehicle type");
     }
 
