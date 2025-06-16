@@ -3,7 +3,7 @@
  */
 export enum Vehicles {
     MOTO ='moto',
-    AUTO = 'auto ',
+    AUTO = 'auto',
     CARAVAN = 'caravan',
     CAMION = 'camion',
 }

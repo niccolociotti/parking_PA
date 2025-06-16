@@ -37,6 +37,10 @@ export class ParkingMiddleware {
           throw ErrorFactory.badRequest();
         }
 
+      if (!Object.values(Vehicles).includes(vehicle)) {
+        throw ErrorFactory.badRequest("Veicolo non valido. Usa uno tra: " + Object.values(Vehicles).join(', '));
+      }
+
       // 1) Recupero il record di capacità per quel parcheggio e quel tipo di veicolo
       const capacityRecord = await this.parkingCapacityDao.findByParkingAndType(parkingId, vehicle as Vehicles);
       if (!capacityRecord) {

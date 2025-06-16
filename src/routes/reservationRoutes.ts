@@ -76,7 +76,7 @@ router.delete("/reservation/:id",uuidMiddleware.validateUUID, reservationControl
  * @param res - Risposta da inviare al client
  * @param next - Funzione per passare al middleware successivo
  */
-router.put("/reservation/:id",uuidMiddleware.validateUUID,reservationController.update);
+router.put("/reservation/:id",uuidMiddleware.validateUUID, parkingMiddleware.checkCapacity, parkingMiddleware.checkParkingClosed, reservationController.update);
 
 /**
  * Rotta per effettuare il pagamento di una prenotazione

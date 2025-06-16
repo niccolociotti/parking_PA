@@ -38,8 +38,9 @@ export class ReservationService {
 
     const parking = await this.parkingDAO.findById(parkingId);
     if (!parking) throw ErrorFactory.entityNotFound("Parking");
-
-    if (!Object.values(vehicle.trim).includes(vehicle as Vehicles)) {
+   
+    if (!Object.values(Vehicles).includes(vehicle as Vehicles)) {
+      console.error(`Invalid vehicle type: ${vehicle}`,Vehicles);
       throw ErrorFactory.entityNotFound("Vehicle type");
     }
 
